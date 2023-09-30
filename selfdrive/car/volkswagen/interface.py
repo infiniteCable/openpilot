@@ -134,8 +134,8 @@ class CarInterface(CarInterfaceBase):
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
 
     elif candidate == CAR.POLO_MK6:
-      ret.mass = 1230
-      ret.wheelbase = 2.55
+      ret.mass = 1151
+      ret.wheelbase = 2.47
 
     elif candidate == CAR.SHARAN_MK2:
       ret.mass = 1639
