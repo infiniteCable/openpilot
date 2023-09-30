@@ -92,7 +92,7 @@ class CarState(CarStateBase):
 
     # Consume factory LDW data relevant for factory SWA (Lane Change Assist)
     # and capture it for forwarding to the blind spot radar controller
-    self.ldw_stock_values = cam_cp.vl["LDW_02"] if self.CP.networkLocation == NetworkLocation.fwdCamera else {}
+    self.ldw_stock_values = {}
 
     # Stock FCW is considered active if the release bit for brake-jerk warning
     # is set. Stock AEB considered active if the partial braking or target
