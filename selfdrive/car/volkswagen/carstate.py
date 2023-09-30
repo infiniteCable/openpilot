@@ -99,11 +99,11 @@ class CarState(CarStateBase):
     # braking release bits are set.
     # Refer to VW Self Study Program 890253: Volkswagen Driver Assistance
     # Systems, chapter on Front Assist with Braking: Golf Family for all MQB
-    ret.stockFcw = False;
-    ret.stockAeb = False;
+    ret.stockFcw = False
+    ret.stockAeb = False
 
     # Update ACC radar status.
-    self.acc_type = 0;
+    self.acc_type = 0
     if pt_cp.vl["TSK_06"]["TSK_Status"] == 2:
       # ACC okay and enabled, but not currently engaged
       ret.cruiseState.available = True
