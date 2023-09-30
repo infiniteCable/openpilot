@@ -120,7 +120,7 @@ def can_fingerprint(next_can: Callable) -> Tuple[Optional[str], Dict[int, dict]]
 
 # **** for use live only ****
 def fingerprint(logcan, sendcan, num_pandas):
-  fixed_fingerprint = os.environ.get('FINGERPRINT', "")
+  fixed_fingerprint = "VOLKSWAGEN POLO 6TH GEN" #os.environ.get('FINGERPRINT', "VOLKSWAGEN POLO 6TH GEN")
   skip_fw_query = os.environ.get('SKIP_FW_QUERY', False)
   disable_fw_cache = os.environ.get('DISABLE_FW_CACHE', False)
   ecu_rx_addrs = set()
