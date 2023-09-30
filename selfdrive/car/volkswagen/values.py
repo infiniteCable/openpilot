@@ -26,7 +26,7 @@ class CarControllerParams:
   # MQB vs PQ maximums are shared, but rate-of-change limited differently
   # based on safety requirements driven by lateral accel testing.
 
-  STEER_MAX = 300                          # Max heading control assist torque 3.00 Nm
+  STEER_MAX = 255                          # Max heading control assist torque 2.55 Nm
   STEER_DRIVER_MULTIPLIER = 3              # weight driver torque heavily
   STEER_DRIVER_FACTOR = 1                  # from dbc
 
@@ -105,8 +105,8 @@ class CarControllerParams:
 
 
 class CANBUS:
-  pt = 0
-  cam = 2
+  pt = 1 # directly connected to engine can bus
+  cam = 2 # directly connected to comfort can bus
 
 
 # Check the 7th and 8th characters of the VIN before adding a new CAR. If the
@@ -738,6 +738,7 @@ FW_VERSIONS = {
     (Ecu.engine, 0x7e0, None): [
       b'\xf1\x8704C906025H \xf1\x895177',
       b'\xf1\x8705C906032J \xf1\x891702',
+      b'\xf1\x8704B997027G \xf1\x899437', # POLO MK5 facelift 1.4 TDI 90hp CUSB engine controller
     ],
     (Ecu.transmission, 0x7e1, None): [
       b'\xf1\x870CW300042D \xf1\x891612',
@@ -752,6 +753,7 @@ FW_VERSIONS = {
     (Ecu.eps, 0x712, None): [
       b'\xf1\x872Q1909144M \xf1\x896041',
       b'\xf1\x872Q2909144AB\xf1\x896050',
+      b'\xf1\x872Q1909144J \xf1\x896030', # POLO MK6 AW EPS
     ],
     (Ecu.fwdRadar, 0x757, None): [
       b'\xf1\x872Q0907572AA\xf1\x890396',
