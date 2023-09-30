@@ -123,7 +123,7 @@ class CarState(CarStateBase):
     # Update ACC setpoint. When the setpoint is zero or there's an error, the
     # radar sends a set-speed of ~90.69 m/s / 203mph.
     if self.CP.pcmCruise:
-      ret.cruiseState.speed = ext_cp.vl["TSK_07"]["TSK_Wunschgeschw"] * CV.KPH_TO_MS
+      ret.cruiseState.speed = pt_cp.vl["TSK_07"]["TSK_Wunschgeschw"] * CV.KPH_TO_MS
       if ret.cruiseState.speed > 90:
         ret.cruiseState.speed = 0
 
