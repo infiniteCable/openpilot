@@ -90,12 +90,6 @@ class CarState(CarStateBase):
     # Update seatbelt fastened status.
     ret.seatbeltUnlatched = pt_cp.vl["Airbag_02"]["AB_Gurtschloss_FA"] != 3
 
-    # Consume blind-spot monitoring info/warning LED states, if available.
-    # Infostufe: BSM LED on, Warnung: BSM LED flashing
-    if self.CP.enableBsm:
-      ret.leftBlindspot = bool(ext_cp.vl["SWA_01"]["SWA_Infostufe_SWA_li"]) or bool(ext_cp.vl["SWA_01"]["SWA_Warnung_SWA_li"])
-      ret.rightBlindspot = bool(ext_cp.vl["SWA_01"]["SWA_Infostufe_SWA_re"]) or bool(ext_cp.vl["SWA_01"]["SWA_Warnung_SWA_re"])
-
     # Consume factory LDW data relevant for factory SWA (Lane Change Assist)
     # and capture it for forwarding to the blind spot radar controller
     self.ldw_stock_values = cam_cp.vl["LDW_02"] if self.CP.networkLocation == NetworkLocation.fwdCamera else {}
@@ -105,11 +99,11 @@ class CarState(CarStateBase):
     # braking release bits are set.
     # Refer to VW Self Study Program 890253: Volkswagen Driver Assistance
     # Systems, chapter on Front Assist with Braking: Golf Family for all MQB
-    ret.stockFcw = bool(ext_cp.vl["ACC_10"]["AWV2_Freigabe"])
-    ret.stockAeb = bool(ext_cp.vl["ACC_10"]["ANB_Teilbremsung_Freigabe"]) or bool(ext_cp.vl["ACC_10"]["ANB_Zielbremsung_Freigabe"])
+    ret.stockFcw = False;
+    ret.stockAeb = False;
 
     # Update ACC radar status.
-    self.acc_type = ext_cp.vl["ACC_06"]["ACC_Typ"]
+    self.acc_type = 0;
     if pt_cp.vl["TSK_06"]["TSK_Status"] == 2:
       # ACC okay and enabled, but not currently engaged
       ret.cruiseState.available = True
@@ -129,7 +123,7 @@ class CarState(CarStateBase):
     # Update ACC setpoint. When the setpoint is zero or there's an error, the
     # radar sends a set-speed of ~90.69 m/s / 203mph.
     if self.CP.pcmCruise:
-      ret.cruiseState.speed = ext_cp.vl["ACC_02"]["ACC_Wunschgeschw_02"] * CV.KPH_TO_MS
+      ret.cruiseState.speed = ext_cp.vl["TSK_07"]["TSK_Wunschgeschw"] * CV.KPH_TO_MS
       if ret.cruiseState.speed > 90:
         ret.cruiseState.speed = 0
 
@@ -263,6 +257,7 @@ class CarState(CarStateBase):
       ("ESP_21", 50),       # From J104 ABS/ESP controller
       ("Motor_20", 50),     # From J623 Engine control module
       ("TSK_06", 50),       # From J623 Engine control module
+      ("TSK_07", 50),       # From J623 Engine control module
       ("ESP_02", 50),       # From J104 ABS/ESP controller
       ("GRA_ACC_01", 33),   # From J533 CAN gateway (via LIN from steering wheel controls)
       ("Gateway_72", 10),   # From J533 CAN gateway (aggregated data)
@@ -278,12 +273,6 @@ class CarState(CarStateBase):
     elif CP.transmissionType == TransmissionType.direct:
       messages.append(("EV_Gearshift", 10))  # From J??? unknown EV control module
 
-    if CP.networkLocation == NetworkLocation.fwdCamera:
-      # Radars are here on CANBUS.pt
-      messages += MqbExtraSignals.fwd_radar_messages
-      if CP.enableBsm:
-        messages += MqbExtraSignals.bsm_radar_messages
-
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
   @staticmethod
@@ -292,17 +281,6 @@ class CarState(CarStateBase):
       return CarState.get_cam_can_parser_pq(CP)
 
     messages = []
-
-    if CP.networkLocation == NetworkLocation.fwdCamera:
-      messages += [
-        # sig_address, frequency
-        ("LDW_02", 10)      # From R242 Driver assistance camera
-      ]
-    else:
-      # Radars are here on CANBUS.cam
-      messages += MqbExtraSignals.fwd_radar_messages
-      if CP.enableBsm:
-        messages += MqbExtraSignals.bsm_radar_messages
 
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
 
@@ -356,18 +334,6 @@ class CarState(CarStateBase):
         messages += PqExtraSignals.bsm_radar_messages
 
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
-
-
-class MqbExtraSignals:
-  # Additional signal and message lists for optional or bus-portable controllers
-  fwd_radar_messages = [
-    ("ACC_06", 50),                              # From J428 ACC radar control module
-    ("ACC_10", 50),                              # From J428 ACC radar control module
-    ("ACC_02", 17),                              # From J428 ACC radar control module
-  ]
-  bsm_radar_messages = [
-    ("SWA_01", 20),                              # From J1086 Lane Change Assist
-  ]
 
 class PqExtraSignals:
   # Additional signal and message lists for optional or bus-portable controllers
