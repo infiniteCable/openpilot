@@ -33,7 +33,7 @@ class CarController:
 
     # **** Steering Controls ************************************************ #
 
-    if self.frame % self.hca_steer_step == 0:
+    if self.frame % self.CCP.STEER_STEP == 0:
       # Logic to avoid HCA state 4 "refused":
       #   * Don't steer unless HCA is in state 3 "ready" or 5 "active"
       #   * Don't steer at standstill
@@ -44,7 +44,7 @@ class CarController:
       # of HCA disabled; this is done whenever output happens to be zero.
 
       if CC.latActive:
-        self.hca_steer_step = self.CCP.STEER_STEP
+        #self.hca_steer_step = self.CCP.STEER_STEP
         new_steer = int(round(actuators.steer * self.CCP.STEER_MAX))
         apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP)
         self.hca_frame_timer_running += self.CCP.STEER_STEP
@@ -57,7 +57,7 @@ class CarController:
           self.hca_frame_same_torque = 0
         hca_enabled = abs(apply_steer) > 0
       else:
-        self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
+        #self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
         hca_enabled = False
         apply_steer = 0
 
@@ -72,9 +72,9 @@ class CarController:
 
     if self.frame % self.CCP.LDW_STEP == 0:
       hud_alert = 0
-      #if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw):
-      hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOver"]
-      can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, True, #CC.enabled,
+      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw):
+        hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOver"]
+      can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
     # **** Stock ACC Button Controls **************************************** #
