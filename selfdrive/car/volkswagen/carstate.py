@@ -56,8 +56,8 @@ class CarState(CarStateBase):
 
     # Verify EPS readiness to accept steering commands
     hca_status = self.CCP.hca_status_values.get(pt_cp.vl["LH_EPS_03"]["EPS_HCA_Status"])
-    ret.steerFaultPermanent = False #hca_status in ("DISABLED", "FAULT")
-    ret.steerFaultTemporary = False #hca_status in ("INITIALIZING", "REJECTED")
+    ret.steerFaultPermanent = hca_status in ("DISABLED", "FAULT")
+    ret.steerFaultTemporary = hca_status in ("INITIALIZING", "REJECTED")
 
     # Update gas, brakes, and gearshift.
     ret.gas = pt_cp.vl["Motor_20"]["MO_Fahrpedalrohwert_01"] / 100.0
