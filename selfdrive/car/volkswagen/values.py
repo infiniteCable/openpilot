@@ -107,7 +107,7 @@ class CarControllerParams:
 
 class CANBUS:
   pt = 1 # directly connected to engine can bus
-  cam = 0 # directly connected to comfort can bus
+  cam = 2 # directly connected to comfort can bus
 
 
 # Check the 7th and 8th characters of the VIN before adding a new CAR. If the
