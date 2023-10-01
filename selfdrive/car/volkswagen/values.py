@@ -106,7 +106,7 @@ class CarControllerParams:
 
 
 class CANBUS:
-  pt = 0 # directly connected to engine can bus
+  pt = 1 # directly connected to engine can bus
   cam = 2 # directly connected to comfort can bus
 
 
