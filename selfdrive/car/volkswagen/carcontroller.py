@@ -29,6 +29,7 @@ class CarController:
     self.gra_send_up = False
     self.gra_send_down = False
     self.gra_step = 100
+    self.gra_speed = 0
     self.curr_gra_speed_diff = 0
     
   def update(self, CC, CS, ext_bus, now_nanos):
@@ -95,8 +96,8 @@ class CarController:
         accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX)
         gra_speed_diff = int(round(accel * 5)) #speed difference via factor from accel
         curr_speed = int(round(CS.out.vEgo * CV.MS_TO_KPH))
-        gra_speed = curr_speed + gra_speed_diff #cc speed to set
-        self.curr_gra_speed_diff = abs(CS.gra_speed - gra_speed)
+        self.gra_speed = curr_speed + gra_speed_diff #cc speed to set
+        self.curr_gra_speed_diff = abs(CS.gra_speed - self.gra_speed)
       
       if self.frame % self.gra_step == 0:
         self.gra_step = 100 / self.curr_gra_speed_diff if self.curr_gra_speed_diff != 0 else 100
@@ -106,9 +107,9 @@ class CarController:
         self.gra_send_up = False
         self.gra_send_down = False
       
-        if gra_speed > CS.gra_speed:
+        if self.gra_speed > CS.gra_speed:
           self.gra_send_up = True
-        elif gra_speed < CS.gra_speed:
+        elif self.gra_speed < CS.gra_speed:
           self.gra_send_down = True
     
     else:
