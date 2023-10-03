@@ -36,12 +36,6 @@ class CarController:
     can_sends = []
 
     # **** Steering Controls ************************************************ #
-
-    # set steer command frequency to satisfy eps (no lasting perm. fault)
-    if CC.latActive:
-      self.hca_steer_step = self.CCP.STEER_STEP
-    else:
-      self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
     
     if self.frame % self.hca_steer_step == 0:
       # Logic to avoid HCA state 4 "refused":
@@ -77,6 +71,12 @@ class CarController:
       self.eps_timer_soft_disable_alert = self.hca_frame_timer_running > self.CCP.STEER_TIME_ALERT / DT_CTRL
       self.apply_steer_last = apply_steer
       can_sends.append(self.CCS.create_steering_control(self.packer_pt, CANBUS.pt, apply_steer, hca_enabled, hca_request))
+
+    # set steer command frequency to satisfy eps (no lasting perm. fault)
+    if CC.latActive:
+      self.hca_steer_step = self.CCP.STEER_STEP
+    else:
+      self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
 
     # **** HUD Controls ***************************************************** #
 
@@ -114,15 +114,17 @@ class CarController:
       if self.CP.pcmCruise and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
       
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
-                                                             cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume,
-                                                             False, False))
+                                                             cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
       elif self.CP.openpilotLongitudinalControl:
-        if self.gra_speed_up:
+        if self.gra_speed_up and not self.gra_speed_down:
           can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, True, False))
           self.gra_speed_up = False
-        elif self.gra_speed_down:
+        elif self.gra_speed_down and not self.gra_speed_up:
           can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, False, True))
           self.gra_speed_down = False
+        else:
+          self.gra_send_up = False
+          self.gra_send_down = False
 
     new_actuators = actuators.copy()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
