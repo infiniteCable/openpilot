@@ -33,10 +33,28 @@ def create_lka_hud_control(packer, bus, ldw_stock_values, enabled, steering_pres
   return packer.make_can_msg("LDW_02", bus, values)
 
 
-def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resume=False, set=False):
+def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resume=False):
   values = {s: gra_stock_values[s] for s in [
     "GRA_Hauptschalter",           # GRA button, on/off
-    #"GRA_Abbrechen",               # GRA button cancel
+    "GRA_Typ_Hauptschalter",       # GRA main button type
+    "GRA_Codierung",               # GRA button configuration/coding
+    "GRA_Tip_Stufe_2",             # unknown related to stalk type
+    "GRA_ButtonTypeInfo",          # unknown related to stalk type
+  ]}
+
+  values.update({
+    "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
+    "GRA_Abbrechen": cancel,
+    "GRA_Tip_Wiederaufnahme": resume,
+  })
+
+  return packer.make_can_msg("GRA_ACC_01", bus, values)
+
+
+def create_gra_buttons_control(packer, bus, gra_stock_values, up, down):
+  values = {s: gra_stock_values[s] for s in [
+    "GRA_Hauptschalter",           # GRA button, on/off
+    "GRA_Abbrechen",               # GRA button cancel
     "GRA_Typ_Hauptschalter",       # GRA main button type
     #"GRA_Limiter",                 # GRA Limiter
     #"GRA_Tip_Setzen",              # GRA set
@@ -53,9 +71,8 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
 
   values.update({
     "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
-    "GRA_Abbrechen": cancel,
-    "GRA_Tip_Wiederaufnahme": resume,
-    "GRA_Tip_Setzen": set,
+    "GRA_Tip_Wiederaufnahme": up,
+    "GRA_Tip_Setzen": down,
   })
 
   return packer.make_can_msg("GRA_ACC_01", bus, values)
