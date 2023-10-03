@@ -95,7 +95,7 @@ class CarController:
       if self.frame % 30 == 0:
         accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX)
         gra_speed_diff = int(round(accel * 4)) #speed difference via factor from accel
-        curr_speed = int(round(CS.out.vEgo * CV.MS_TO_KPH) + 1)
+        curr_speed = int(round(CS.clu_speed))
         self.gra_speed = curr_speed + gra_speed_diff #cc speed to set
         #self.curr_gra_speed_diff = abs(CS.gra_speed - self.gra_speed)
       
