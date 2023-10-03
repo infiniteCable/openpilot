@@ -26,11 +26,11 @@ class CarController:
     self.hca_frame_same_torque = 0
     self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
 
-    self.gra_step = 100
     self.gra_send_up = False
     self.gra_send_down = False
-    self.accel = 0
-  
+    self.gra_step = 100
+    self.curr_gra_speed_diff = 0
+    
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
     hud_control = CC.hudControl
@@ -91,17 +91,18 @@ class CarController:
     # **** Acceleration Controls ******************************************** #
 
     if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
-      if self.frame % 20: # calc gra button press speed
-        self.accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX)
-        self.gra_step = int(round(100 / ( self.accel + 1 ))) if self.accel != 0 else 100 # gra button press speed from accel
-        if self.gra_step < 20: # make sure, accel is up to date for following decisions
+      if self.frame % 20 == 0:
+        accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX)
+        gra_speed_diff = int(round(accel * 5)) #speed difference via factor from accel
+        curr_speed = int(round(CS.out.vEgo * CV.MS_TO_KPH))
+        gra_speed = curr_speed + gra_speed_diff #cc speed to set
+        self.curr_gra_speed_diff = abs(CS.gra_speed - gra_speed)
+      
+      if self.frame % self.gra_step == 0:
+        self.gra_step = 100 / self.curr_gra_speed_diff if self.curr_gra_speed_diff != 0 else 100
+        if self.gra_step < 20:
           self.gra_step = 20
         
-      if self.frame % self.gra_step == 0:
-        gra_speed_diff = int(round(self.accel * 5)) # speed difference via factor from accel
-        curr_speed = int(round(CS.out.vEgo * CV.MS_TO_KPH))
-        gra_speed = curr_speed + gra_speed_diff # speed to set
-
         self.gra_send_up = False
         self.gra_send_down = False
       
