@@ -26,6 +26,10 @@ class CarController:
     self.hca_frame_same_torque = 0
     self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
 
+    self.gra_step = 100
+    self.gra_send_up = False
+    self.gra_send_down = False
+  
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
     hud_control = CC.hudControl
@@ -83,12 +87,42 @@ class CarController:
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
+    # **** Acceleration Controls ******************************************** #
+
+    if self.frame % self.gra_step == 0 and self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
+      accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX) if CC.longActive else 0
+      gra_speed_diff = int(round(accel * 5)) # speed difference via factor from accel
+      self.gra_step = int(round(100 / ( accel * 10 ))) if accel != 0 else 100 # gra button press speed via factor from accel
+      gra_speed = CS.gra_speed + gra_speed_diff # speed to set
+
+      self.gra_send_up = False
+      self.gra_send_down = False
+      
+      if gra_speed > CS.gra_speed:
+        self.gra_send_up = True
+      elif gra_speed < CS.gra_speed:
+        self.gra_send_down = True
+    
+    else:
+      self.gra_send_up = False
+      self.gra_send_down = False
+
     # **** Stock ACC Button Controls **************************************** #
 
-    gra_send_ready = self.CP.pcmCruise and CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
-    if gra_send_ready and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
-      can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
-                                                           cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
+    gra_send_ready = CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
+    if gra_send_ready:
+      if self.CP.pcmCruise and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
+      
+        can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
+                                                             cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume,
+                                                             False, False))
+      elif self.CP.openpilotLongitudinalControl:
+        if self.gra_speed_up:
+          can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, True, False))
+          self.gra_speed_up = False
+        elif self.gra_speed_down:
+          can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, False, True))
+          self.gra_speed_down = False
 
     new_actuators = actuators.copy()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
