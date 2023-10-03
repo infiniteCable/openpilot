@@ -89,19 +89,22 @@ class CarController:
 
     # **** Acceleration Controls ******************************************** #
 
-    if self.frame % self.gra_step == 0 and self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
-      accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX) if CC.longActive else 0
-      gra_speed_diff = int(round(accel * 5)) # speed difference via factor from accel
-      self.gra_step = int(round(100 / ( accel * 10 ))) if accel != 0 else 100 # gra button press speed via factor from accel
-      gra_speed = CS.gra_speed + gra_speed_diff # speed to set
+    if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
+      if self.frame % 20: # calc gra button press speed
+        accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX) if CC.longActive else 0
+        self.gra_step = int(round(100 / ( accel + 1 ))) if accel != 0 else 100 # gra button press speed from accel
+        
+      if self.frame % self.gra_step == 0:
+        gra_speed_diff = int(round(accel * 5)) # speed difference via factor from accel
+        gra_speed = CS.gra_speed + gra_speed_diff # speed to set
 
-      self.gra_send_up = False
-      self.gra_send_down = False
+        self.gra_send_up = False
+        self.gra_send_down = False
       
-      if gra_speed > CS.gra_speed:
-        self.gra_send_up = True
-      elif gra_speed < CS.gra_speed:
-        self.gra_send_down = True
+        if gra_speed > CS.gra_speed:
+          self.gra_send_up = True
+        elif gra_speed < CS.gra_speed:
+          self.gra_send_down = True
     
     else:
       self.gra_send_up = False
@@ -112,7 +115,6 @@ class CarController:
     gra_send_ready = CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
     if gra_send_ready:
       if self.CP.pcmCruise and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
-      
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
                                                              cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
       elif self.CP.openpilotLongitudinalControl:
