@@ -96,7 +96,7 @@ class CarController:
         
       if self.frame % self.gra_step == 0:
         gra_speed_diff = int(round(accel * 5)) # speed difference via factor from accel
-        gra_speed = CS.gra_speed + gra_speed_diff # speed to set
+        gra_speed = CS.out.gra_speed + gra_speed_diff # speed to set
 
         self.gra_send_up = False
         self.gra_send_down = False
