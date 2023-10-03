@@ -264,7 +264,7 @@ class CarState(CarStateBase):
       ("Motor_20", 50),     # From J623 Engine control module
       ("TSK_06", 50),       # From J623 Engine control module
       ("TSK_07", 50),       # From J623 Engine control module
-      ("Kombi_01, 50),
+      ("Kombi_01", 50),
       ("ESP_02", 50),       # From J104 ABS/ESP controller
       ("GRA_ACC_01", 33),   # From J533 CAN gateway (via LIN from steering wheel controls)
       ("Gateway_72", 10),   # From J533 CAN gateway (aggregated data)
