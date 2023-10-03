@@ -29,6 +29,7 @@ class CarController:
     self.gra_step = 100
     self.gra_send_up = False
     self.gra_send_down = False
+    self.accel = 0
   
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
@@ -91,19 +92,21 @@ class CarController:
 
     if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
       if self.frame % 20: # calc gra button press speed
-        accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX) if CC.longActive else 0
-        self.gra_step = int(round(100 / ( accel + 1 ))) if accel != 0 else 100 # gra button press speed from accel
+        self.accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX) if CC.longActive else 0
+        self.gra_step = int(round(100 / ( self.accel + 1 ))) if accel != 0 else 100 # gra button press speed from accel
+        if self.gra_step < 20: # make sure, accel is up to date for following decisions
+          self.gra_step = 20
         
       if self.frame % self.gra_step == 0:
-        gra_speed_diff = int(round(accel * 5)) # speed difference via factor from accel
+        gra_speed_diff = int(round(self.accel * 5)) # speed difference via factor from accel
         gra_speed = CS.out.gra_speed + gra_speed_diff # speed to set
 
         self.gra_send_up = False
         self.gra_send_down = False
       
-        if gra_speed > CS.gra_speed:
+        if gra_speed > CS.out.gra_speed:
           self.gra_send_up = True
-        elif gra_speed < CS.gra_speed:
+        elif gra_speed < CS.out.gra_speed:
           self.gra_send_down = True
     
     else:
