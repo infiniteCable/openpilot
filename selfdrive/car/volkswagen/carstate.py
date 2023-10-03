@@ -16,6 +16,7 @@ class CarState(CarStateBase):
     self.upscale_lead_car_signal = False
 
     self.gra_speed = 0
+    self.speed_korr = 0
 
   def create_button_events(self, pt_cp, buttons):
     button_events = []
@@ -130,7 +131,8 @@ class CarState(CarStateBase):
         ret.cruiseState.speed = 0
 
     self.gra_speed = pt_cp.vl["TSK_07"]["TSK_Wunschgeschw"]
-
+    self.speed_korr = self.gra_speed / (ret.vEgo * CV.MS_TO_KPH)
+    
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
     ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["Comfort_Signal_Left"])
     ret.rightBlinker = bool(pt_cp.vl["Blinkmodi_02"]["Comfort_Signal_Right"])
