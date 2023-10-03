@@ -16,7 +16,7 @@ class CarState(CarStateBase):
     self.upscale_lead_car_signal = False
 
     self.gra_speed = 0
-    self.speed_korr = 0
+    self.clu_speed = 0
 
   def create_button_events(self, pt_cp, buttons):
     button_events = []
@@ -131,7 +131,7 @@ class CarState(CarStateBase):
         ret.cruiseState.speed = 0
 
     self.gra_speed = pt_cp.vl["TSK_07"]["TSK_Wunschgeschw"]
-    self.speed_korr = self.gra_speed / (ret.vEgo * CV.MS_TO_KPH)
+    self.clu_speed = cam_cp.vl["Kombi_01"]["KBI_angez_Geschw"]
     
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
     ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["Comfort_Signal_Left"])
@@ -264,6 +264,7 @@ class CarState(CarStateBase):
       ("Motor_20", 50),     # From J623 Engine control module
       ("TSK_06", 50),       # From J623 Engine control module
       ("TSK_07", 50),       # From J623 Engine control module
+      ("Kombi_01, 50),
       ("ESP_02", 50),       # From J104 ABS/ESP controller
       ("GRA_ACC_01", 33),   # From J533 CAN gateway (via LIN from steering wheel controls)
       ("Gateway_72", 10),   # From J533 CAN gateway (aggregated data)
