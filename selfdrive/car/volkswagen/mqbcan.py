@@ -33,7 +33,7 @@ def create_lka_hud_control(packer, bus, ldw_stock_values, enabled, steering_pres
   return packer.make_can_msg("LDW_02", bus, values)
 
 
-def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resume=False):
+def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resume=False, set=False):
   values = {s: gra_stock_values[s] for s in [
     "GRA_Hauptschalter",           # GRA button, on/off
     #"GRA_Abbrechen",               # GRA button cancel
@@ -55,6 +55,7 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
     "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
     "GRA_Abbrechen": cancel,
     "GRA_Tip_Wiederaufnahme": resume,
+    "GRA_Tip_Setzen": set,
   })
 
   return packer.make_can_msg("GRA_ACC_01", bus, values)
