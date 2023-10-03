@@ -93,13 +93,13 @@ class CarController:
     if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
       if self.frame % 20: # calc gra button press speed
         self.accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX)
-        self.gra_step = int(round(100 / ( self.accel + 1 ))) if accel != 0 else 100 # gra button press speed from accel
+        self.gra_step = int(round(100 / ( self.accel + 1 ))) if self.accel != 0 else 100 # gra button press speed from accel
         if self.gra_step < 20: # make sure, accel is up to date for following decisions
           self.gra_step = 20
         
       if self.frame % self.gra_step == 0:
         gra_speed_diff = int(round(self.accel * 5)) # speed difference via factor from accel
-        curr_speed = CS.out.vEgo * CV.MS_TO_KPH
+        curr_speed = int(round(CS.out.vEgo * CV.MS_TO_KPH))
         gra_speed = curr_speed + gra_speed_diff # speed to set
 
         self.gra_send_up = False
