@@ -129,7 +129,7 @@ class CarState(CarStateBase):
       if ret.cruiseState.speed > 90:
         ret.cruiseState.speed = 0
 
-    self.gra_speed = pt_cp.vl["TSK_07"]["TSK_Wunschgeschw"] * CV.KPH_TO_MS
+    self.gra_speed = pt_cp.vl["TSK_07"]["TSK_Wunschgeschw"]
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
     ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["Comfort_Signal_Left"])
