@@ -105,9 +105,9 @@ class CarController:
         self.gra_send_up = False
         self.gra_send_down = False
       
-        if gra_speed > CS.out.gra_speed:
+        if gra_speed > CS.gra_speed:
           self.gra_send_up = True
-        elif gra_speed < CS.out.gra_speed:
+        elif gra_speed < CS.gra_speed:
           self.gra_send_down = True
     
     else:
@@ -122,15 +122,15 @@ class CarController:
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
                                                              cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
       elif self.CP.openpilotLongitudinalControl:
-        if self.gra_speed_up and not self.gra_speed_down:
+        if self.gra_send_up:
           can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, True, False))
-          self.gra_speed_up = False
-        elif self.gra_speed_down and not self.gra_speed_up:
-          can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, False, True))
-          self.gra_speed_down = False
-        else:
           self.gra_send_up = False
+        elif self.gra_send_down:
+          can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, False, True))
           self.gra_send_down = False
+          
+        self.gra_send_up = False
+        self.gra_send_down = False
 
     new_actuators = actuators.copy()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
