@@ -1,3 +1,5 @@
+import math
+import statistics
 from cereal import car
 from opendbc.can.packer import CANPacker
 from openpilot.common.numpy_fast import clip
@@ -6,7 +8,6 @@ from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.car import apply_driver_steer_torque_limits
 from openpilot.selfdrive.car.volkswagen import mqbcan, pqcan
 from openpilot.selfdrive.car.volkswagen.values import CANBUS, PQ_CARS, CarControllerParams
-import math
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 LongCtrlState = car.CarControl.Actuators.LongControlState
@@ -32,6 +33,8 @@ class CarController:
     self.gra_step = 100
     self.gra_speed = 0
     self.curr_gra_speed_diff = 0
+
+    self.sm = messaging.SubMaster(['longitudinalPlan'])
     
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
@@ -94,10 +97,12 @@ class CarController:
 
     if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
       if self.frame % 20 == 0:
-        accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX)
-        gra_speed_diff = math.floor(accel * 4) #speed difference via factor from accel
-        curr_speed = math.floor(CS.clu_speed)
-        self.gra_speed = curr_speed + gra_speed_diff #cc speed to set
+        self.sm.update(0)
+        curr_speed = int(round(CS.clu_speed))
+        self.gra_speed = int(round(statistics.fmean(self.sm['longitudinalPlan'].speeds))) if len(self.sm['longitudinalPlan'].speeds) > 0 else curr_speed 
+        #accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX)
+        #gra_speed_diff = math.floor(accel * 4) #speed difference via factor from accel
+        #self.gra_speed = curr_speed + gra_speed_diff #cc speed to set
         #self.curr_gra_speed_diff = abs(CS.gra_speed - self.gra_speed)
       
       #if self.frame % self.gra_step == 0:
