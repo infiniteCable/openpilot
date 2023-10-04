@@ -91,25 +91,25 @@ class CarController:
 
     # **** Acceleration Controls ******************************************** #
 
-    #if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
-    #  if self.frame % 20 == 0:
-    #    curr_speed = int(round(CS.clu_speed))
-    #    if actuators.accel > 0.1:
-    #      self.gra_speed = curr_speed + 1
-    #    elif actuators.accel < -0.1:
-    #      self.gra_speed = curr_speed - 1
+    if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
+      if self.frame % 20 == 0:
+        curr_speed = int(round(CS.clu_speed))
+        if actuators.accel > 0.1:
+          self.gra_speed = curr_speed + 1
+        elif actuators.accel < -0.1:
+          self.gra_speed = curr_speed - 1
           
-    #    self.gra_send_up = False
-    #    self.gra_send_down = False
+        self.gra_send_up = False
+        self.gra_send_down = False
       
-    #    if self.gra_speed > CS.gra_speed:
-    #      self.gra_send_up = True
-    #    elif self.gra_speed < CS.gra_speed:
-    #      self.gra_send_down = True
+        if self.gra_speed > CS.gra_speed:
+          self.gra_send_up = True
+        elif self.gra_speed < CS.gra_speed:
+          self.gra_send_down = True
     
-    #else:
-    #  self.gra_send_up = False
-    #  self.gra_send_down = False
+    else:
+      self.gra_send_up = False
+      self.gra_send_down = False
 
     # **** Stock ACC Button Controls **************************************** #
 
