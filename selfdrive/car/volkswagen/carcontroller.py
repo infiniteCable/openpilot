@@ -1,5 +1,3 @@
-import math
-import statistics
 from cereal import car
 from opendbc.can.packer import CANPacker
 from openpilot.common.numpy_fast import clip
@@ -97,19 +95,12 @@ class CarController:
 
     if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
       if self.frame % 20 == 0:
-        self.sm.update(0)
         curr_speed = int(round(CS.clu_speed))
-        self.gra_speed = int(round(statistics.fmean(self.sm['longitudinalPlan'].speeds))) if len(self.sm['longitudinalPlan'].speeds) > 0 else curr_speed 
-        #accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX)
-        #gra_speed_diff = math.floor(accel * 4) #speed difference via factor from accel
-        #self.gra_speed = curr_speed + gra_speed_diff #cc speed to set
-        #self.curr_gra_speed_diff = abs(CS.gra_speed - self.gra_speed)
-      
-      #if self.frame % self.gra_step == 0:
-        #self.gra_step = 100 / self.curr_gra_speed_diff if self.curr_gra_speed_diff != 0 else 100
-        #if self.gra_step < 30:
-        #  self.gra_step = 30
-        
+        if actuators.accel > 0.1:
+          self.gra_speed = curr_speed + 1
+        elif actuators.accel < -0.1:
+          self.gra_speed = curr_speed - 1
+          
         self.gra_send_up = False
         self.gra_send_down = False
       
