@@ -95,8 +95,8 @@ class CarController:
     if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
       if self.frame % 20 == 0:
         accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX)
-        gra_speed_diff = int(accel * 4) #speed difference via factor from accel
-        curr_speed = int(CS.clu_speed)
+        gra_speed_diff = math.floor(accel * 4) #speed difference via factor from accel
+        curr_speed = math.floor(CS.clu_speed)
         self.gra_speed = curr_speed + gra_speed_diff #cc speed to set
         #self.curr_gra_speed_diff = abs(CS.gra_speed - self.gra_speed)
       
