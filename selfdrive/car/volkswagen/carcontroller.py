@@ -31,8 +31,6 @@ class CarController:
     self.gra_step = 100
     self.gra_speed = 0
     self.curr_gra_speed_diff = 0
-
-    self.sm = messaging.SubMaster(['longitudinalPlan'])
     
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
