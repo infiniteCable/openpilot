@@ -64,12 +64,13 @@ def create_gra_buttons_control(packer, bus, gra_stock_values):
     "GRA_Fehler",
     "GRA_Typ468",
     "GRA_Tip_Stufe_2",
-    "GRA_ButtonTypeInfo",
+    #"GRA_ButtonTypeInfo",
   ]}
 
   values.update({
     "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
-    "GRA_Codierung": 3,
+    "GRA_Codierung": 2,
+    "GRA_ButtonTypeInfo": 0,
   })
 
   return packer.make_can_msg("GRA_ACC_01", bus, values)
