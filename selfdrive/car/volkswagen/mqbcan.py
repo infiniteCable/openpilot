@@ -70,7 +70,7 @@ def create_gra_buttons_control(packer, bus, gra_stock_values):
   values.update({
     "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
     #"GRA_Codierung": 1,
-    "GRA_ButtonTypeInfo": 3,
+    "GRA_ButtonTypeInfo": 2,
   })
 
   return packer.make_can_msg("GRA_ACC_01", bus, values)
