@@ -25,11 +25,30 @@ class CarController:
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
     self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
+
+    self.code = 0
+    self.type = 0
+    self.acc_type = 0
     
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
+
+    if self.frame % 400 == 0:
+      if self.code <= 3:
+        self.code = self.code + 1
+      else:
+        self.code = 0
+        if self.type <= 3:
+          self.type = self.type + 1
+        else:
+          self.type = 0
+          if self.acc_type <= 3:
+            self.acc_type = self.acc_type + 1
+          else:
+            self.acc_type = 0
+
 
     # **** Steering Controls ************************************************ #
     
@@ -81,7 +100,7 @@ class CarController:
       accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX) if CC.longActive else 0
       stopping = actuators.longControlState == LongCtrlState.stopping
       starting = actuators.longControlState == LongCtrlState.starting
-      can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
+      can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, self.acc_type, CC.longActive, accel,
                                                          acc_control, stopping, starting, CS.esp_hold_confirmation))
 
     # **** HUD Controls ***************************************************** #
@@ -111,7 +130,7 @@ class CarController:
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
                                                              cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
       else:
-        can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values))
+        can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, self.code, self.type))
 
     new_actuators = actuators.copy()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
