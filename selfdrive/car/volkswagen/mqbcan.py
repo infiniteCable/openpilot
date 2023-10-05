@@ -44,34 +44,6 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
     "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
     "GRA_Abbrechen": cancel,
     "GRA_Tip_Wiederaufnahme": resume,
-    "GRA_Codierung": 3,
-  })
-
-  return packer.make_can_msg("GRA_ACC_01", bus, values)
-
-def create_gra_buttons_control(packer, bus, gra_stock_values, code, type, hs):
-  values = {s: gra_stock_values[s] for s in [
-    "GRA_Hauptschalter",
-    "GRA_Abbrechen",
-    #"GRA_Typ_Hauptschalter",
-    "GRA_Limiter",
-    "GRA_Tip_Setzen",
-    "GRA_Tip_Hoch",
-    "GRA_Tip_Runter",
-    "GRA_Tip_Wiederaufnahme",
-    "GRA_Verstellung_Zeitluecke",
-    #"GRA_Codierung",
-    "GRA_Fehler",
-    "GRA_Typ468",
-    "GRA_Tip_Stufe_2",
-    #"GRA_ButtonTypeInfo",
-  ]}
-
-  values.update({
-    "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
-    "GRA_Codierung": code,
-    "GRA_ButtonTypeInfo": type,
-    "GRA_Typ_Hauptschalter": hs,
   })
 
   return packer.make_can_msg("GRA_ACC_01", bus, values)
