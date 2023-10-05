@@ -60,7 +60,7 @@ def create_gra_buttons_control(packer, bus, gra_stock_values):
     "GRA_Tip_Runter",
     "GRA_Tip_Wiederaufnahme",
     "GRA_Verstellung_Zeitluecke",
-    #"GRA_Codierung",
+    "GRA_Codierung",
     "GRA_Fehler",
     "GRA_Typ468",
     "GRA_Tip_Stufe_2",
@@ -69,8 +69,8 @@ def create_gra_buttons_control(packer, bus, gra_stock_values):
 
   values.update({
     "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
-    "GRA_Codierung": 1,
-    "GRA_ButtonTypeInfo": 0,
+    #"GRA_Codierung": 1,
+    "GRA_ButtonTypeInfo": 3,
   })
 
   return packer.make_can_msg("GRA_ACC_01", bus, values)
