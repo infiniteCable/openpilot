@@ -29,6 +29,7 @@ class CarController:
     self.code = 0
     self.type = 0
     self.acc_type = 0
+    self.hs = 1
     
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
@@ -36,18 +37,22 @@ class CarController:
     can_sends = []
 
     if self.frame % 400 == 0:
-      if self.code <= 3:
+      if self.code <= 2:
         self.code = self.code + 1
       else:
         self.code = 0
-        if self.type <= 3:
+        if self.type <= 2:
           self.type = self.type + 1
         else:
           self.type = 0
-          if self.acc_type <= 3:
+          if self.acc_type <= 2:
             self.acc_type = self.acc_type + 1
           else:
             self.acc_type = 0
+            if self.hs <= 0:
+              self.hs = self.hs + 1
+            else:
+              self.hs = 0
 
 
     # **** Steering Controls ************************************************ #
@@ -126,11 +131,11 @@ class CarController:
 
     gra_send_ready = CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
     if gra_send_ready:
-      if self.CP.pcmCruise and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
-        can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
-                                                             cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
-      else:
-        can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, self.code, self.type))
+      #if self.CP.pcmCruise and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
+      #  can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
+      #                                                       cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
+      #else:
+      can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, self.code, self.type, self.hs))
 
     new_actuators = actuators.copy()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
