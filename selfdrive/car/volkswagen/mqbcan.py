@@ -1,13 +1,11 @@
 def create_steering_control(packer, bus, apply_steer, lkas_enabled, lkas_request):
   values = {
-    "SET_ME_0XF": 0xF,
     "HCA_01_LM_Offset": abs(apply_steer),
     "HCA_01_Request": lkas_request,
     "HCA_01_LM_OffSign": 1 if apply_steer < 0 and lkas_enabled == 1 else 0,
-    "HCA_01_Enabled": lkas_enabled,
+    "HCA_01_Enable": lkas_enabled,
     "HCA_01_Standby": not lkas_enabled,
-    "SET_ME_0XFE": 0xFE,
-    "SET_ME_0X1": 0x1,
+    "HCA_01_Available": 1,
   }
   return packer.make_can_msg("HCA_01", bus, values)
 
