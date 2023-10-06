@@ -25,6 +25,8 @@ class CarController:
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
     self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
+    self.hca_standby_timer = 0
+    self.hca_enabled = False
     
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
@@ -44,7 +46,7 @@ class CarController:
       # of HCA disabled; this is done whenever output happens to be zero.
 
       if CC.latActive:
-        hca_enabled = True
+        self.hca_enabled = True
         new_steer = int(round(actuators.steer * self.CCP.STEER_MAX))
         apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP)
         self.hca_frame_timer_running += self.CCP.STEER_STEP
@@ -58,18 +60,24 @@ class CarController:
         hca_request = abs(apply_steer) > 0
       else:
         hca_request = False
-        hca_enabled = False
         apply_steer = 0
+
+
+        if self.hca_enabled and self.hca_standby_timer <= 10:
+          self.hca_standby_timer += 1
+        else:
+          self.hca_enabled = False
+          self.hca_standby_timer = 0
 
       if not hca_request:
         self.hca_frame_timer_running = 0
 
       self.eps_timer_soft_disable_alert = self.hca_frame_timer_running > self.CCP.STEER_TIME_ALERT / DT_CTRL
       self.apply_steer_last = apply_steer
-      can_sends.append(self.CCS.create_steering_control(self.packer_pt, CANBUS.pt, apply_steer, hca_enabled, hca_request))
+      can_sends.append(self.CCS.create_steering_control(self.packer_pt, CANBUS.pt, apply_steer, self.hca_enabled, hca_request))
 
     # set steer command frequency to satisfy eps (no lasting perm. fault)
-    if CC.latActive:
+    if self.hca_enabled:
       self.hca_steer_step = self.CCP.STEER_STEP
     else:
       self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
