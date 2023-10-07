@@ -28,8 +28,8 @@ class CarController:
     self.hca_standby_timer = 0
     self.hca_enabled = False
 
-    self.gra_send_up
-    self.gra_send_down
+    self.gra_send_up = False
+    self.gra_send_down = False
     
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
