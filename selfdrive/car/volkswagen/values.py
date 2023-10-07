@@ -1,6 +1,6 @@
 from collections import defaultdict, namedtuple
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Dict, List, Union
 
 from cereal import car
@@ -115,7 +115,7 @@ class CANBUS:
 # FW_VERSIONS for that existing CAR.
 # Exception: SEAT Leon and SEAT Ateca share a chassis code
 
-class CAR:
+class CAR(StrEnum):
   ARTEON_MK1 = "VOLKSWAGEN ARTEON 1ST GEN"          # Chassis AN, Mk1 VW Arteon and variants
   ATLAS_MK1 = "VOLKSWAGEN ATLAS 1ST GEN"            # Chassis CA, Mk1 VW Atlas and Atlas Cross Sport
   CRAFTER_MK2 = "VOLKSWAGEN CRAFTER 2ND GEN"        # Chassis SY/SZ, Mk2 VW Crafter, VW Grand California, MAN TGE
@@ -777,15 +777,18 @@ FW_VERSIONS = {
     (Ecu.engine, 0x7e0, None): [
       b'\xf1\x8704E906027NJ\xf1\x891445',
       b'\xf1\x8704E906027NP\xf1\x891286',
+      b'\xf1\x8705E906013BD\xf1\x892496',
       b'\xf1\x8705E906013E \xf1\x891624',
     ],
     (Ecu.transmission, 0x7e1, None): [
       b'\xf1\x8709G927158EM\xf1\x893812',
       b'\xf1\x8709S927158BL\xf1\x893791',
+      b'\xf1\x8709S927158DN\xf1\x893946',
       b'\xf1\x8709S927158FF\xf1\x893876',
     ],
     (Ecu.srs, 0x715, None): [
       b'\xf1\x875Q0959655CB\xf1\x890421\xf1\x82\x1311111111333500314646021450149333613100',
+      b'\xf1\x875Q0959655CB\xf1\x890421\xf1\x82\x1312111111333500314646021550159333613100',
       b'\xf1\x875Q0959655CE\xf1\x890421\xf1\x82\x1311110011333300314240021350139333613100',
     ],
     (Ecu.eps, 0x712, None): [
@@ -1066,10 +1069,12 @@ FW_VERSIONS = {
       b'\xf1\x8705L906022M \xf1\x890901',
       b'\xf1\x8783A906259  \xf1\x890001',
       b'\xf1\x8783A906259  \xf1\x890005',
+      b'\xf1\x8783A906259C \xf1\x890002',
       b'\xf1\x8783A906259F \xf1\x890001',
     ],
     (Ecu.transmission, 0x7e1, None): [
       b'\xf1\x8709G927158CN\xf1\x893608',
+      b'\xf1\x8709G927158FL\xf1\x893758',
       b'\xf1\x8709G927158GP\xf1\x893937',
       b'\xf1\x870GC300045D \xf1\x892802',
       b'\xf1\x870GC300046F \xf1\x892701',
@@ -1084,6 +1089,7 @@ FW_VERSIONS = {
       b'\xf1\x875Q0910143C \xf1\x892211\xf1\x82\x0567G6000300',
       b'\xf1\x875Q0910143C \xf1\x892211\xf1\x82\x0567G6000800',
       b'\xf1\x875QF909144B \xf1\x895582\xf1\x82\x0571G60533A1',
+      b'\xf1\x875QF909144B \xf1\x895582\xf1\x82\x0571G60733A1',
       b'\xf1\x875TA907145D \xf1\x891051\xf1\x82\x001PG60A1P7N',
     ],
     (Ecu.fwdRadar, 0x757, None): [
