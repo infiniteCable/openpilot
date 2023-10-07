@@ -82,6 +82,24 @@ class CarController:
     else:
       self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
 
+    # **** Acceleration Controls ******************************************** #
+
+    if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
+      if self.frame % 20 == 0:
+        self.gra_send_up = False
+        self.gra_send_down = False
+        
+        gra_speed = int(round(CS.gra_speed))
+        speed = int(round(actuators.speed))
+        if speed > gra_speed:
+          self.gra_send_up = True
+        elif speed < gra_speed:
+          self.gra_send_down = True
+    
+    else:
+      self.gra_send_up = False
+      self.gra_send_down = False
+
     # **** HUD Controls ***************************************************** #
 
     if self.frame % self.CCP.LDW_STEP == 0:
