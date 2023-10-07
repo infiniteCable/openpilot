@@ -91,13 +91,14 @@ class CarController:
       if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
         self.gra_send_up = False
         self.gra_send_down = False
-        
+
+        target_accel = actuators.accel
+        target_speed = max(CS.out.vEgo + (target_accel * 3), 0)
         gra_speed = int(round(CS.gra_speed))
-        speed = int(round(actuators.speed))
-        if actuators.accel != 0:
-          if speed > gra_speed:
+
+          if target_speed > gra_speed:
             self.gra_send_up = True
-          elif speed < gra_speed:
+          elif target_speed < gra_speed:
             self.gra_send_down = True
     
       else:
