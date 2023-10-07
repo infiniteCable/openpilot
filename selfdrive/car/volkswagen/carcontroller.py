@@ -93,10 +93,10 @@ class CarController:
         target_speed = max(CS.out.vEgo + (target_accel * 3), 0)
         gra_speed = int(round(CS.gra_speed))
 
-          if target_speed > gra_speed:
-            self.gra_send_up = True
-          elif target_speed < gra_speed:
-            self.gra_send_down = True
+        if target_speed > gra_speed:
+          self.gra_send_up = True
+        elif target_speed < gra_speed:
+          self.gra_send_down = True
     
       else:
         self.gra_send_up = False
