@@ -87,15 +87,18 @@ class CarController:
 
     # **** Acceleration Controls ******************************************** #
 
-    if self.frame % 30 == 0 and not self.gra_send_up and not self.gra_send_down:
+    if self.frame % 30 == 0:
       if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
         target_accel = actuators.accel
+        #target_speed = actuators.speed
         target_speed = max(CS.out.vEgo + (target_accel * 3), 0)
         gra_speed = int(round(CS.gra_speed))
 
         if target_speed > gra_speed:
           self.gra_send_up = True
+          self.gra_send_down = False
         elif target_speed < gra_speed:
+          self.gra_send_up = False
           self.gra_send_down = True
     
       else:
@@ -110,16 +113,6 @@ class CarController:
         hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverUrgent"]
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
-
-    if self.frame % self.CCP.ACC_HUD_STEP == 0 and self.CP.openpilotLongitudinalControl:
-      lead_distance = 0
-      if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
-        lead_distance = 512 if CS.upscale_lead_car_signal else 8
-      acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
-      # FIXME: follow the recent displayed-speed updates, also use mph_kmh toggle to fix display rounding problem?
-      set_speed = hud_control.setSpeed * CV.MS_TO_KPH
-      can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.cam, acc_hud_status, set_speed,
-                                                       lead_distance))
 
     # **** Stock ACC Button Controls **************************************** #
 
