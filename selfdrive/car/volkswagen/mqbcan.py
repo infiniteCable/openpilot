@@ -49,7 +49,7 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
   return packer.make_can_msg("GRA_ACC_01", bus, values)
 
 
-def create_gra_buttons_control(packer, bus, gra_stock_values, up, down):
+def create_gra_buttons_control(packer, bus, gra_stock_values, up=False, down=False):
   values = {s: gra_stock_values[s] for s in [
     "GRA_Hauptschalter",           # GRA button, on/off
     "GRA_Abbrechen",               # GRA button cancel
