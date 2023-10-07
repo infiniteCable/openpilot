@@ -49,6 +49,25 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
   return packer.make_can_msg("GRA_ACC_01", bus, values)
 
 
+def create_gra_buttons_control(packer, bus, gra_stock_values, up, down):
+  values = {s: gra_stock_values[s] for s in [
+    "GRA_Hauptschalter",           # GRA button, on/off
+    "GRA_Abbrechen",               # GRA button cancel
+    "GRA_Typ_Hauptschalter",       # GRA main button type
+    "GRA_Codierung",               # GRA button configuration/coding
+    "GRA_Tip_Stufe_2",             # unknown related to stalk type
+    "GRA_ButtonTypeInfo",          # unknown related to stalk type
+  ]}
+
+  values.update({
+    "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
+    "GRA_Tip_Wiederaufnahme": up,
+    "GRA_Tip_Setzen": down,
+  })
+
+  return packer.make_can_msg("GRA_ACC_01", bus, values)
+
+
 def acc_control_value(main_switch_on, acc_faulted, long_active):
   if acc_faulted:
     acc_control = 6
