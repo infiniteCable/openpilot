@@ -87,7 +87,7 @@ class CarController:
 
     # **** Acceleration Controls ******************************************** #
 
-    if self.frame % 20 == 0:
+    if self.frame % 30 == 0:
       if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
         self.gra_send_up = False
         self.gra_send_down = False
