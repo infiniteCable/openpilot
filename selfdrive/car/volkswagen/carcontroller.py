@@ -47,6 +47,7 @@ class CarController:
 
       if CC.latActive:
         self.hca_enabled = True
+        self.hca_standby_timer = 0
         new_steer = int(round(actuators.steer * self.CCP.STEER_MAX))
         apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP)
         self.hca_frame_timer_running += self.CCP.STEER_STEP
@@ -61,7 +62,6 @@ class CarController:
       else:
         hca_request = False
         apply_steer = 0
-
 
         if self.hca_enabled and self.hca_standby_timer <= 10:
           self.hca_standby_timer += 1
