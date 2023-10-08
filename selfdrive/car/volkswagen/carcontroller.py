@@ -89,9 +89,9 @@ class CarController:
 
     if self.frame % 20 == 0:
       if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
-        #target_accel = actuators.accel
-        target_speed = int(actuators.speed * CV.MS_TO_KPH * ((CS.out.vEgo * CV.MS_TO_KPH) / CS.clu_speed))
-        #target_speed = int(round(max(CS.gra_speed + (target_accel * 3), 0)))
+        target_accel = actuators.accel
+        #target_speed = int(actuators.speed * CV.MS_TO_KPH * ((CS.out.vEgo * CV.MS_TO_KPH) / CS.clu_speed))
+        target_speed = int(max((CS.out.vEgo * CV.MS_TO_KPH) + (target_accel * 3), 0))
         gra_speed = int(CS.gra_speed)
 
         if actuators.accel != 0:
