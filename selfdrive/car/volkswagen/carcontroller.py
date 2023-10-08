@@ -124,9 +124,6 @@ class CarController:
 
       elif self.CP.openpilotLongitudinalControl and (self.gra_send_up or self.gra_send_down):
         can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, up=self.gra_send_up, down=self.gra_send_down))
-        hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverChime"]
-        can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
-                                                         CS.out.steeringPressed, hud_alert, hud_control))
         self.gra_send_up = False
         self.gra_send_down = False
 
