@@ -123,7 +123,7 @@ class CarController:
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
                                                              cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
 
-      elif self.CP.openpilotLongitudinalControl:
+      elif self.CP.openpilotLongitudinalControl and CC.longActive:
         can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, up=self.gra_send_up, down=self.gra_send_down))
         self.gra_send_up = False
         self.gra_send_down = False
