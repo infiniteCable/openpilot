@@ -57,14 +57,13 @@ def create_gra_buttons_control(packer, bus, gra_stock_values, up=False, down=Fal
     "GRA_Codierung",               # GRA button configuration/coding
     "GRA_Tip_Stufe_2",             # unknown related to stalk type
     "GRA_ButtonTypeInfo",          # unknown related to stalk type
-    "GRA_Tip_Wiederaufnahme",
-    "GRA_Tip_Setzen",
   ]}
 
+  if up or 
   values.update({
     "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
-    "GRA_Tip_Wiederaufnahme": up if up,
-    "GRA_Tip_Setzen": down if down,
+    "GRA_Tip_Wiederaufnahme": up,
+    "GRA_Tip_Setzen": down,
   })
 
   return packer.make_can_msg("GRA_ACC_01", bus, values)
