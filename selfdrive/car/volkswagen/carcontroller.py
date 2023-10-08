@@ -100,14 +100,14 @@ class CarController:
         elif target_speed < gra_speed:
           self.gra_send_up = False
           self.gra_send_down = True
-        else:
-          hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverUrgent"]
-          can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
-                                                           CS.out.steeringPressed, hud_alert, hud_control))
     
       else:
         self.gra_send_up = False
         self.gra_send_down = False
+
+        hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverUrgent"]
+        can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
+                                                         CS.out.steeringPressed, hud_alert, hud_control))
 
     # **** HUD Controls ***************************************************** #
 
