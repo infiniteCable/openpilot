@@ -30,6 +30,10 @@ class CarController:
 
     self.gra_send_up = False
     self.gra_send_down = False
+    self.gra_speed = 0
+    self.target_speed = 0
+    self.gra_button_timer = 20
+    self.gra_button_frame = 0
     
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
@@ -87,8 +91,8 @@ class CarController:
 
     # **** Acceleration Controls ******************************************** #
 
-    if self.frame % 20 == 0:
-      if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
+    if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
+      if self.frame % 20 == 0:
         target_accel = actuators.accel
         if target_accel > 0:
           scaling = 16
@@ -97,20 +101,29 @@ class CarController:
         else:
           scaling = 1
         #target_speed = int(actuators.speed * CV.MS_TO_KPH * ((CS.out.vEgo * CV.MS_TO_KPH) / CS.clu_speed))
-        target_speed = int(max(CS.clu_speed + (target_accel * scaling), 0))
-        gra_speed = int(CS.gra_speed)
+        self.target_speed = int(max(CS.clu_speed + (target_accel * scaling), 0))
+        self.gra_speed = int(CS.gra_speed)
+        speed_diff = abs(self.target_speed - self.gra_speed)
+        self.gra_button_timer = max(int(200 / speed_diff) if speed_diff != 0 else 200, 20)
 
-        if actuators.accel != 0:
-          if target_speed > gra_speed:
-            self.gra_send_up = True
-            self.gra_send_down = False
-          elif target_speed < gra_speed:
-            self.gra_send_up = False
-            self.gra_send_down = True
-    
+      if self.gra_button_frame >= self.gra_button_timer:
+        if self.target_speed > self.gra_speed:
+          self.gra_send_up = True
+          self.gra_send_down = False
+        elif self.target_speed < self.gra_speed:
+          self.gra_send_up = False
+          self.gra_send_down = True
+        else:
+          self.gra_send_up = False
+          self.gra_send_down = False
+          
+        self.gra_button_frame = 0
       else:
-        self.gra_send_up = False
-        self.gra_send_down = False
+        self.gra_button_frame += 1
+    
+    else:
+      self.gra_send_up = False
+      self.gra_send_down = False
 
     # **** HUD Controls ***************************************************** #
 
