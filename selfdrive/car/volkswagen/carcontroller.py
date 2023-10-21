@@ -95,9 +95,9 @@ class CarController:
       if self.frame % 20 == 0:
         target_accel = actuators.accel
         if target_accel > 0:
-          scaling = 16
+          scaling = 40
         elif target_accel < 0:
-          scaling = 6
+          scaling = 10
         else:
           scaling = 1
         #target_speed = int(actuators.speed * CV.MS_TO_KPH * ((CS.out.vEgo * CV.MS_TO_KPH) / CS.clu_speed))
