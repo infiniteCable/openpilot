@@ -145,6 +145,8 @@ class CarState(CarStateBase):
     # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
     self.upscale_lead_car_signal = bool(pt_cp.vl["Kombi_03"]["KBI_Variante"])
 
+    self.bap_ldw = pt_cp.vl["BAP_LDW_01_S"]
+    
     return ret
 
   def update_pq(self, pt_cp, cam_cp, ext_cp, trans_type):
@@ -272,6 +274,7 @@ class CarState(CarStateBase):
       ("Kombi_01", 2),      # From J285 Instrument cluster
       ("Blinkmodi_02", 1),  # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
       ("Kombi_03", 0),      # From J285 instrument cluster (not present on older cars, 1Hz when present)
+      ("BAP_LDW_01_S", 0),  # From J285 Instrument cluster
     ]
 
     if CP.transmissionType == TransmissionType.automatic:
