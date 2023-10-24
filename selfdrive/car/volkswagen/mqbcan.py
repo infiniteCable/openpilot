@@ -136,3 +136,37 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
   }
 
   return packer.make_can_msg("ACC_02", bus, values)
+
+
+def create_bap_short(packer, bus, id, op, logid, func, data):
+  values = {
+    "Op": op,
+    "LogID": logid,
+    "Func": func,
+    "Data": data,
+  }
+
+  return packer.make_can_msg(id, bus, values)
+
+
+def create_bap_long_1(packer, bus, id, length, op, logid, func, data):
+  values = {
+    "0x80": 0x80,
+    "Length": length,
+    "Op": op,
+    "LogID": logid,
+    "Func": func,
+    "Data": data,
+  }
+
+  return packer.make_can_msg(id, bus, values)
+
+
+def create_bap_long_n(packer, bus, id, index, data):
+  values = {
+    "0xC": 0xC,
+    "Index": length,
+    "Data": data,
+  }
+
+  return packer.make_can_msg(id, bus, values)
