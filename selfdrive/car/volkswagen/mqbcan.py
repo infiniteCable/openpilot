@@ -143,7 +143,12 @@ def create_bap_short(packer, bus, id, op, logid, func, data):
     "Op": op,
     "LogID": logid,
     "Func": func,
-    "Data": data,
+    "Data1": data[0],
+    "Data2": data[1],
+    "Data3": data[2],
+    "Data4": data[3],
+    "Data5": data[4],
+    "Data6": data[5],
   }
 
   return packer.make_can_msg(id, bus, values)
@@ -156,7 +161,10 @@ def create_bap_long_1(packer, bus, id, length, op, logid, func, data):
     "Op": op,
     "LogID": logid,
     "Func": func,
-    "Data": data,
+    "Data1": data[0],
+    "Data2": data[1],
+    "Data3": data[2],
+    "Data4": data[3],
   }
 
   return packer.make_can_msg(id, bus, values)
@@ -166,7 +174,13 @@ def create_bap_long_n(packer, bus, id, index, data):
   values = {
     "0xC": 0xC,
     "Index": index,
-    "Data": data,
+    "Data1": data[0],
+    "Data2": data[1],
+    "Data3": data[2],
+    "Data4": data[3],
+    "Data5": data[4],
+    "Data6": data[5],
+    "Data7": data[6],
   }
 
   return packer.make_can_msg(id, bus, values)
