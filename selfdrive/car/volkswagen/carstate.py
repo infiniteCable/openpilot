@@ -18,6 +18,8 @@ class CarState(CarStateBase):
     self.gra_speed = 0
     self.clu_speed = 0
 
+    self.bap_ldw = []
+
   def create_button_events(self, pt_cp, buttons):
     button_events = []
 
@@ -145,7 +147,7 @@ class CarState(CarStateBase):
     # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
     self.upscale_lead_car_signal = bool(pt_cp.vl["Kombi_03"]["KBI_Variante"])
 
-    self.bap_ldw = pt_cp.vl["BAP_LDW_01_S"]
+    self.bap_ldw = cam_cp.vl["BAP_LDW_01_S"]
     
     return ret
 
@@ -274,7 +276,6 @@ class CarState(CarStateBase):
       ("Kombi_01", 2),      # From J285 Instrument cluster
       ("Blinkmodi_02", 1),  # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
       ("Kombi_03", 0),      # From J285 instrument cluster (not present on older cars, 1Hz when present)
-      ("BAP_LDW_01_S", 0),  # From J285 Instrument cluster
     ]
 
     if CP.transmissionType == TransmissionType.automatic:
@@ -289,7 +290,10 @@ class CarState(CarStateBase):
     if CP.carFingerprint in PQ_CARS:
       return CarState.get_cam_can_parser_pq(CP)
 
-    messages = []
+    messages = [
+      # sig_address, frequency
+      ("BAP_LDW_01_S", 0),  # From J285 Instrument cluster
+    ]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
 
