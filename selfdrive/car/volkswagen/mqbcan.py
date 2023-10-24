@@ -165,7 +165,7 @@ def create_bap_long_1(packer, bus, id, length, op, logid, func, data):
 def create_bap_long_n(packer, bus, id, index, data):
   values = {
     "0xC": 0xC,
-    "Index": length,
+    "Index": index,
     "Data": data,
   }
 
