@@ -18,8 +18,6 @@ class CarState(CarStateBase):
     self.gra_speed = 0
     self.clu_speed = 0
 
-    self.bap_ldw = []
-
   def create_button_events(self, pt_cp, buttons):
     button_events = []
 
@@ -147,7 +145,7 @@ class CarState(CarStateBase):
     # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
     self.upscale_lead_car_signal = bool(pt_cp.vl["Kombi_03"]["KBI_Variante"])
 
-    self.bap_ldw = cam_cp.vl["BAP_LDW_01_S"]
+    self.bap_ldw_01 = cam_cp.vl["BAP_LDW_01_S"]
     
     return ret
 
