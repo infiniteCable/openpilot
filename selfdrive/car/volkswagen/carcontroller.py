@@ -124,7 +124,7 @@ class CarController:
     else:
       self.gra_send_up = False
       self.gra_send_down = False
-
+      
     # **** HUD Controls ***************************************************** #
 
     if self.frame % self.CCP.LDW_STEP == 0:
@@ -154,3 +154,25 @@ class CarController:
     self.gra_acc_counter_last = CS.gra_stock_values["COUNTER"]
     self.frame += 1
     return new_actuators, can_sends, self.eps_timer_soft_disable_alert
+
+  def handle_bap_ldw_01(bap_ldw_01):
+    op     = bap_ldw_01["Op"]
+    log_id = bap_ldw_01["LogID"]
+    func   = bap_ldw_01["Func"]
+
+    if log_id == 25: # LDW
+      if op == 1: # get
+        if func == 1:
+          msg = {
+            "Op": 0, # reset
+            "LogID": log_id,
+            "Func": func,
+            "Data": 0x030019000401
+          }
+        elif func == 2:
+          
+        elif fund == 3:
+          
+      
+    
+    return msg
