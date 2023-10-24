@@ -134,6 +134,8 @@ class CarController:
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
+    handle_bap_ldw_01(self, can_sends, CS.bap_ldw)
+
     # **** Stock ACC Button Controls **************************************** #
 
     gra_send_ready = CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
@@ -155,24 +157,22 @@ class CarController:
     self.frame += 1
     return new_actuators, can_sends, self.eps_timer_soft_disable_alert
 
-  def handle_bap_ldw_01(bap_ldw_01):
+  def handle_bap_ldw_01(self, can_sends, bap_ldw_01):
     op     = bap_ldw_01["Op"]
     log_id = bap_ldw_01["LogID"]
     func   = bap_ldw_01["Func"]
 
     if log_id == 25: # LDW
       if op == 1: # get
-        if func == 1:
-          msg = {
-            "Op": 0, # reset
-            "LogID": log_id,
-            "Func": func,
-            "Data": 0x030019000401
-          }
-        elif func == 2:
-          
-        elif fund == 3:
-          
-      
-    
-    return msg
+        if func == 2: # configuration
+          can_sends.append(self.CCS.create_bap_short(self.packer_pt, CANBUS.pt, "BAP_LDW_10_S", 0, log_id, func, 0x030019000401))
+        elif func == 3: # functions
+          can_sends.append(self.CCS.create_bap_long_1(self.packer_pt, CANBUS.pt, "BAP_LDW_10_L1", 4, 0x08, log_id, func, 0x3807E000))
+          can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.pt, "BAP_LDW_10_LN", 0, 0x040108003807E0)
+                            
+        elif func == 1: # properties
+          can_sends.append(self.CCS.create_bap_long_1(self.packer_pt, CANBUS.pt, "BAP_LDW_10_L1", 4, 0x1A, log_id, func, 0x03001900))
+          can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.pt, "BAP_LDW_10_LN", 0, 0x040108003807E0)
+          can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.pt, "BAP_LDW_10_LN", 1, 0x00000000000A00)
+          can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.pt, "BAP_LDW_10_LN", 2, 0x02000100020000)
+          can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.pt, "BAP_LDW_10_LN", 3, 0x00)
