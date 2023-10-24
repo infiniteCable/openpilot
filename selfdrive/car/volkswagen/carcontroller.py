@@ -134,7 +134,7 @@ class CarController:
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
-    #self.handle_bap_ldw_01(self, can_sends, CS.bap_ldw)
+    self.handle_bap_ldw_01(self, can_sends, CS.bap_ldw)
 
     # **** Stock ACC Button Controls **************************************** #
 
@@ -158,9 +158,9 @@ class CarController:
     return new_actuators, can_sends, self.eps_timer_soft_disable_alert
 
   def handle_bap_ldw_01(self, can_sends, bap_ldw_01):
-    op     = bap_ldw_01["Op"]
+    op = bap_ldw_01["Op"]
     log_id = bap_ldw_01["LogID"]
-    func   = bap_ldw_01["Func"]
+    func = bap_ldw_01["Func"]
 
     if log_id == 25: # LDW
       if op == 1: # get
