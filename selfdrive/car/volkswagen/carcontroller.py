@@ -163,22 +163,23 @@ class CarController:
     bap_dest_dbc = "BAP_LDW_10"
     bap_dest_hex = 0x17331910
     
-    if CS.bap_ldw_01 is not None:
-      can_id, opcode, lsg_id, fct_id, bap_data = CS.bap_ldw_01
+    if bap_ldw_01 is not None:
+      can_id, opcode, lsg_id, fct_id, bap_data = bap_ldw_01
 
-    if lsg_id == 25: # LDW
-      if opcode == 1: # get
-        if fct_id == 2: # configuration
-          can_frames = self.bap.send(bap_dest_hex, 0, lsg_id, fct_id, 0x030019000401)
-          for (id, data) in can_frames:
-            can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
+      if lsg_id == 25: # LDW
+        if opcode == 1: # get
+          if fct_id == 2: # configuration
+            can_frames = self.bap.send(bap_dest_hex, 0, lsg_id, fct_id, 0x030019000401)
+            for (id, data) in can_frames:
+              can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
           
-        elif fct_id == 3: # functions
-          can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, 0x3807E000040108003807E0)
-          for (id, data) in can_frames:
-            can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
+          elif fct_id == 3: # functions
+            can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, 0x3807E000040108003807E0)
+            for (id, data) in can_frames:
+              can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
                             
-        elif func == 1: # properties
-          can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, 0x03001900040108003807E000000000000A00020001000200000000)
-          for (id, data) in can_frames:
-            can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
+          elif func == 1: # properties
+            can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, 0x03001900040108003807E000000000000A00020001000200000000)
+            for (id, data) in can_frames:
+              can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
+
