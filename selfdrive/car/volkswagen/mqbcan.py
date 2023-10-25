@@ -138,49 +138,9 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
   return packer.make_can_msg("ACC_02", bus, values)
 
 
-#def create_bap_short(packer, bus, id, op, logid, func, data):
-#  values = {
-#    "Op": op,
-#    "LogID": logid,
-#    "Func": func,
-#    "Data1": data[0],
-#    "Data2": data[1],
-#    "Data3": data[2],
-#    "Data4": data[3],
-#    "Data5": data[4],
-#    "Data6": data[5],
-#  }
+def create_bap(packer, bus, id, data):
+  values = {
+    "Stream": data,
+  }
 
-#  return packer.make_can_msg(id, bus, values)
-
-
-#def create_bap_long_1(packer, bus, id, length, op, logid, func, data):
-#  values = {
-#    "0x80": 0x80,
-#    "Length": length,
-#    "Op": op,
-#    "LogID": logid,
-#    "Func": func,
-#    "Data1": data[0],
-#    "Data2": data[1],
-#    "Data3": data[2],
-#    "Data4": data[3],
-#  }
-
-#  return packer.make_can_msg(id, bus, values)
-
-
-#def create_bap_long_n(packer, bus, id, index, data):
-#  values = {
-#    "0xC": 0xC,
-#    "Index": index,
-#    "Data1": data[0],
-#    "Data2": data[1],
-#    "Data3": data[2],
-#    "Data4": data[3],
-#    "Data5": data[4],
-#    "Data6": data[5],
-#    "Data7": data[6],
-#  }
-#
-#  return packer.make_can_msg(id, bus, values)
+ return packer.make_can_msg(id, bus, values)
