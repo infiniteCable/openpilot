@@ -178,7 +178,7 @@ class CarController:
             for (id, data) in can_frames:
               can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
                             
-          elif func == 1: # properties
+          elif fct_id == 1: # properties
             can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, 0x03001900040108003807E000000000000A00020001000200000000)
             for (id, data) in can_frames:
               can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
