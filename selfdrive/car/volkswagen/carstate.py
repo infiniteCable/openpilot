@@ -145,7 +145,7 @@ class CarState(CarStateBase):
     # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
     self.upscale_lead_car_signal = bool(pt_cp.vl["Kombi_03"]["KBI_Variante"])
 
-    self.bap_ldw_01 = cam_cp.vl["BAP_LDW_01_S"]
+    #self.bap_ldw_01 = cam_cp.vl["BAP_LDW_01_S"]
     
     return ret
 
@@ -290,7 +290,7 @@ class CarState(CarStateBase):
 
     messages = [
       # sig_address, frequency
-      ("BAP_LDW_01_S", 0),  # From J285 Instrument cluster
+      #("BAP_LDW_01_S", 0),  # From J285 Instrument cluster
     ]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
