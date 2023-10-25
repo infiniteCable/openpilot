@@ -159,31 +159,24 @@ class CarController:
     self.frame += 1
     return new_actuators, can_sends, self.eps_timer_soft_disable_alert
 
-  #def handle_bap_ldw_01(self, can_sends, bap_ldw_01):
-  #  op = bap_ldw_01["Op"]
-  #  log_id = bap_ldw_01["LogID"]
-  #  func = bap_ldw_01["Func"]
+  def handle_bap_ldw_01(self, can_sends, bap_ldw_01):
+    bap_dest_dbc = "BAP_LDW_10"
+    bap_dest_hex = 0x17331910
+    
+    if CS.bap_ldw_01 is not None:
+      can_id, opcode, lsg_id, fct_id, bap_data = CS.bap_ldw_01
 
-  #  if log_id == 25: # LDW
-  #    if op == 1: # get
-  #      if func == 2: # configuration
-  #        data = [0x03, 0x00, 0x19, 0x00, 0x04, 0x01]
-  #        can_sends.append(self.CCS.create_bap_short(self.packer_pt, CANBUS.cam, "BAP_LDW_10_S", 0, log_id, func, data))
+    if lsg_id == 25: # LDW
+      if opcode == 1: # get
+        if fct_id == 2: # configuration
+          can_frames = self.bap.send(bap_dest_hex, 0, lsg_id, fct_id, 0x030019000401)
+          for (id, data) in can_frames:
+            can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
           
-  #      elif func == 3: # functions
-  #        data = [0x38, 0x07, 0xE0, 0x00]
-  #        can_sends.append(self.CCS.create_bap_long_1(self.packer_pt, CANBUS.cam, "BAP_LDW_10_L1", 4, 0x08, log_id, func, data))
-  #        data = [0x04, 0x01, 0x08, 0x00, 0x38, 0x07, 0xE0]
-  #        can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.cam, "BAP_LDW_10_LN", 0, data))
+        elif fct_id == 3: # functions
+          can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, 0x3807E000040108003807E0)
+          can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
                             
-  #      elif func == 1: # properties
-  #        data = [0x03,0x00, 0x19, 0x00]
-  #        can_sends.append(self.CCS.create_bap_long_1(self.packer_pt, CANBUS.cam, "BAP_LDW_10_L1", 4, 0x1A, log_id, func, data))
-  #        data = [0x04, 0x01, 0x08, 0x00, 0x38, 0x07, 0xE0]
-  #        can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.cam, "BAP_LDW_10_LN", 0, data))
-  #        data = [0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00]
-  #        can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.cam, "BAP_LDW_10_LN", 1, data))
-  #        data = [0x02, 0x00, 0x01, 0x00, 0x02, 0x00, 0x00]
-  #        can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.cam, "BAP_LDW_10_LN", 2, data))
-  #        data = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
-  #        can_sends.append(self.CCS.create_bap_long_n(self.packer_pt, CANBUS.cam, "BAP_LDW_10_LN", 3, data))
+        elif func == 1: # properties
+          can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, 0x03001900040108003807E000000000000A00020001000200000000)
+          can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
