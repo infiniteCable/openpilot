@@ -143,4 +143,4 @@ def create_bap(packer, bus, id, data):
     "Stream": data,
   }
 
- return packer.make_can_msg(id, bus, values)
+  return packer.make_can_msg(id, bus, values)
