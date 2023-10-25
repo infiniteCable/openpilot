@@ -5,12 +5,14 @@ from openpilot.selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from openpilot.selfdrive.car.volkswagen.values import DBC, CANBUS, PQ_CARS, NetworkLocation, TransmissionType, GearShifter, \
                                             CarControllerParams
+from openpilot.selfdrive.car.volkswagen import bap
 
 
 class CarState(CarStateBase):
   def __init__(self, CP):
     super().__init__(CP)
     self.CCP = CarControllerParams(CP)
+    self.bap = bap
     self.button_states = {button.event_type: False for button in self.CCP.BUTTONS}
     self.esp_hold_confirmation = False
     self.upscale_lead_car_signal = False
@@ -145,7 +147,7 @@ class CarState(CarStateBase):
     # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
     self.upscale_lead_car_signal = bool(pt_cp.vl["Kombi_03"]["KBI_Variante"])
 
-    self.bap_ldw_01 = cam_cp.vl["BAP_LDW_01"]
+    self.bap_ldw_01 = self.bap.receive_can(0x17331901, cam_cp.vl["BAP_LDW_01"]["Stream"])
     
     return ret
 
