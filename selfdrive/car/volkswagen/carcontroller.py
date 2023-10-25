@@ -6,6 +6,7 @@ from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.car import apply_driver_steer_torque_limits
 from openpilot.selfdrive.car.volkswagen import mqbcan, pqcan
 from openpilot.selfdrive.car.volkswagen.values import CANBUS, PQ_CARS, CarControllerParams
+from openpilot.selfdrive.car.volkswagen import bap
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 LongCtrlState = car.CarControl.Actuators.LongControlState
@@ -17,6 +18,7 @@ class CarController:
     self.CCP = CarControllerParams(CP)
     self.CCS = pqcan if CP.carFingerprint in PQ_CARS else mqbcan
     self.packer_pt = CANPacker(dbc_name)
+    self.bap = bap
 
     self.apply_steer_last = 0
     self.gra_acc_counter_last = None
