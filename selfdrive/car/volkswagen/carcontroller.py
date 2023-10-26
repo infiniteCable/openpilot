@@ -136,7 +136,7 @@ class CarController:
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
-    #self.handle_bap_ldw_01(self, can_sends, CS.bap_ldw_01)
+    self.handle_bap_ldw_01(self, can_sends, CS.bap_ldw_01)
 
     # **** Stock ACC Button Controls **************************************** #
 
@@ -169,17 +169,17 @@ class CarController:
       if lsg_id == 25: # LDW
         if opcode == 1: # get
           if fct_id == 2: # configuration
-            can_frames = self.bap.send(bap_dest_hex, 0, lsg_id, fct_id, 0x030019000401)
+            can_frames = self.bap.send(bap_dest_hex, 0, lsg_id, fct_id, bytes.fromhex("030019000401"))
             for (id, data) in can_frames:
               can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
           
           elif fct_id == 3: # functions
-            can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, 0x3807E000040108003807E0)
+            can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, bytes.fromhex("3807E000040108003807E0"))
             for (id, data) in can_frames:
               can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
                             
           elif fct_id == 1: # properties
-            can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, 0x03001900040108003807E000000000000A00020001000200000000)
+            can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, bytes.fromhex("03001900040108003807E000000000000A00020001000200000000"))
             for (id, data) in can_frames:
               can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, data))
 
