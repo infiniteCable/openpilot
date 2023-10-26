@@ -147,8 +147,8 @@ class CarState(CarStateBase):
     # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
     self.upscale_lead_car_signal = bool(pt_cp.vl["Kombi_03"]["KBI_Variante"])
 
-    #test = hex(int(cam_cp.vl["BAP_LDW_01"]["Stream"]))[2:]
-    self.bap_ldw_01 = self.bap.receive_can(0x17331901, bytes.fromhex(hex(int(cam_cp.vl["BAP_LDW_01"]["Stream"]))[2:]))
+    bap_ldw_01_rec = cam_cp.vl["BAP_LDW_01"]["Stream"]
+    self.bap_ldw_01 = self.bap.receive_can(0x17331901, bytes.fromhex(hex(int(bap_ldw_01_rec))[2:])) if str.isnumeric(bap_ldw_01_rec) else None
     
     return ret
 
