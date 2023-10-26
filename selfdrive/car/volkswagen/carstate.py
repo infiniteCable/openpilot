@@ -5,14 +5,14 @@ from openpilot.selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from openpilot.selfdrive.car.volkswagen.values import DBC, CANBUS, PQ_CARS, NetworkLocation, TransmissionType, GearShifter, \
                                             CarControllerParams
-from openpilot.selfdrive.car.volkswagen import bap
+from openpilot.selfdrive.car.volkswagen import Bap
 
 
 class CarState(CarStateBase):
   def __init__(self, CP):
     super().__init__(CP)
     self.CCP = CarControllerParams(CP)
-    self.bap = bap
+    self.bap = Bap
     self.button_states = {button.event_type: False for button in self.CCP.BUTTONS}
     self.esp_hold_confirmation = False
     self.upscale_lead_car_signal = False
