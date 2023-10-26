@@ -7,6 +7,7 @@ class Bap:
         self.target = {}
 
     def receive_can(self, can_id, data):
+        return None
         header = struct.unpack(">H", data[:2])[0]
         return None
 
