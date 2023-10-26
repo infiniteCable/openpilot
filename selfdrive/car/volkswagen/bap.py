@@ -18,7 +18,10 @@ class Bap:
 
         if header & 0xC000 == 0x8000: # start
             self.pktlen[logical_channel] = header & 0xFFF
-            header = struct.unpack(">H", data[2:4])[0]
+            try:
+              header = struct.unpack(">H", data[2:4])[0]
+            except struct.error:
+              return None
             self.target[logical_channel] = header
             self.data[logical_channel] = data[4:]
         elif header & 0xC000 == 0xC000 and self.data.get(logical_channel) is not None: # data
