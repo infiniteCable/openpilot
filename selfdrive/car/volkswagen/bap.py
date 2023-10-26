@@ -52,10 +52,10 @@ class Bap:
         else:
             res.append((id, struct.pack(">H", 0x8000 | len(data)) + header + data[:4]))
             data = data[4:]
-            idx = 0xC0
+            idx = bytes.fromhex("C0")
             while len(data):
-                res.append((id, chr(idx) + data[:7]))
+                res.append((id, idx + data[:7]))
                 data = data[7:]
-                idx += 1
+                idx = (int.from_bytes(idx) + 1).to_bytes(1)
 
         return res
