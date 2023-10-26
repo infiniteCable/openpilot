@@ -136,7 +136,7 @@ class CarController:
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
-    self.handle_bap_ldw_01(self, can_sends, CS.bap_ldw_01)
+    self.handle_bap_ldw_01(can_sends, CS.bap_ldw_01)
 
     # **** Stock ACC Button Controls **************************************** #
 
