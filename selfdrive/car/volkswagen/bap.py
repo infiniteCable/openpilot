@@ -8,6 +8,7 @@ class Bap:
 
     def receive_can(self, can_id, data):
         header = struct.unpack(">H", data[:2])[0]
+        return None
 
         logical_channel = can_id
         if header & 0x8000 == 0x8000:
