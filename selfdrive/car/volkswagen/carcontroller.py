@@ -170,19 +170,19 @@ class CarController:
         if opcode == 1: # get
           if fct_id == 2: # configuration
             can_frames = self.bap.send(bap_dest_hex, 0, lsg_id, fct_id, bytes.fromhex("030019000401"))
-            for (id, data) in can_frames:
-              can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
+            #for (id, data) in can_frames:
+            #  can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
               #can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, int.from_bytes(data)))
           
           elif fct_id == 3: # functions
             can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, bytes.fromhex("3807E000040108003807E0"))
-            for (id, data) in can_frames:
-              can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
+            #for (id, data) in can_frames:
+            #  can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
               #can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, int.from_bytes(data)))
                             
           elif fct_id == 1: # properties
             can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, bytes.fromhex("03001900040108003807E000000000000A00020001000200000000"))
-            for (id, data) in can_frames:
-              can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
+            #for (id, data) in can_frames:
+             # can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
               #can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest, int.from_bytes(data)))
 
