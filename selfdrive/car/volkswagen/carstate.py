@@ -148,7 +148,7 @@ class CarState(CarStateBase):
     self.upscale_lead_car_signal = bool(pt_cp.vl["Kombi_03"]["KBI_Variante"])
 
     #test = hex(int(cam_cp.vl["BAP_LDW_01"]["Stream"]))[2:]
-    self.bap_ldw_01 = self.bap.receive_can(0x17331901, hex(int(cam_cp.vl["BAP_LDW_01"]["Stream"])))
+    self.bap_ldw_01 = self.bap.receive_can(0x17331901, bytes.fromhex(hex(int(cam_cp.vl["BAP_LDW_01"]["Stream"]))[2:]))
     
     return ret
 
