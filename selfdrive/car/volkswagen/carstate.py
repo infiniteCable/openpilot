@@ -150,7 +150,10 @@ class CarState(CarStateBase):
 
     try:
       bap_ldw_01_rec = int(cam_cp.vl["BAP_LDW_01"]["Stream"])
-      self.bap_ldw_01 = self.bap.receive_can(0x17331901, bap_ldw_01_rec.to_bytes(8, 'big'))
+      if bap_ldw_01_rec != 0:
+        self.bap_ldw_01 = self.bap.receive_can(0x17331901, bap_ldw_01_rec.to_bytes(8, 'big'))
+      else:
+        self.bap_ldw_01 = None
     except ValueError:
       self.bap_ldw_01 = None
     
