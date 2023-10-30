@@ -36,6 +36,8 @@ class CarController:
     self.target_speed = 0
     self.gra_button_timer = 20
     self.gra_button_frame = 0
+
+    self.test = False
     
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
@@ -129,9 +131,13 @@ class CarController:
       
     # **** HUD Controls ***************************************************** #
 
+    if CS.bap_ldw_01 is not None:
+      self.test = True
+    
     if self.frame % self.CCP.LDW_STEP == 0:
       hud_alert = 0
-      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or CS.bap_ldw_01 is not None:
+      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or self.test:
+        self.test = False
         hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverUrgent"]
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
