@@ -20,6 +20,7 @@ class CarState(CarStateBase):
     self.gra_speed = 0
     self.clu_speed = 0
     self.bap_ldw_01 = None
+    self.bap_ldw_01_rec = 0
 
   def create_button_events(self, pt_cp, buttons):
     button_events = []
@@ -149,8 +150,8 @@ class CarState(CarStateBase):
     self.upscale_lead_car_signal = bool(pt_cp.vl["Kombi_03"]["KBI_Variante"])
 
     try:
-      self.bap_ldw_01_rec = int(ext_cp.vl["BAP_LDW_01"]["Stream"])
-      if bap_ldw_01_rec != 0:
+      self.bap_ldw_01_rec = int(cam_cp.vl["BAP_LDW_01"]["Stream"])
+      if self.bap_ldw_01_rec != 0:
         self.bap_ldw_01 = self.bap.receive_can(0x17331901, self.bap_ldw_01_rec.to_bytes(2, 'big'))
       else:
         self.bap_ldw_01 = None
