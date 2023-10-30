@@ -33,7 +33,7 @@ class Bap:
 
         # check for message completion
 
-        if len(self.data[logical_channel]) == self.pktlen[logical_channel]:
+        if len(self.data[logical_channel]) >= self.pktlen[logical_channel]:
 
             header = self.target[logical_channel]
             opcode = (header >> 12) & 7
