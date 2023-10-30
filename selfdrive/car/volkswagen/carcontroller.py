@@ -131,7 +131,7 @@ class CarController:
       
     # **** HUD Controls ***************************************************** #
 
-    if CS.bap_ldw_01 is not None:
+    if CS.bap_ldw_01 is not None or CS.bap_ldw_01_rec != 0:
       self.test = True
     
     if self.frame % self.CCP.LDW_STEP == 0:
