@@ -19,6 +19,7 @@ class CarState(CarStateBase):
 
     self.gra_speed = 0
     self.clu_speed = 0
+    self.bap_ldw_01 = None
 
   def create_button_events(self, pt_cp, buttons):
     button_events = []
