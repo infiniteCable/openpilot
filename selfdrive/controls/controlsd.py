@@ -857,8 +857,7 @@ class Controls:
     self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
 
     # enable lateral only mode, when lateral only toggle is enabled
-    # or lateral only mode was already set when not disangaging on brake toggle is enabled
-    self.lateral_only_mode = self.lateral_only or self.lateral_only_mode and self.not_disengage_lat_on_brake 
+    self.lateral_only_mode = self.lateral_only
 
     # Sample data from sockets and get a carState
     CS = self.data_sample()
