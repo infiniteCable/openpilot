@@ -858,7 +858,7 @@ class Controls:
     self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
     
     self.lateral_only = self.params.get_bool("EngageLatOnly")
-    self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
+    #self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
 
     # enable lateral only mode, when lateral only toggle is enabled
     self.lateral_only_mode = self.lateral_only
