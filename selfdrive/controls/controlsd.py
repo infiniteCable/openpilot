@@ -244,7 +244,7 @@ class Controls:
 
       # set openpilot to lateral control only mode when toggle NotDisengageLatOnBrake is set and the brake was pressed  
       if CS.brakePressed and self.not_disengage_lat_on_brake:
-        self.events.add(EventName.lateralOnly)
+        #self.events.add(EventName.lateralOnly)
         self.lateral_only_mode = True
       else:
         self.events.add(EventName.pedalPressed)
@@ -858,7 +858,7 @@ class Controls:
     self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
     
     self.lateral_only = self.params.get_bool("EngageLatOnly")
-    #self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
+    self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
 
     # enable lateral only mode, when lateral only toggle is enabled
     self.lateral_only_mode = self.lateral_only
