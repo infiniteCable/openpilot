@@ -109,6 +109,7 @@ class Controls:
     self.CP.alternativeExperience = 0
     if not self.disengage_on_accelerator:
       self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
+    # alrernative experience for not disengage lat on brake has still to be done for panda to ensure, no long control messages will be sent to can
 
     # read params
     self.is_metric = self.params.get_bool("IsMetric")
@@ -116,6 +117,7 @@ class Controls:
     openpilot_enabled_toggle = self.params.get_bool("OpenpilotEnabledToggle")
     passive = self.params.get_bool("Passive") or not openpilot_enabled_toggle
     self.lateral_only = self.params.get_bool("EngageLatOnly")
+    self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
 
     # detect sound card presence and ensure successful init
     sounds_available = HARDWARE.get_sound_card_online()
@@ -593,7 +595,7 @@ class Controls:
     CC.enabled = self.enabled
 
     # Check which actuators can be enabled
-    standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
+    standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) and not self.ignore_lat_min_speed or self.ignore_lat_min_speed and CS.vEgo <= MIN_LATERAL_CONTROL_SPEED or CS.standstill
     CC.latActive = self.active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                    (not standstill or self.joystick_mode)
     CC.longActive = self.enabled and not self.lateral_only_mode and not self.events.contains(ET.OVERRIDE_LONGITUDINAL) and self.CP.openpilotLongitudinalControl
@@ -858,6 +860,7 @@ class Controls:
     self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
     
     self.lateral_only = self.params.get_bool("EngageLatOnly")
+    self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
 
     # enable lateral only mode, when lateral only toggle is enabled
     # or lateral only mode was already set when not disangaging on brake toggle is enabled
