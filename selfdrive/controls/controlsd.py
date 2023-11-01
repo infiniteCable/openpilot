@@ -181,9 +181,7 @@ class Controls:
     self.experimental_mode = False
     self.v_cruise_helper = VCruiseHelper(self.CP)
     self.recalibrating_seen = False
-    self.lateral_only = False
     self.lateral_only_mode = False
-    self.not_disengage_lat_on_brake = False
 
     # TODO: no longer necessary, aside from process replay
     self.sm['liveParameters'].valid = True
