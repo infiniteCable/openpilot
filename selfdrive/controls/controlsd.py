@@ -243,9 +243,15 @@ class Controls:
 
     # Disable on rising edge of accelerator or brake. Also disable on brake when speed > 0
     if (CS.gasPressed and not self.CS_prev.gasPressed and self.disengage_on_accelerator) or \
-      (CS.brakePressed and (not self.CS_prev.brakePressed or not CS.standstill)) or \
+      (CS.brakePressed and self.(not self.CS_prev.brakePressed or not CS.standstill)) or \
       (CS.regenBraking and (not self.CS_prev.regenBraking or not CS.standstill)):
-      self.events.add(EventName.pedalPressed)
+
+      # set openpilot to lateral control only mode when toggle NotDisengageLatOnBrake is set and the brake was pressed  
+      if CS.brakePressed and self.not_disengage_lat_on_brake:
+        self.events.add(EventName.lateralOnly)
+        self.lateral_only_mode = True
+      else:
+        self.events.add(EventName.pedalPressed)
 
     if CS.brakePressed and CS.standstill:
       self.events.add(EventName.preEnableStandstill)
