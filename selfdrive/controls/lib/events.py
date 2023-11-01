@@ -628,6 +628,15 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
                               visual_alert=VisualAlert.brakePressed),
   },
 
+  EventName.lateralOnly: {
+    ET.ENABLE: EngagementAlert(AudibleAlert.engage),
+    ET.WARNING: Alert(
+      "Lateral Only Mode",
+      "Longitudinal Control is now disabled",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOW, VisualAlert.none, AudibleAlert.none, .1),
+  },
+
   EventName.preEnableStandstill: {
     ET.PRE_ENABLE: Alert(
       "Release Brake to Engage",
