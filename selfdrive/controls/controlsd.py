@@ -104,6 +104,8 @@ class Controls:
     if not self.disengage_on_accelerator:
       self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
     # alrernative experience for not disengage lat on brake has still to be done for panda to ensure, no long control messages will be sent to can
+    if self.not_disengage_lat_on_brake:
+      self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.ALLOW_LATERAL_ON_BRAKE
 
     # read params
     self.is_metric = self.params.get_bool("IsMetric")
