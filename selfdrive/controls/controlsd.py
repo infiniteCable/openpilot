@@ -596,7 +596,7 @@ class Controls:
 
     # Check which actuators can be enabled
     if self.ignore_lat_min_speed and self.lateral_only_mode:
-      standstill = CS.vEgo <= MIN_LATERAL_CONTROL_SPEED
+      standstill = CS.vEgo <= 1.3 # ~5km/h
     else:
       standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
       
