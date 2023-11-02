@@ -252,6 +252,14 @@ DevicePanel::DevicePanel(SettingsWindow *parent) : ListWidget(parent) {
     addItem(regulatoryBtn);
   }
 
+  if (Hardware::TICI()) {
+    auto brigthBtn = new ButtonControl(tr("Change Brigthness"), tr("CHANGE"), "");
+    connect(brigthBtn, &ButtonControl::clicked, [=]() {
+      Hardware::set_brightness(20);
+    });
+    addItem(brigthBtn);
+  }
+
   auto translateBtn = new ButtonControl(tr("Change Language"), tr("CHANGE"), "");
   connect(translateBtn, &ButtonControl::clicked, [=]() {
     QMap<QString, QString> langs = getSupportedLanguages();
