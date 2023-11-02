@@ -86,7 +86,7 @@ class CarInterface(CarInterfaceBase):
       ret.openpilotLongitudinalControl = True
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
       if ret.transmissionType == TransmissionType.manual:
-        ret.minEnableSpeed = -1. #4.5
+        ret.minEnableSpeed = 4.5
 
     ret.pcmCruise = not ret.openpilotLongitudinalControl
     ret.stoppingControl = False
@@ -232,13 +232,13 @@ class CarInterface(CarInterfaceBase):
                                        enable_buttons=(ButtonType.setCruise, ButtonType.resumeCruise))
     
     # lateral only is enforced in controls, when minimum speed is being ignored
-    ignore_min_speed = False #self.params.get_bool("IgnoreLatMinSpeed")
+    ignore_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
     if ignore_min_speed:
       self.CP.minSteerSpeed = 0.
-      self.CP.minEnableSpeed = 0.
+      self.CP.minEnableSpeed = -1.
       
     # Low speed steer alert hysteresis logic
-    if not ignore_min_speed:
+    if True:
       if self.CP.minSteerSpeed > 0. and ret.vEgo < (self.CP.minSteerSpeed + 1.):
         self.low_speed_alert = True
       elif ret.vEgo > (self.CP.minSteerSpeed + 2.):
