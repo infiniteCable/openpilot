@@ -253,11 +253,19 @@ DevicePanel::DevicePanel(SettingsWindow *parent) : ListWidget(parent) {
   }
 
   if (Hardware::TICI()) {
-    auto brigthBtn = new ButtonControl(tr("Change Brigthness"), tr("CHANGE"), "");
-    connect(brigthBtn, &ButtonControl::clicked, [=]() {
-      Hardware::set_brightness(20);
+    auto brigthBtnD = new ButtonControl(tr("Abdunkeln"), tr("CHANGE"), "");
+    connect(brigthBtnD, &ButtonControl::clicked, [=]() {
+      Hardware::set_brightness(6);
     });
-    addItem(brigthBtn);
+    addItem(brigthBtnD);
+  }
+
+  if (Hardware::TICI()) {
+    auto brigthBtnB = new ButtonControl(tr("Aufhellen"), tr("CHANGE"), "");
+    connect(brigthBtnB, &ButtonControl::clicked, [=]() {
+      Hardware::set_brightness(50);
+    });
+    addItem(brigthBtnB);
   }
 
   auto translateBtn = new ButtonControl(tr("Change Language"), tr("CHANGE"), "");
