@@ -591,10 +591,10 @@ class Controls:
     CC.enabled = self.enabled
 
     # Check which actuators can be enabled
-    if not self.ignore_lat_min_speed:
-      standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
-    else:
+    if self.ignore_lat_min_speed and self.lateral_only_mode:
       standstill = CS.vEgo <= MIN_LATERAL_CONTROL_SPEED
+    else:
+      standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
       
     CC.latActive = self.active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                    (not standstill or self.joystick_mode)
