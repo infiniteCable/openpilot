@@ -86,7 +86,7 @@ class CarInterface(CarInterfaceBase):
       ret.openpilotLongitudinalControl = True
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
       if ret.transmissionType == TransmissionType.manual:
-        ret.minEnableSpeed = 0.1 #4.5
+        ret.minEnableSpeed = -1. #4.5
 
     ret.pcmCruise = not ret.openpilotLongitudinalControl
     ret.stoppingControl = False
