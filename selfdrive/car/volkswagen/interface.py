@@ -85,12 +85,12 @@ class CarInterface(CarInterfaceBase):
       # Proof-of-concept, prep for E2E only. No radar points available. Panda ALLOW_DEBUG firmware required.
       ret.openpilotLongitudinalControl = True
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
-      if ret.transmissionType == TransmissionType.manual: #and not self.params.get_bool("IgnoreLatMinSpeed"):
+      if ret.transmissionType == TransmissionType.manual:
         ret.minEnableSpeed = 4.5
 
     ret.pcmCruise = not ret.openpilotLongitudinalControl
-    ret.stoppingControl = True
-    ret.startingState = True
+    ret.stoppingControl = False
+    ret.startingState = False
     ret.startAccel = 1.0
     ret.stopAccel = -0.55
     ret.vEgoStarting = 1.0
@@ -243,7 +243,8 @@ class CarInterface(CarInterfaceBase):
       if ret.vEgo < self.CP.minEnableSpeed + 0.5:
         events.add(EventName.belowEngageSpeed)
       if c.enabled and ret.vEgo < self.CP.minEnableSpeed:
-        events.add(EventName.speedTooLow)
+        if not self.params.get_bool("IgnoreLatMinSpeed"):
+          events.add(EventName.speedTooLow)
 
     if self.eps_timer_soft_disable_alert:
       events.add(EventName.steerTimeLimit)
