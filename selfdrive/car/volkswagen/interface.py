@@ -85,9 +85,8 @@ class CarInterface(CarInterfaceBase):
       # Proof-of-concept, prep for E2E only. No radar points available. Panda ALLOW_DEBUG firmware required.
       ret.openpilotLongitudinalControl = True
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
-      if ret.transmissionType == TransmissionType.manual:
-        if not self.params.get_bool("IgnoreLatMinSpeed"):
-          ret.minEnableSpeed = 4.5
+      if ret.transmissionType == TransmissionType.manual and not self.params.get_bool("IgnoreLatMinSpeed"):
+        ret.minEnableSpeed = 4.5
 
     ret.pcmCruise = not ret.openpilotLongitudinalControl
     ret.stoppingControl = True
