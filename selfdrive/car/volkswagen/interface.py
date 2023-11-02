@@ -86,7 +86,8 @@ class CarInterface(CarInterfaceBase):
       ret.openpilotLongitudinalControl = True
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
       if ret.transmissionType == TransmissionType.manual:
-        ret.minEnableSpeed = 4.5
+        if not self.params.get_bool("IgnoreLatMinSpeed"):
+          ret.minEnableSpeed = 4.5
 
     ret.pcmCruise = not ret.openpilotLongitudinalControl
     ret.stoppingControl = True
@@ -237,15 +238,13 @@ class CarInterface(CarInterfaceBase):
     elif ret.vEgo > (self.CP.minSteerSpeed + 2.):
       self.low_speed_alert = False
     if self.low_speed_alert:
-      if not self.params.get_bool("IgnoreLatMinSpeed"):
-        events.add(EventName.belowSteerSpeed)
+      events.add(EventName.belowSteerSpeed)
 
     if self.CS.CP.openpilotLongitudinalControl:
       if ret.vEgo < self.CP.minEnableSpeed + 0.5:
         events.add(EventName.belowEngageSpeed)
       if c.enabled and ret.vEgo < self.CP.minEnableSpeed:
-        if not self.params.get_bool("IgnoreLatMinSpeed"):
-          events.add(EventName.speedTooLow)
+        events.add(EventName.speedTooLow)
 
     if self.eps_timer_soft_disable_alert:
       events.add(EventName.steerTimeLimit)
