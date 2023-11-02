@@ -230,6 +230,9 @@ class CarInterface(CarInterfaceBase):
     events = self.create_common_events(ret, extra_gears=[GearShifter.eco, GearShifter.sport, GearShifter.manumatic],
                                        pcm_enable=not self.CS.CP.openpilotLongitudinalControl,
                                        enable_buttons=(ButtonType.setCruise, ButtonType.resumeCruise))
+    
+    # lateral only is enforced in controls, when minimum speed is being ignored
+    ignore_min_speed =  self.params.get_bool("IgnoreLatMinSpeed")
 
     # Low speed steer alert hysteresis logic
     if self.CP.minSteerSpeed > 0. and ret.vEgo < (self.CP.minSteerSpeed + 1.):
@@ -237,13 +240,14 @@ class CarInterface(CarInterfaceBase):
     elif ret.vEgo > (self.CP.minSteerSpeed + 2.):
       self.low_speed_alert = False
     if self.low_speed_alert:
-      events.add(EventName.belowSteerSpeed)
+      if not ignore_min_speed:
+        events.add(EventName.belowSteerSpeed)
 
     if self.CS.CP.openpilotLongitudinalControl:
       if ret.vEgo < self.CP.minEnableSpeed + 0.5:
         events.add(EventName.belowEngageSpeed)
       if c.enabled and ret.vEgo < self.CP.minEnableSpeed:
-        if not self.params.get_bool("IgnoreLatMinSpeed"):
+        if not ignore_min_speed:
           events.add(EventName.speedTooLow)
 
     if self.eps_timer_soft_disable_alert:
