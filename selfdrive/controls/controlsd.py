@@ -863,7 +863,7 @@ class Controls:
     self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
 
     # enable lateral only mode, when lateral only toggle is enabled
-    self.lateral_only_mode = self.lateral_only
+    self.lateral_only_mode = self.lateral_only or self.ignore_lat_min_speed
 
     # Sample data from sockets and get a carState
     CS = self.data_sample()
