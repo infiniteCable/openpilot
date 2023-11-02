@@ -86,15 +86,15 @@ class CarInterface(CarInterfaceBase):
       ret.openpilotLongitudinalControl = True
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
       if ret.transmissionType == TransmissionType.manual:
-        ret.minEnableSpeed = 4.5
+        ret.minEnableSpeed = 0.1 #4.5
 
     ret.pcmCruise = not ret.openpilotLongitudinalControl
     ret.stoppingControl = False
     ret.startingState = False
     ret.startAccel = 1.0
     ret.stopAccel = -0.55
-    ret.vEgoStarting = 0
-    ret.vEgoStopping = 0
+    ret.vEgoStarting = 1.0
+    ret.vEgoStopping = 1.0
     ret.longitudinalTuning.kpV = [0.1]
     ret.longitudinalTuning.kiV = [0.0]
 
@@ -232,7 +232,7 @@ class CarInterface(CarInterfaceBase):
                                        enable_buttons=(ButtonType.setCruise, ButtonType.resumeCruise))
     
     # lateral only is enforced in controls, when minimum speed is being ignored
-    ignore_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
+    ignore_min_speed = False #self.params.get_bool("IgnoreLatMinSpeed")
     if ignore_min_speed:
       self.CP.minSteerSpeed = 0.
       self.CP.minEnableSpeed = 0.
