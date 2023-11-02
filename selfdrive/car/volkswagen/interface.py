@@ -237,13 +237,15 @@ class CarInterface(CarInterfaceBase):
     elif ret.vEgo > (self.CP.minSteerSpeed + 2.):
       self.low_speed_alert = False
     if self.low_speed_alert:
-      events.add(EventName.belowSteerSpeed)
+      if not self.params.get_bool("IgnoreLatMinSpeed"):
+        events.add(EventName.belowSteerSpeed)
 
     if self.CS.CP.openpilotLongitudinalControl:
       if ret.vEgo < self.CP.minEnableSpeed + 0.5:
         events.add(EventName.belowEngageSpeed)
       if c.enabled and ret.vEgo < self.CP.minEnableSpeed:
-        events.add(EventName.speedTooLow)
+        if not self.params.get_bool("IgnoreLatMinSpeed"):
+          events.add(EventName.speedTooLow)
 
     if self.eps_timer_soft_disable_alert:
       events.add(EventName.steerTimeLimit)
