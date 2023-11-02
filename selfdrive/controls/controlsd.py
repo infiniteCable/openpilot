@@ -243,7 +243,7 @@ class Controls:
       (CS.regenBraking and (not self.CS_prev.regenBraking or not CS.standstill)):
 
       # set openpilot to lateral control only mode when toggle NotDisengageLatOnBrake is set and the brake was pressed  
-      if CS.brakePressed and self.not_disengage_lat_on_brake:
+      if self.active and self.enabled and CS.brakePressed and self.not_disengage_lat_on_brake:
         self.events.add(EventName.lateralOnly)
         self.lateral_only_mode = True
       else:
