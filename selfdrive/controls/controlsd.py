@@ -252,7 +252,11 @@ class Controls:
         self.events.add(EventName.pedalPressed)
 
     if CS.brakePressed and CS.standstill:
-      self.events.add(EventName.preEnableStandstill)
+      if self.active and self.enabled and self.not_disengage_lat_on_brake:
+        self.events.add(EventName.lateralOnly)
+        self.lateral_only_mode = True
+      else:
+        self.events.add(EventName.preEnableStandstill)
 
     if CS.gasPressed:
       self.events.add(EventName.gasPressedOverride)
