@@ -232,22 +232,24 @@ class CarInterface(CarInterfaceBase):
                                        enable_buttons=(ButtonType.setCruise, ButtonType.resumeCruise))
     
     # lateral only is enforced in controls, when minimum speed is being ignored
-    ignore_min_speed =  self.params.get_bool("IgnoreLatMinSpeed")
-
+    ignore_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
+    if ignore_min_speed:
+      self.CP.minSteerSpeed = 0.
+      self.CP.minEnableSpeed = 0.
+      
     # Low speed steer alert hysteresis logic
-    if self.CP.minSteerSpeed > 0. and ret.vEgo < (self.CP.minSteerSpeed + 1.):
-      self.low_speed_alert = True
-    elif ret.vEgo > (self.CP.minSteerSpeed + 2.):
-      self.low_speed_alert = False
-    if self.low_speed_alert:
-      if not ignore_min_speed:
+    if not ignore_min_speed:
+      if self.CP.minSteerSpeed > 0. and ret.vEgo < (self.CP.minSteerSpeed + 1.):
+        self.low_speed_alert = True
+      elif ret.vEgo > (self.CP.minSteerSpeed + 2.):
+        self.low_speed_alert = False
+      if self.low_speed_alert:
         events.add(EventName.belowSteerSpeed)
 
-    if self.CS.CP.openpilotLongitudinalControl:
-      if ret.vEgo < self.CP.minEnableSpeed + 0.5:
-        events.add(EventName.belowEngageSpeed)
-      if c.enabled and ret.vEgo < self.CP.minEnableSpeed:
-        if not ignore_min_speed:
+      if self.CS.CP.openpilotLongitudinalControl:
+        if ret.vEgo < self.CP.minEnableSpeed + 0.5:
+          events.add(EventName.belowEngageSpeed)
+        if c.enabled and ret.vEgo < self.CP.minEnableSpeed:
           events.add(EventName.speedTooLow)
 
     if self.eps_timer_soft_disable_alert:
