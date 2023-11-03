@@ -21,6 +21,7 @@ class CarState(CarStateBase):
     self.clu_speed = 0
     self.bap_ldw_01 = None
     self.bap_ldw_01_rec = 0
+    self.motor_stop = False
 
   def create_button_events(self, pt_cp, buttons):
     button_events = []
@@ -157,6 +158,8 @@ class CarState(CarStateBase):
         self.bap_ldw_01 = None
     except ValueError:
       self.bap_ldw_01 = None
+
+    self.stop_active = bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
     
     return ret
 
@@ -285,6 +288,7 @@ class CarState(CarStateBase):
       ("Kombi_01", 2),      # From J285 Instrument cluster
       ("Blinkmodi_02", 1),  # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
       ("Kombi_03", 0),      # From J285 instrument cluster (not present on older cars, 1Hz when present)
+      ("Motor_14", 1),
     ]
 
     if CP.transmissionType == TransmissionType.automatic:
