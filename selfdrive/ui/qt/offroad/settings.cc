@@ -54,9 +54,9 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
-      "EngageLatOnACCMain",
-      tr("Engage Lateral Control on ACC Main"),
-      tr("When ACC is available, lateral control will be engaged."),
+      "DarkMode",
+      tr("Dark Mode"),
+      tr("Force brightness to a minimal value."),
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
