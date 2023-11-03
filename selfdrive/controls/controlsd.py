@@ -123,7 +123,7 @@ class Controls:
     self.dark_mode = self.params.get_bool("DarkMode")
     brightness = HARDWARE.get_screen_brightness()
     if self.dark_mode:
-      brightness = max(brightness - 20, 4)
+      brightness = max(brightness - 20, 1)
       HARDWARE.set_screen_brightness(brightness)
     self.brightness = brightness
 
@@ -874,7 +874,7 @@ class Controls:
     if self.dark_mode:
       brightness = HARDWARE.get_screen_brightness()
       if brightness != self.brightness:
-        self.brightness = max(brightness - 20, 4)
+        self.brightness = max(brightness - 20, 1)
         HARDWARE.set_screen_brightness(self.brightness)
 
     # Sample data from sockets and get a carState
