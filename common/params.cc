@@ -104,6 +104,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"ControlsReady", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
     {"CurrentBootlog", PERSISTENT},
     {"CurrentRoute", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
+    {"DarkMode", PERSISTENT},
     {"DisableLogging", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
     {"DisablePowerDown", PERSISTENT},
     {"DisableUpdates", PERSISTENT},
