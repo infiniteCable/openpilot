@@ -113,7 +113,6 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"DoReboot", CLEAR_ON_MANAGER_START},
     {"DoShutdown", CLEAR_ON_MANAGER_START},
     {"DoUninstall", CLEAR_ON_MANAGER_START},
-    {"EngageLatOnACCMain", PERSISTENT},
     {"EngageLatOnly", PERSISTENT},
     {"ExperimentalLongitudinalEnabled", PERSISTENT},
     {"ExperimentalMode", PERSISTENT},
