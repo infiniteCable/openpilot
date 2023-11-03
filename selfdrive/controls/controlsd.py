@@ -28,7 +28,7 @@ from openpilot.selfdrive.controls.lib.events import Events, ET
 from openpilot.selfdrive.controls.lib.alertmanager import AlertManager, set_offroad_alert
 from openpilot.selfdrive.controls.lib.vehicle_model import VehicleModel
 from openpilot.system.hardware import HARDWARE
-from openpilot.system.hardware.tici.hardware import Tici
+#from openpilot.system.hardware.tici.hardware import Tici
 
 SOFT_DISABLE_TIME = 3  # seconds
 LDW_MIN_SPEED = 31 * CV.MPH_TO_MS
@@ -60,7 +60,7 @@ class Controls:
   def __init__(self, CI=None):
     config_realtime_process(4, Priority.CTRL_HIGH)
 
-    self.Tici = Tici()
+    #self.Tici = Tici()
 
     # Ensure the current branch is cached, otherwise the first iteration of controlsd lags
     self.branch = get_short_branch("")
@@ -121,9 +121,9 @@ class Controls:
     sounds_available = HARDWARE.get_sound_card_online()
 
     self.dark_mode = self.params.get_bool("DarkMode")
-    brightness = self.Tici.get_screen_brightness()
+    brightness = HARDWARE.get_screen_brightness()
     if self.dark_mode:
-      brightness = brightness - 20
+      brightness = max(brightness - 20, 4)
       HARDWARE.set_screen_brightness(brightness)
     self.brightness = brightness
 
@@ -872,10 +872,10 @@ class Controls:
 
     self.dark_mode = self.params.get_bool("DarkMode")
     if self.dark_mode:
-      brightness = self.Tici.get_screen_brightness()
+      brightness = HARDWARE.get_screen_brightness()
       if brightness != self.brightness:
-        self.brightness = brightness - 20
-        self.Tici.set_screen_brightness(self.brightness)
+        self.brightness = max(brightness - 20, 4)
+        HARDWARE.set_screen_brightness(self.brightness)
 
     # Sample data from sockets and get a carState
     CS = self.data_sample()
