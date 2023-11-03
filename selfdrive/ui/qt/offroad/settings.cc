@@ -54,6 +54,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
+      "EngageLatOnACCMain",
+      tr("Engage Lateral Control on ACC Main"),
+      tr("When ACC is available, lateral control will be engaged."),
+      "../assets/offroad/icon_disengage_on_accelerator.svg",
+    },
+    {
       "EngageLatOnly",
       tr("Engage Lateral Control only"),
       tr("When enabled, engaging openpilot will control lateral only."),
