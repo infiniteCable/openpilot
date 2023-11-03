@@ -113,7 +113,6 @@ class Controls:
     openpilot_enabled_toggle = self.params.get_bool("OpenpilotEnabledToggle")
     passive = self.params.get_bool("Passive") or not openpilot_enabled_toggle
     self.lateral_only = self.params.get_bool("EngageLatOnly")
-    self.engage_lat_on_cs_available = self.params.get_bool("EngageLatOnACCMain")
 
     # detect sound card presence and ensure successful init
     sounds_available = HARDWARE.get_sound_card_online()
@@ -179,8 +178,6 @@ class Controls:
     self.experimental_mode = False
     self.v_cruise_helper = VCruiseHelper(self.CP)
     self.recalibrating_seen = False
-    self.lateral_only_mode = False
-    self.lateral_active = False
 
     # TODO: no longer necessary, aside from process replay
     self.sm['liveParameters'].valid = True
@@ -235,12 +232,6 @@ class Controls:
     if self.read_only:
       return
 
-    # activate lateral with acc main on and acc is not enabled
-    if self.engage_lat_on_cs_available:
-      if CS.cruiseState.available and not CS.cruiseState.enabled:
-        self.lateral_only_mode = True
-        self.events.add(EventName.lateralOnly)
-
     # Block resume if cruise never previously enabled
     resume_pressed = any(be.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for be in CS.buttonEvents)
     if not self.CP.pcmCruise and not self.v_cruise_helper.v_cruise_initialized and resume_pressed:
@@ -254,14 +245,14 @@ class Controls:
       # set openpilot to lateral control only mode when toggle NotDisengageLatOnBrake is set and the brake was pressed  
       if self.active and self.enabled and CS.brakePressed and self.not_disengage_lat_on_brake:
         self.events.add(EventName.lateralOnly)
-        self.lateral_only_mode = True
+        self.lateral_only = True
       else:
         self.events.add(EventName.pedalPressed)
 
     if CS.brakePressed and CS.standstill:
       if self.active and self.enabled and self.not_disengage_lat_on_brake:
         self.events.add(EventName.lateralOnly)
-        self.lateral_only_mode = True
+        self.lateral_only = True
       else:
         self.events.add(EventName.preEnableStandstill)
 
@@ -605,7 +596,7 @@ class Controls:
       
     CC.latActive = self.active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                    (not standstill or self.joystick_mode)
-    CC.longActive = self.enabled and not self.lateral_only_mode and not self.events.contains(ET.OVERRIDE_LONGITUDINAL) and self.CP.openpilotLongitudinalControl
+    CC.longActive = self.enabled and not self.lateral_only and not self.events.contains(ET.OVERRIDE_LONGITUDINAL) and self.CP.openpilotLongitudinalControl
 
     actuators = CC.actuators
     actuators.longControlState = self.LoC.long_control_state
@@ -866,11 +857,8 @@ class Controls:
     self.is_metric = self.params.get_bool("IsMetric")
     self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
     
-    # enable lateral only mode, when lateral only toggle is enabled
+    # allow lateral only, when lateral only toggle is enabled
     self.lateral_only = self.params.get_bool("EngageLatOnly")
-    self.lateral_only_mode = self.lateral_only
-
-    self.engage_lat_on_cs_available = self.params.get_bool("EngageLatOnACCMain")
 
     # Sample data from sockets and get a carState
     CS = self.data_sample()
