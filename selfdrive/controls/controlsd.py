@@ -117,6 +117,13 @@ class Controls:
     # detect sound card presence and ensure successful init
     sounds_available = HARDWARE.get_sound_card_online()
 
+    self.dark_mode = self.params.get_bool("DarkMode")
+    brightness = HARDWARE.get_screen_brightness()
+    if self.dark_mode:
+      brightness = brightness - 20
+      HARDWARE.set_screen_brightness(brightness)
+    self.brightness = brightness
+
     car_recognized = self.CP.carName != 'mock'
 
     controller_available = self.CI.CC is not None and not passive and not self.CP.dashcamOnly
@@ -859,6 +866,13 @@ class Controls:
     
     # allow lateral only, when lateral only toggle is enabled
     self.lateral_only = self.params.get_bool("EngageLatOnly")
+
+    self.dark_mode = self.params.get_bool("DarkMode")
+    if self.dark_mode:
+      brightness = HARDWARE.get_screen_brightness()
+      if brightness != self.brightness:
+        self.brightness = brightness - 20
+        HARDWARE.set_screen_brightness(self.brightness)
 
     # Sample data from sockets and get a carState
     CS = self.data_sample()
