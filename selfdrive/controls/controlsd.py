@@ -113,7 +113,7 @@ class Controls:
     openpilot_enabled_toggle = self.params.get_bool("OpenpilotEnabledToggle")
     passive = self.params.get_bool("Passive") or not openpilot_enabled_toggle
     self.lateral_only = self.params.get_bool("EngageLatOnly")
-    self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
+    self.engage_lat_on_cs_available = self.params.get_bool("EngageLatOnACCMain")
 
     # detect sound card presence and ensure successful init
     sounds_available = HARDWARE.get_sound_card_online()
@@ -180,6 +180,7 @@ class Controls:
     self.v_cruise_helper = VCruiseHelper(self.CP)
     self.recalibrating_seen = False
     self.lateral_only_mode = False
+    self.lateral_active = False
 
     # TODO: no longer necessary, aside from process replay
     self.sm['liveParameters'].valid = True
@@ -233,6 +234,12 @@ class Controls:
     # no more events while in dashcam mode
     if self.read_only:
       return
+
+    # activate lateral with acc main on and acc is not enabled
+    if self.engage_lat_on_cs_available:
+      if CS.cruiseState.available and not CS.cruiseState.enabled:
+        self.lateral_only_mode = True
+        self.events.add(EventName.lateralOnly)
 
     # Block resume if cruise never previously enabled
     resume_pressed = any(be.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for be in CS.buttonEvents)
@@ -594,11 +601,7 @@ class Controls:
     CC = car.CarControl.new_message()
     CC.enabled = self.enabled
 
-    # Check which actuators can be enabled
-    if self.ignore_lat_min_speed and self.lateral_only_mode:
-      standstill = CS.vEgo <= 1.3 # ~5km/h
-    else:
-      standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
+    standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
       
     CC.latActive = self.active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                    (not standstill or self.joystick_mode)
@@ -863,11 +866,11 @@ class Controls:
     self.is_metric = self.params.get_bool("IsMetric")
     self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
     
-    self.lateral_only = self.params.get_bool("EngageLatOnly")
-    self.ignore_lat_min_speed = self.params.get_bool("IgnoreLatMinSpeed")
-
     # enable lateral only mode, when lateral only toggle is enabled
-    self.lateral_only_mode = self.lateral_only or self.ignore_lat_min_speed
+    self.lateral_only = self.params.get_bool("EngageLatOnly")
+    self.lateral_only_mode = self.lateral_only
+
+    self.engage_lat_on_cs_available = self.params.get_bool("EngageLatOnACCMain")
 
     # Sample data from sockets and get a carState
     CS = self.data_sample()
