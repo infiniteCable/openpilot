@@ -159,7 +159,7 @@ class CarState(CarStateBase):
     except ValueError:
       self.bap_ldw_01 = None
 
-    self.stop_active = bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
+    self.motor_stop = bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
     
     return ret
 
