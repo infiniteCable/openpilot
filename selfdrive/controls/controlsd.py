@@ -188,6 +188,7 @@ class Controls:
     self.experimental_mode = False
     self.v_cruise_helper = VCruiseHelper(self.CP)
     self.recalibrating_seen = False
+    self.frame = 0
 
     # TODO: no longer necessary, aside from process replay
     self.sm['liveParameters'].valid = True
@@ -861,6 +862,10 @@ class Controls:
     self.CC = CC
 
   def step(self):
+    self.frame = self.frame + 1
+    if self.frame > 100:
+      self.frame = 0
+      
     start_time = time.monotonic()
     self.prof.checkpoint("Ratekeeper", ignore=True)
 
@@ -868,10 +873,11 @@ class Controls:
     self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
     
     # allow lateral only, when lateral only toggle is enabled
+    
     self.lateral_only = self.params.get_bool("EngageLatOnly")
 
     self.dark_mode = self.params.get_bool("DarkMode")
-    if self.dark_mode:
+    if self.dark_mode and self.frame % 100 == 0:
       brightness = HARDWARE.get_screen_brightness()
       if brightness != self.brightness:
         self.brightness = max(brightness - 20, 1)
