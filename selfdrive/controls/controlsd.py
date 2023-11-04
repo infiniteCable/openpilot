@@ -877,7 +877,7 @@ class Controls:
     self.lateral_only = self.params.get_bool("EngageLatOnly")
 
     self.dark_mode = self.params.get_bool("DarkMode")
-    if self.dark_mode and self.frame % 100 == 0:
+    if self.dark_mode and self.frame % 20 == 0:
       brightness = HARDWARE.get_screen_brightness()
       if brightness != self.brightness:
         self.brightness = max(brightness - 20, 1)
