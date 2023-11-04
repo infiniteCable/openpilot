@@ -313,6 +313,7 @@ void Device::resetInteractiveTimeout(int timeout) {
 
 void Device::updateBrightness(const UIState &s) {
   float clipped_brightness = offroad_brightness;
+  auto params = Params();
   bool dark_mode = params.getBool("DarkMode");
   if (s.scene.started) {
     clipped_brightness = s.scene.light_sensor;
