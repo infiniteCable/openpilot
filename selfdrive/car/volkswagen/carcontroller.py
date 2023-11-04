@@ -138,7 +138,7 @@ class CarController:
       hud_alert = 0
       if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or self.test:
         self.test = False
-        if CS.motor_stop and CS.out.steerFaultTemporary:
+        if not CS.steering_recovered:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
         else:
           hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverUrgent"]
