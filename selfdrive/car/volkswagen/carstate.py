@@ -22,6 +22,7 @@ class CarState(CarStateBase):
     self.bap_ldw_01 = None
     self.bap_ldw_01_rec = 0
     self.motor_stop = False
+    self.steering_recovered = True
 
   def create_button_events(self, pt_cp, buttons):
     button_events = []
@@ -160,6 +161,10 @@ class CarState(CarStateBase):
       self.bap_ldw_01 = None
 
     self.motor_stop = bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
+    if self.motor_stop and ret.steerFaultTemporary:
+      self.steering_recovered = False
+    else:
+      self.steering_recovered = True
     
     return ret
 
