@@ -288,7 +288,6 @@ class CarState(CarStateBase):
       ("Kombi_01", 2),      # From J285 Instrument cluster
       ("Blinkmodi_02", 1),  # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
       ("Kombi_03", 0),      # From J285 instrument cluster (not present on older cars, 1Hz when present)
-      ("Motor_14", 0),
     ]
 
     if CP.transmissionType == TransmissionType.automatic:
