@@ -11,6 +11,7 @@
 
 #include "common/timing.h"
 #include "selfdrive/ui/qt/util.h"
+#include "common/params.h"
 #ifdef ENABLE_MAPS
 #include "selfdrive/ui/qt/maps/map_helpers.h"
 #include "selfdrive/ui/qt/maps/map_panel.h"
@@ -102,6 +103,8 @@ void OnroadWindow::mousePressEvent(QMouseEvent* e) {
 #endif
   // propagation event to parent(HomeWindow)
   QWidget::mousePressEvent(e);
+  auto params = Params();
+  params.putBool("EnableScreenEvent", true);
 }
 
 void OnroadWindow::offroadTransition(bool offroad) {
