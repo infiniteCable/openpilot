@@ -313,6 +313,7 @@ void Device::resetInteractiveTimeout(int timeout) {
 
 void Device::updateBrightness(const UIState &s) {
   float clipped_brightness = offroad_brightness;
+  dark_mode = params.getBool("DarkMode");
   if (s.scene.started) {
     clipped_brightness = s.scene.light_sensor;
 
@@ -325,6 +326,10 @@ void Device::updateBrightness(const UIState &s) {
 
     // Scale back to 10% to 100%
     clipped_brightness = std::clamp(100.0f * clipped_brightness, 10.0f, 100.0f);
+
+    if (dark_mode) {
+      clipped_brightness = 1;
+    }
   }
 
   int brightness = brightness_filter.update(clipped_brightness);
