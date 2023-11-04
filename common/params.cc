@@ -115,7 +115,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"DoReboot", CLEAR_ON_MANAGER_START},
     {"DoShutdown", CLEAR_ON_MANAGER_START},
     {"DoUninstall", CLEAR_ON_MANAGER_START},
-    {"ClickEnableScreen", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
+    {"EnableScreenEvent", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
     {"EngageLatOnly", PERSISTENT},
     {"ExperimentalLongitudinalEnabled", PERSISTENT},
     {"ExperimentalMode", PERSISTENT},
