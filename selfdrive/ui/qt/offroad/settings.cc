@@ -60,6 +60,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
+      "DisableScreenTimer",
+      tr("Turn onroad screen off after 10 seconds."),
+      tr("the onroad screen is turned of after 10 seconds. It will be temporarily enabled on alerts."),
+      "../assets/offroad/icon_disengage_on_accelerator.svg",
+    },
+    {
       "EngageLatOnly",
       tr("Engage Lateral Control only"),
       tr("When enabled, engaging openpilot will control lateral only."),
