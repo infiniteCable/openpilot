@@ -348,15 +348,22 @@ void Device::updateBrightness(const UIState &s) {
 
 void Device::updateWakefulness(const UIState &s) {
   bool ignition_just_turned_off = !s.scene.ignition && ignition_on;
+  bool ignition_just_turned_on = s.scene.ignition && !ignition_on;
+
   ignition_on = s.scene.ignition;
 
-  if (ignition_just_turned_off) {
+  auto params = Params();
+  bool enable_screen_event = params.getBool("EnableScreenEvent");
+  bool disable_screen_timer = params.getBool("DisableScreenTimer");
+
+  if (ignition_just_turned_off || ignition_just_turned_on && disable_screen_timer || enable_screen_event) {
     resetInteractiveTimeout();
+    params.putBool("EnableScreenEvent", false);
   } else if (interactive_timeout > 0 && --interactive_timeout == 0) {
     emit interactiveTimeout();
   }
 
-  setAwake(s.scene.ignition || interactive_timeout > 0);
+  setAwake(s.scene.ignition && !disable_screen_timer || interactive_timeout > 0);
 }
 
 UIState *uiState() {
