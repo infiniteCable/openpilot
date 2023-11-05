@@ -224,7 +224,7 @@ void UIState::updateStatus() {
     } else {
       status = controls_state.getEnabled() ? STATUS_ENGAGED : STATUS_DISENGAGED;
     }
-    if (state != cereal::ControlsState::AlertStatus::NORMAL) {
+    if (state == cereal::ControlsState::AlertStatus::USER_PROMPT || state == cereal::ControlsState::AlertStatus::CRITICAL ) {
       auto params = Params();
       params.putBool("EnableScreenEvent", true);
     }
