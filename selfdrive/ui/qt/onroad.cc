@@ -103,8 +103,8 @@ void OnroadWindow::mousePressEvent(QMouseEvent* e) {
 #endif
   // propagation event to parent(HomeWindow)
   QWidget::mousePressEvent(e);
-  //auto params = Params();
-  //params.putBool("EnableScreenEvent", true);
+  auto params = Params();
+  params.putBool("EnableScreenEvent", true);
 }
 
 void OnroadWindow::offroadTransition(bool offroad) {
@@ -153,8 +153,8 @@ void OnroadAlerts::updateAlert(const Alert &a) {
   if (!alert.equal(a)) {
     alert = a;
     update();
-    auto params = Params();
-    params.putBool("EnableScreenEvent", true);
+    //auto params = Params();
+    //params.putBool("EnableScreenEvent", true);
   }
 }
 
