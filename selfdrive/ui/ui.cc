@@ -224,6 +224,10 @@ void UIState::updateStatus() {
     } else {
       status = controls_state.getEnabled() ? STATUS_ENGAGED : STATUS_DISENGAGED;
     }
+    if (state != cereal::ControlsState::AlertStatus::NORMAL) {
+      auto params = Params();
+      params.putBool("EnableScreenEvent", true);
+    }
   }
 
   // Handle onroad/offroad transition
