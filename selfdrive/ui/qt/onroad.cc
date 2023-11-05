@@ -153,6 +153,8 @@ void OnroadAlerts::updateAlert(const Alert &a) {
   if (!alert.equal(a)) {
     alert = a;
     update();
+    auto params = Params();
+    params.putBool("EnableScreenEvent", true);
   }
 }
 
