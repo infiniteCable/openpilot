@@ -163,7 +163,7 @@ class CarState(CarStateBase):
     self.motor_stop = bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
     if self.motor_stop and ret.steerFaultTemporary:
       self.steering_recovered = False
-    else:
+    elif not ret.steerFaultTemporary:
       self.steering_recovered = True
     
     return ret
