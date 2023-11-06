@@ -138,10 +138,10 @@ class CarController:
       hud_alert = 0
       if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or self.test:
         self.test = False
-        #if not CS.steering_recovered:
-        #  hud_alert = self.CCP.LDW_MESSAGES["none"]
-        #else:
-        hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverUrgent"]
+        if not CS.steering_recovered:
+          hud_alert = self.CCP.LDW_MESSAGES["none"]
+        else:
+          hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverUrgent"]
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
@@ -155,7 +155,7 @@ class CarController:
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
                                                              cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
 
-      elif self.CP.openpilotLongitudinalControl and CC.longActive:
+      elif self.CP.openpilotLongitudinalControl and CC.longActive and not CS.out.cruiseState.enabled:
         can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, up=self.gra_send_up, down=self.gra_send_down))
         self.gra_send_up = False
         self.gra_send_down = False
