@@ -288,6 +288,7 @@ class CarInterfaceBase(ABC):
           self.silent_steer_warning = True
           events.add(EventName.steerTempUnavailableSilent)
         elif not self.CS.steering_recovered:
+          self.silent_steer_warning = True
           events.add(EventName.steerTempUnavailableSilent)
         else:
           events.add(EventName.steerTempUnavailable)
