@@ -99,7 +99,7 @@ class CarController:
       if self.frame % 20 == 0:
         target_accel = actuators.accel
         if target_accel > 0:
-          scaling = 65
+          scaling = 40
         elif target_accel < 0:
           scaling = 10
         else:
