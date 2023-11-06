@@ -267,8 +267,11 @@ class Controls:
       else:
         self.events.add(EventName.preEnableStandstill)
 
-    if CS.gasPressed and not self.lateral_only:
-      self.events.add(EventName.gasPressedOverride)
+    if CS.gasPressed:
+      if self.lateral_only:
+        self.events.add(EventName.lateralOnly)
+      else:
+        self.events.add(EventName.gasPressedOverride)
 
     if not self.CP.notCar:
       self.events.add_from_msg(self.sm['driverMonitoringState'].events)
