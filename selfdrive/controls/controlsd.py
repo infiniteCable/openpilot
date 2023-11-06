@@ -267,7 +267,7 @@ class Controls:
       else:
         self.events.add(EventName.preEnableStandstill)
 
-    if CS.gasPressed:
+    if CS.gasPressed and not self.lateral_only:
       self.events.add(EventName.gasPressedOverride)
 
     if not self.CP.notCar:
