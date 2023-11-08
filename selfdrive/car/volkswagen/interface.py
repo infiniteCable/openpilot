@@ -137,6 +137,16 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 1151
       ret.wheelbase = 2.47
       ret.minEnableSpeed = -1.
+      ret.lateralTuning.init('torque')
+      ret.lateralTuning.torque.useSteeringAngle = True
+      ret.lateralTuning.torque.kp = 1.0
+      ret.lateralTuning.torque.kf = 1.0
+      ret.lateralTuning.torque.ki = 0.1
+      ret.lateralTuning.torque.friction = 0.20
+      ret.lateralTuning.torque.latAccelFactor = 1.38
+      ret.lateralTuning.torque.latAccelOffset = 0.0
+      ret.lateralTuning.torque.steeringAngleDeadzoneDeg = 180.0
+
 
     elif candidate == CAR.SHARAN_MK2:
       ret.mass = 1639
