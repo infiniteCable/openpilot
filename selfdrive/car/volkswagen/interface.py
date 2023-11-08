@@ -142,8 +142,8 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.torque.kp = 1.0
       ret.lateralTuning.torque.kf = 1.0
       ret.lateralTuning.torque.ki = 0.1
-      ret.lateralTuning.torque.friction = 0.40
-      ret.lateralTuning.torque.latAccelFactor = 1.00
+      ret.lateralTuning.torque.friction = 0.20
+      ret.lateralTuning.torque.latAccelFactor = 1.38
       ret.lateralTuning.torque.latAccelOffset = 0.0
       ret.lateralTuning.torque.steeringAngleDeadzoneDeg = 180.0
 
