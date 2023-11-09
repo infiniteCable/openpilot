@@ -74,7 +74,7 @@ class CarInterface(CarInterfaceBase):
     ret.steerRatio = 14.4  # Let the params learner figure this out
     ret.lateralTuning.pid.kpBP = [0.]
     ret.lateralTuning.pid.kiBP = [0.]
-    ret.lateralTuning.pid.kf = 0.00006
+    ret.lateralTuning.pid.kf = 0.00003
     ret.lateralTuning.pid.kpV = [0.6]
     ret.lateralTuning.pid.kiV = [0.2]
 
