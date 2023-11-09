@@ -74,9 +74,9 @@ class CarInterface(CarInterfaceBase):
     ret.steerRatio = 14.4  # Let the params learner figure this out
     ret.lateralTuning.pid.kpBP = [0.]
     ret.lateralTuning.pid.kiBP = [0.]
-    ret.lateralTuning.pid.kf = 0.00006
-    ret.lateralTuning.pid.kpV = [0.6]
-    ret.lateralTuning.pid.kiV = [0.2]
+    ret.lateralTuning.pid.kf = 0.0 #0.00006
+    ret.lateralTuning.pid.kpV = [0.3]
+    ret.lateralTuning.pid.kiV = [0.1]
 
     # Global longitudinal tuning defaults, can be overridden per-vehicle
 
@@ -137,16 +137,15 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 1151
       ret.wheelbase = 2.47
       ret.minEnableSpeed = -1.
-      ret.lateralTuning.init('torque')
-      ret.lateralTuning.torque.useSteeringAngle = True
-      ret.lateralTuning.torque.kp = 1.0
-      ret.lateralTuning.torque.kf = 1.0
-      ret.lateralTuning.torque.ki = 0.1
-      ret.lateralTuning.torque.friction = 0.20
-      ret.lateralTuning.torque.latAccelFactor = 1.38
-      ret.lateralTuning.torque.latAccelOffset = 0.0
-      ret.lateralTuning.torque.steeringAngleDeadzoneDeg = 180.0
-
+      #ret.lateralTuning.init('torque')
+      #ret.lateralTuning.torque.useSteeringAngle = True
+      #ret.lateralTuning.torque.kp = 1.0
+      #ret.lateralTuning.torque.kf = 1.0
+      #ret.lateralTuning.torque.ki = 0.1
+      #ret.lateralTuning.torque.friction = 0.20
+      #ret.lateralTuning.torque.latAccelFactor = 1.38
+      #ret.lateralTuning.torque.latAccelOffset = 0.0
+      #ret.lateralTuning.torque.steeringAngleDeadzoneDeg = 180.0
 
     elif candidate == CAR.SHARAN_MK2:
       ret.mass = 1639
