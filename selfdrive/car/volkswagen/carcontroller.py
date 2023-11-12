@@ -177,17 +177,17 @@ class CarController:
 
     if self.bap_ldw_mode == 0:
       can_frames = self.bap.send(bap_dest_hex, 0, 25, 2, bytes.fromhex("030019000401"))
-      send_bap(can_sends, bap_dest_dbc, can_frames)
+      self.send_bap(can_sends, bap_dest_dbc, can_frames)
       self.bap_ldw_mode = 1
       
     elif self.bap_ldw_mode == 1:
       can_frames = self.bap.send(bap_dest_hex, 4, 25, 3, bytes.fromhex("3807E000040108003807E0"))
-      send_bap(can_sends, bap_dest_dbc, can_frames)
+      self.send_bap(can_sends, bap_dest_dbc, can_frames)
       self.bap_ldw_mode = 2
       
     elif self.bap_ldw_mode == 2:
       can_frames = self.bap.send(bap_dest_hex, 4, 25, 1, bytes.fromhex("03001900040108003807E000000000000A00020001000200000000"))
-      send_bap(can_sends, bap_dest_dbc, can_frames)
+      self.send_bap(can_sends, bap_dest_dbc, can_frames)
       self.bap_ldw_mode = 0
 
   def send_bap(self, can_sends, can_dest, can_frames):
