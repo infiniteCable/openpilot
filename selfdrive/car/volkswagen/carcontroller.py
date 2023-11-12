@@ -37,6 +37,7 @@ class CarController:
     self.gra_button_timer = 20
     self.gra_button_frame = 0
 
+    self.bap_ldw_mode = 0
     self.test = False
     
   def update(self, CC, CS, ext_bus, now_nanos):
@@ -145,7 +146,9 @@ class CarController:
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
-    self.handle_bap_ldw_01(can_sends, CS.bap_ldw_01)
+    #self.handle_bap_ldw_01(can_sends, CS.bap_ldw_01)
+    if self.frame % 100 == 0:
+      self.send_bap_ldw(can_sends)
 
     # **** Stock ACC Button Controls **************************************** #
 
@@ -168,6 +171,29 @@ class CarController:
     self.frame += 1
     return new_actuators, can_sends, self.eps_timer_soft_disable_alert
 
+  def send_bap_ldw(self, can_sends):
+    bap_dest_dbc = "BAP_LDW_10"
+    bap_dest_hex = 0x17331910
+
+    if self.bap_ldw_mode == 0:
+      can_frames = self.bap.send(bap_dest_hex, 0, 25, 2, bytes.fromhex("030019000401"))
+      send_bap(can_sends, bap_dest_dbc, can_frames)
+      self.bap_ldw_mode = 1
+      
+    elif self.bap_ldw_mode == 1:
+      can_frames = self.bap.send(bap_dest_hex, 4, 25, 3, bytes.fromhex("3807E000040108003807E0"))
+      send_bap(can_sends, bap_dest_dbc, can_frames)
+      self.bap_ldw_mode = 2
+      
+    elif self.bap_ldw_mode == 2:
+      can_frames = self.bap.send(bap_dest_hex, 4, 25, 1, bytes.fromhex("03001900040108003807E000000000000A00020001000200000000"))
+      send_bap(can_sends, bap_dest_dbc, can_frames)
+      self.bap_ldw_mode = 0
+
+  def send_bap(self, can_sends, can_dest, can_frames):
+    for (id, data) in can_frames:
+      can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, can_dest, int.from_bytes(data)))
+      
   def handle_bap_ldw_01(self, can_sends, bap_ldw_01):
     bap_dest_dbc = "BAP_LDW_10"
     bap_dest_hex = 0x17331910
