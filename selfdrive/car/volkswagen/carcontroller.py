@@ -136,8 +136,9 @@ class CarController:
     
     if self.frame % self.CCP.LDW_STEP == 0:
       hud_alert = 0
-      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or self.test:
+      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or self.test or CS.test:
         self.test = False
+        CS.test = False
         if not CS.steering_recovered:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
         else:
