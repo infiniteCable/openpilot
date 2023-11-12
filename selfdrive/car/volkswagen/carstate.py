@@ -23,7 +23,6 @@ class CarState(CarStateBase):
     self.bap_ldw_01_rec = 0
     self.motor_stop = False
     self.steering_recovered = True
-    self.test = False
 
   def create_button_events(self, pt_cp, buttons):
     button_events = []
@@ -152,15 +151,11 @@ class CarState(CarStateBase):
     # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
     self.upscale_lead_car_signal = bool(pt_cp.vl["Kombi_03"]["KBI_Variante"])
 
-    try:
-      self.bap_ldw_01_rec = int(cam_cp.vl["BAP_LDW_01"]["Stream"])
-      if self.bap_ldw_01_rec != 0:
-        self.bap_ldw_01 = self.bap.receive_can(0x17331901, self.bap_ldw_01_rec.to_bytes(2, 'big'))
-      else:
-        self.bap_ldw_01 = None
-    except ValueError:
+    self.bap_ldw_01_rec = int(cam_cp.vl["BAP_LDW_01"]["Stream"])
+    if self.bap_ldw_01_rec != 0:
+      self.bap_ldw_01 = self.bap.receive_can(0x17331901, self.bap_ldw_01_rec.to_bytes(2, 'big'))
+    else:
       self.bap_ldw_01 = None
-      self.test = True
 
     self.motor_stop = bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
     if self.motor_stop and ret.steerFaultTemporary:
