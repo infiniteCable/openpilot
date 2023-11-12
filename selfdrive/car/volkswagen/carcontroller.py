@@ -147,8 +147,8 @@ class CarController:
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
     #self.handle_bap_ldw_01(can_sends, CS.bap_ldw_01)
-    if self.frame % 100 == 0:
-      self.send_bap_ldw(can_sends)
+    #if self.frame % 100 == 0:
+    #  self.send_bap_ldw(can_sends)
 
     # **** Stock ACC Button Controls **************************************** #
 
