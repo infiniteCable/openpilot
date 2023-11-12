@@ -71,7 +71,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.steerActuatorDelay = 0.14
     ret.steerLimitTimer = 0.4
-    ret.steerRatio = 15  # Let the params learner figure this out
+    ret.steerRatio = 12  # Let the params learner figure this out
     ret.lateralTuning.pid.kpBP = [0.]
     ret.lateralTuning.pid.kiBP = [0.]
     ret.lateralTuning.pid.kf = 0.000005
