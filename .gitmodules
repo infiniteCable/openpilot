@@ -4,9 +4,6 @@
 [submodule "opendbc"]
   path = opendbc
   url = ../../infiniteCable/opendbc.git
-[submodule "laika_repo"]
-  path = laika_repo
-  url = ../../commaai/laika.git
 [submodule "cereal"]
   path = cereal
   url = ../../infiniteCable/cereal.git
