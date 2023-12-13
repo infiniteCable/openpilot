@@ -96,8 +96,7 @@ class Controls:
     else:
       self.CI, self.CP = CI, CI.CP
 
-    self.joystick_enabled = self.params.get_bool("JoystickDebugMode")
-    self.joystick_mode = self.joystick_enabled or self.CP.notCar
+    self.joystick_mode = self.params.get_bool("JoystickDebugMode")
 
     # set alternative experiences from parameters
     self.disengage_on_accelerator = self.params.get_bool("DisengageOnAccelerator")
@@ -208,9 +207,6 @@ class Controls:
         set_offroad_alert("Offroad_NoFirmware", True)
     elif self.CP.passive:
       self.events.add(EventName.dashcamMode, static=True)
-    elif self.joystick_mode:
-      self.events.add(EventName.joystickDebug, static=True)
-      self.startup_event = None
 
     # controlsd is driven by can recv, expected at 100Hz
     self.rk = Ratekeeper(100, print_delay_threshold=None)
@@ -230,6 +226,11 @@ class Controls:
     """Compute onroadEvents from carState"""
 
     self.events.clear()
+
+    # Add joystick event, static on cars, dynamic on nonCars
+    if self.joystick_mode:
+      self.events.add(EventName.joystickDebug)
+      self.startup_event = None
 
     # Add startup event
     if self.startup_event is not None:
@@ -255,7 +256,7 @@ class Controls:
       (CS.brakePressed and (not self.CS_prev.brakePressed or not CS.standstill)) or \
       (CS.regenBraking and (not self.CS_prev.regenBraking or not CS.standstill)):
 
-      # set openpilot to lateral control only mode when toggle NotDisengageLatOnBrake is set and the brake was pressed  
+      # set openpilot to lateral control only mode when toggle NotDisengageLatOnBrake is set and the brake was pressed
       if self.active and self.enabled and CS.brakePressed and self.not_disengage_lat_on_brake:
         self.events.add(EventName.lateralOnly)
         self.lateral_only = True
@@ -397,7 +398,7 @@ class Controls:
     else:
       self.logged_comm_issue = None
 
-    if not (self.CP.notCar and self.joystick_enabled):
+    if not (self.CP.notCar and self.joystick_mode):
       if not self.sm['lateralPlan'].mpcSolutionValid:
         self.events.add(EventName.plannerError)
       if not self.sm['liveLocationKalman'].posenetOK:
@@ -607,7 +608,7 @@ class Controls:
     CC.enabled = self.enabled
 
     standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
-      
+
     CC.latActive = self.active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                    (not standstill or self.joystick_mode)
     CC.longActive = self.enabled and not self.lateral_only and not self.events.contains(ET.OVERRIDE_LONGITUDINAL) and self.CP.openpilotLongitudinalControl
@@ -877,15 +878,15 @@ class Controls:
     self.frame = self.frame + 1
     if self.frame > 100:
       self.frame = 0
-      
+
     start_time = time.monotonic()
     self.prof.checkpoint("Ratekeeper", ignore=True)
 
     self.is_metric = self.params.get_bool("IsMetric")
     self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
-    
+
     # allow lateral only, when lateral only toggle is enabled
-    
+
     self.lateral_only = self.params.get_bool("EngageLatOnly")
 
     #self.dark_mode = self.params.get_bool("DarkMode")
@@ -894,6 +895,9 @@ class Controls:
     #  if brightness != self.brightness:
     #    self.brightness = max(brightness - 20, 1)
     #    HARDWARE.set_screen_brightness(self.brightness)
+
+    if self.CP.notCar:
+      self.joystick_mode = self.params.get_bool("JoystickDebugMode")
 
     # Sample data from sockets and get a carState
     CS = self.data_sample()
