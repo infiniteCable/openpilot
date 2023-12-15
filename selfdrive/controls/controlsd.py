@@ -2,13 +2,14 @@
 import os
 import math
 import time
+import threading
 from typing import SupportsFloat
 
 from cereal import car, log
 from openpilot.common.numpy_fast import clip
 from openpilot.common.realtime import config_realtime_process, Priority, Ratekeeper, DT_CTRL
 from openpilot.common.profiler import Profiler
-from openpilot.common.params import Params, put_nonblocking, put_bool_nonblocking
+from openpilot.common.params import Params
 import cereal.messaging as messaging
 from cereal.visionipc import VisionIpcClient, VisionStreamType
 from openpilot.common.conversions import Conversions as CV
@@ -142,8 +143,8 @@ class Controls:
     # Write CarParams for radard
     cp_bytes = self.CP.to_bytes()
     self.params.put("CarParams", cp_bytes)
-    put_nonblocking("CarParamsCache", cp_bytes)
-    put_nonblocking("CarParamsPersistent", cp_bytes)
+    self.params.put_nonblocking("CarParamsCache", cp_bytes)
+    self.params.put_nonblocking("CarParamsPersistent", cp_bytes)
 
     # cleanup old params
     if not self.CP.experimentalLongitudinalAvailable:
@@ -474,7 +475,7 @@ class Controls:
 
         self.initialized = True
         self.set_initial_state()
-        put_bool_nonblocking("ControlsReady", True)
+        self.params.put_bool_nonblocking("ControlsReady", True)
 
     # Check for CAN timeout
     if not can_strs:
@@ -882,23 +883,6 @@ class Controls:
     start_time = time.monotonic()
     self.prof.checkpoint("Ratekeeper", ignore=True)
 
-    self.is_metric = self.params.get_bool("IsMetric")
-    self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
-
-    # allow lateral only, when lateral only toggle is enabled
-
-    self.lateral_only = self.params.get_bool("EngageLatOnly")
-
-    #self.dark_mode = self.params.get_bool("DarkMode")
-    #if self.dark_mode and self.frame % 20 == 0:
-    #  brightness = HARDWARE.get_screen_brightness()
-    #  if brightness != self.brightness:
-    #    self.brightness = max(brightness - 20, 1)
-    #    HARDWARE.set_screen_brightness(self.brightness)
-
-    if self.CP.notCar:
-      self.joystick_mode = self.params.get_bool("JoystickDebugMode")
-
     # Sample data from sockets and get a carState
     CS = self.data_sample()
     cloudlog.timestamp("Data sampled")
@@ -923,11 +907,27 @@ class Controls:
 
     self.CS_prev = CS
 
+  def params_thread(self, evt):
+    while not evt.is_set():
+      self.is_metric = self.params.get_bool("IsMetric")
+      self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
+      if self.CP.notCar:
+        self.joystick_mode = self.params.get_bool("JoystickDebugMode")
+      self.lateral_only = self.params.get_bool("EngageLatOnly")
+      time.sleep(0.1)
+
   def controlsd_thread(self):
-    while True:
-      self.step()
-      self.rk.monitor_time()
-      self.prof.display()
+    e = threading.Event()
+    t = threading.Thread(target=self.params_thread, args=(e, ))
+    try:
+      t.start()
+      while True:
+        self.step()
+        self.rk.monitor_time()
+        self.prof.display()
+    except SystemExit:
+      e.set()
+      t.join()
 
 
 def main():
