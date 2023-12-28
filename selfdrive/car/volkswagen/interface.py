@@ -138,7 +138,7 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.47
       ret.minEnableSpeed = -1.
       
-      ret.lateralTuning.init('torque')
+      #ret.lateralTuning.init('torque')
       #ret.lateralTuning.torque.useSteeringAngle = False
       #ret.lateralTuning.torque.kp = 1.0
       #ret.lateralTuning.torque.kf = 1.0
