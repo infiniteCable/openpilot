@@ -4,7 +4,7 @@ from openpilot.common.conversions import Conversions as CV
 from openpilot.selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from openpilot.selfdrive.car.volkswagen.values import DBC, CANBUS, PQ_CARS, NetworkLocation, TransmissionType, GearShifter, \
-                                            CarControllerParams
+                                            CarControllerParams, VolkswagenFlags
 from openpilot.selfdrive.car.volkswagen.bap import Bap
 
 
@@ -16,6 +16,7 @@ class CarState(CarStateBase):
     self.button_states = {button.event_type: False for button in self.CCP.BUTTONS}
     self.esp_hold_confirmation = False
     self.upscale_lead_car_signal = False
+    self.eps_stock_values = False
 
     self.gra_speed = 0
     self.clu_speed = 0
@@ -67,6 +68,11 @@ class CarState(CarStateBase):
     hca_status = self.CCP.hca_status_values.get(pt_cp.vl["LH_EPS_03"]["EPS_HCA_Status"])
     ret.steerFaultPermanent = hca_status in ("DISABLED", "FAULT")
     ret.steerFaultTemporary = hca_status in ("INITIALIZING", "REJECTED")
+
+    # VW Emergency Assist status tracking and mitigation
+    self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
+    if self.CP.flags & VolkswagenFlags.STOCK_HCA_PRESENT:
+      ret.carFaultedNonCritical = bool(cam_cp.vl["HCA_01"]["EA_Ruckfreigabe"]) or cam_cp.vl["HCA_01"]["EA_ACC_Sollstatus"] > 0
 
     # Update gas, brakes, and gearshift.
     ret.gas = pt_cp.vl["Motor_20"]["MO_Fahrpedalrohwert_01"] / 100.0
@@ -138,7 +144,7 @@ class CarState(CarStateBase):
 
     self.gra_speed = pt_cp.vl["TSK_07"]["TSK_Wunschgeschw"]
     self.clu_speed = pt_cp.vl["Kombi_01"]["KBI_angez_Geschw"]
-    
+
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
     ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["Comfort_Signal_Left"])
     ret.rightBlinker = bool(pt_cp.vl["Blinkmodi_02"]["Comfort_Signal_Right"])
@@ -162,7 +168,7 @@ class CarState(CarStateBase):
       self.steering_recovered = False
     elif not ret.steerFaultTemporary:
       self.steering_recovered = True
-    
+
     return ret
 
   def update_pq(self, pt_cp, cam_cp, ext_cp, trans_type):

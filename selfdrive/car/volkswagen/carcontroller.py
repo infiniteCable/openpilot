@@ -5,8 +5,8 @@ from openpilot.common.conversions import Conversions as CV
 from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.car import apply_driver_steer_torque_limits
 from openpilot.selfdrive.car.volkswagen import mqbcan, pqcan
-from openpilot.selfdrive.car.volkswagen.values import CANBUS, PQ_CARS, CarControllerParams
 from openpilot.selfdrive.car.volkswagen.bap import Bap
+from openpilot.selfdrive.car.volkswagen.values import CANBUS, PQ_CARS, CarControllerParams, VolkswagenFlags
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 LongCtrlState = car.CarControl.Actuators.LongControlState
@@ -39,14 +39,14 @@ class CarController:
 
     self.bap_ldw_mode = 0
     self.test = False
-    
+
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
 
     # **** Steering Controls ************************************************ #
-    
+
     if self.frame % self.hca_steer_step == 0:
       # Logic to avoid HCA state 4 "refused":
       #   * Don't steer unless HCA is in state 3 "ready" or 5 "active"
@@ -94,6 +94,15 @@ class CarController:
     else:
       self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
 
+      if self.CP.flags & VolkswagenFlags.STOCK_HCA_PRESENT:
+        # Pacify VW Emergency Assist driver inactivity detection by changing its view of driver steering input torque
+        # to the greatest of actual driver input or 2x openpilot's output (1x openpilot output is not enough to
+        # consistently reset inactivity detection on straight level roads). See commaai/openpilot#23274 for background.
+        ea_simulated_torque = clip(apply_steer * 2, -self.CCP.STEER_MAX, self.CCP.STEER_MAX)
+        if abs(CS.out.steeringTorque) > abs(ea_simulated_torque):
+          ea_simulated_torque = CS.out.steeringTorque
+        can_sends.append(self.CCS.create_eps_update(self.packer_pt, CANBUS.cam, CS.eps_stock_values, ea_simulated_torque))
+
     # **** Acceleration Controls ******************************************** #
 
     if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
@@ -121,20 +130,20 @@ class CarController:
         else:
           self.gra_send_up = False
           self.gra_send_down = False
-          
+
         self.gra_button_frame = 0
       else:
         self.gra_button_frame += 1
-    
+
     else:
       self.gra_send_up = False
       self.gra_send_down = False
-      
+
     # **** HUD Controls ***************************************************** #
 
     if CS.bap_ldw_01 is not None or CS.bap_ldw_01_rec != 0:
       self.test = True
-    
+
     if self.frame % self.CCP.LDW_STEP == 0:
       hud_alert = 0
       if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or self.test:
@@ -179,12 +188,12 @@ class CarController:
       can_frames = self.bap.send(bap_dest_hex, 0, 25, 2, bytes.fromhex("030019000401"))
       self.send_bap(can_sends, bap_dest_dbc, can_frames)
       self.bap_ldw_mode = 1
-      
+
     elif self.bap_ldw_mode == 1:
       can_frames = self.bap.send(bap_dest_hex, 4, 25, 3, bytes.fromhex("3807E000040108003807E0"))
       self.send_bap(can_sends, bap_dest_dbc, can_frames)
       self.bap_ldw_mode = 2
-      
+
     elif self.bap_ldw_mode == 2:
       can_frames = self.bap.send(bap_dest_hex, 4, 25, 1, bytes.fromhex("03001900040108003807E000000000000A00020001000200000000"))
       self.send_bap(can_sends, bap_dest_dbc, can_frames)
@@ -193,11 +202,11 @@ class CarController:
   def send_bap(self, can_sends, can_dest, can_frames):
     for (id, data) in can_frames:
       can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, can_dest, int.from_bytes(data)))
-      
+
   def handle_bap_ldw_01(self, can_sends, bap_ldw_01):
     bap_dest_dbc = "BAP_LDW_10"
     bap_dest_hex = 0x17331910
-    
+
     if bap_ldw_01 is not None:
       can_id, opcode, lsg_id, fct_id, bap_data = bap_ldw_01
 
@@ -208,13 +217,13 @@ class CarController:
             for (id, data) in can_frames:
               #can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
               can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest_dbc, int.from_bytes(data)))
-          
+
           elif fct_id == 3: # functions
             can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, bytes.fromhex("3807E000040108003807E0"))
             for (id, data) in can_frames:
             #  can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
               can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest_dbc, int.from_bytes(data)))
-                            
+
           elif fct_id == 1: # properties
             can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, bytes.fromhex("03001900040108003807E000000000000A00020001000200000000"))
             for (id, data) in can_frames:

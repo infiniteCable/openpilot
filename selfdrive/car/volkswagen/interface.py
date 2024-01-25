@@ -3,7 +3,7 @@ from panda import Panda
 from openpilot.common.conversions import Conversions as CV
 from openpilot.selfdrive.car import get_safety_config
 from openpilot.selfdrive.car.interfaces import CarInterfaceBase
-from openpilot.selfdrive.car.volkswagen.values import CAR, PQ_CARS, CANBUS, NetworkLocation, TransmissionType, GearShifter
+from openpilot.selfdrive.car.volkswagen.values import CAR, PQ_CARS, CANBUS, NetworkLocation, TransmissionType, GearShifter, VolkswagenFlags
 
 ButtonType = car.CarState.ButtonEvent.Type
 EventName = car.CarEvent.EventName
@@ -67,6 +67,9 @@ class CarInterface(CarInterfaceBase):
       #else:
       #  ret.networkLocation = NetworkLocation.fwdCamera
 
+      if 0x126 in fingerprint[2]:  # HCA_01
+        ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
+
     # Global lateral tuning defaults, can be overridden per-vehicle
 
     ret.steerActuatorDelay = 0.16
@@ -93,8 +96,8 @@ class CarInterface(CarInterfaceBase):
     ret.startingState = False
     ret.startAccel = 1.0
     ret.stopAccel = -0.55
-    ret.vEgoStarting = 1.0
-    ret.vEgoStopping = 1.0
+    ret.vEgoStarting = 0.1
+    ret.vEgoStopping = 0.5
     ret.longitudinalTuning.kpV = [0.1]
     ret.longitudinalTuning.kiV = [0.0]
 
@@ -137,7 +140,7 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 1151
       ret.wheelbase = 2.47
       ret.minEnableSpeed = -1.
-      
+
       #ret.lateralTuning.init('torque')
       #ret.lateralTuning.torque.useSteeringAngle = False
       #ret.lateralTuning.torque.kp = 1.0
@@ -241,7 +244,7 @@ class CarInterface(CarInterfaceBase):
     events = self.create_common_events(ret, extra_gears=[GearShifter.eco, GearShifter.sport, GearShifter.manumatic],
                                        pcm_enable=not self.CS.CP.openpilotLongitudinalControl,
                                        enable_buttons=(ButtonType.setCruise, ButtonType.resumeCruise))
-      
+
     # Low speed steer alert hysteresis logic
     if self.CP.minSteerSpeed > 0. and ret.vEgo < (self.CP.minSteerSpeed + 1.):
       self.low_speed_alert = True

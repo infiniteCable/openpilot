@@ -1,6 +1,6 @@
 from collections import defaultdict, namedtuple
 from dataclasses import dataclass, field
-from enum import Enum, StrEnum
+from enum import Enum, IntFlag, StrEnum
 from typing import Dict, List, Union
 
 from cereal import car
@@ -108,6 +108,10 @@ class CarControllerParams:
 class CANBUS:
   pt = 0 # directly connected to engine can bus
   cam = 1 # directly connected to comfort can bus
+
+
+class VolkswagenFlags(IntFlag):
+  STOCK_HCA_PRESENT = 1
 
 
 # Check the 7th and 8th characters of the VIN before adding a new CAR. If the
