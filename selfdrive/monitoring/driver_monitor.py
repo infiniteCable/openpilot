@@ -27,7 +27,7 @@ class DRIVER_MONITOR_SETTINGS():
     # self._DISTRACTED_PROMPT_TIME_TILL_TERMINAL = 6.
 
     # MORE AGGRESSIVE PROMPTING!!
-    self._DISTRACTED_TIME = 5. # active monitoring total timeout
+    self._DISTRACTED_TIME = 10. # active monitoring total timeout
     self._DISTRACTED_PRE_TIME_TILL_TERMINAL = 1.
     self._DISTRACTED_PROMPT_TIME_TILL_TERMINAL = 3.
 
