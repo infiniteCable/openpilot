@@ -30,6 +30,8 @@ class CarController:
     self.hca_standby_timer = 0
     self.hca_enabled = False
 
+    self.warn_repeat_timer = 0
+
     self.gra_send_up = False
     self.gra_send_down = False
     self.gra_speed = 0
@@ -148,10 +150,15 @@ class CarController:
       hud_alert = 0
       if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or self.test:
         self.test = False
-        if not CS.steering_recovered:
+        self.warn_repeat_timer += 1
+        if not CS.steering_recovered or self.warn_repeat_timer >= 10:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
+          if self.warn_repeat_timer >= 20:
+            self.warn_repeat_timer = 0
         else:
           hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverUrgent"]
+      else:
+        self.warn_repeat_timer = 0
       can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.enabled,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
