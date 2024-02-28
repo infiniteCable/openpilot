@@ -57,7 +57,7 @@ class CarController:
       # MQB racks reset the uninterrupted steering timer after a single frame
       # of HCA disabled; this is done whenever output happens to be zero.
 
-      if CC.latActive:
+      if CC.latActive and not CS.out.accFaulted:
         self.hca_enabled = True
         self.hca_standby_timer = 0
         new_steer = int(round(actuators.steer * self.CCP.STEER_MAX))
