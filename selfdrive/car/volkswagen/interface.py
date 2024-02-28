@@ -108,7 +108,7 @@ class CarInterface(CarInterfaceBase):
     # candidate == CAR.POLO_MK6:
     #  ret.mass = 1151
     #  ret.wheelbase = 2.47
-    #  ret.minEnableSpeed = -1.
+    ret.minEnableSpeed = -1.
 
     #  #ret.lateralTuning.init('torque')
     #  #ret.lateralTuning.torque.useSteeringAngle = False
