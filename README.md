@@ -4,7 +4,7 @@ PQ26 can be seen as nearly identical to MQB regarding can bus communication.
 Panda can 0 is directly connected to engine can bus.
 Panda can 1 is directly connected to comfort can bus.
 
-Allow lateral on brake with panda disallowing long messages on brake, still working on bap allowing the use of the car lane assist activation menu, no car Alert for steering unavailable on start stop Motor stop active, simple dark mode for onroad screen (minimum brightness), turn screen of for onroad screen when no status or alert changes, using GRA controls as exp. long control (still on progress), panda not working for any other brands than volkswagen.
+Allow lateral on brake with panda disallowing long messages on brake, still working on bap allowing the use of the car lane assist activation menu, no car Alert for steering unavailable on start stop Motor stop active, simple dark mode for onroad screen (minimum brightness), turn screen of for onroad screen when no status or alert changes, using GRA controls as exp. long control (still on progress), panda not working for any other brands than Volkswagen. Driver monitoring is more aggressive. Enabled lateral torque controller which works good for disabled steering wheel centering.
 
 [![openpilot on the comma 3X](https://github.com/commaai/openpilot/assets/8762862/f09e6d29-db2d-4179-80c2-51e8d92bdb5c)](https://comma.ai/shop/comma-3x)
 
