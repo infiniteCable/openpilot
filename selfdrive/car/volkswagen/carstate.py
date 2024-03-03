@@ -3,7 +3,7 @@ from cereal import car
 from openpilot.common.conversions import Conversions as CV
 from openpilot.selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
-from openpilot.selfdrive.car.volkswagen.values import DBC, CANBUS, PQ_CARS, NetworkLocation, TransmissionType, GearShifter, \
+from openpilot.selfdrive.car.volkswagen.values import DBC, CANBUS, NetworkLocation, TransmissionType, GearShifter, \
                                             CarControllerParams, VolkswagenFlags
 from openpilot.selfdrive.car.volkswagen.bap import Bap
 
@@ -40,7 +40,7 @@ class CarState(CarStateBase):
     return button_events
 
   def update(self, pt_cp, cam_cp, ext_cp, trans_type):
-    if self.CP.carFingerprint in PQ_CARS:
+    if self.CP.flags & VolkswagenFlags.PQ:
       return self.update_pq(pt_cp, cam_cp, ext_cp, trans_type)
 
     ret = car.CarState.new_message()
@@ -275,7 +275,7 @@ class CarState(CarStateBase):
 
   @staticmethod
   def get_can_parser(CP):
-    if CP.carFingerprint in PQ_CARS:
+    if CP.flags & VolkswagenFlags.PQ:
       return CarState.get_can_parser_pq(CP)
 
     messages = [
@@ -307,7 +307,7 @@ class CarState(CarStateBase):
 
   @staticmethod
   def get_cam_can_parser(CP):
-    if CP.carFingerprint in PQ_CARS:
+    if CP.flags & VolkswagenFlags.PQ:
       return CarState.get_cam_can_parser_pq(CP)
 
     messages = [
