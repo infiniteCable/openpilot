@@ -134,7 +134,7 @@ class VolkswagenPQPlatformConfig(PlatformConfig):
 @dataclass(frozen=True, kw_only=True)
 class VolkswagenCarSpecs(CarSpecs):
   centerToFrontRatio: float = 0.45
-  steerRatio: float = 15.6
+  steerRatio: float = 12.6
 
 
 class Footnote(Enum):
@@ -261,7 +261,7 @@ class CAR(Platforms):
       VWCarInfo("Volkswagen Polo GTI 2018-23", footnotes=[Footnote.VW_MQB_A0]),
     ],
     #specs=VolkswagenCarSpecs(mass=1230, wheelbase=2.55),
-    specs=VolkswagenCarSpecs(mass=1151, wheelbase=2.47, steerRatio=12.6),
+    specs=VolkswagenCarSpecs(mass=1151, wheelbase=2.47),
   )
   SHARAN_MK2 = VolkswagenPQPlatformConfig(
     "VOLKSWAGEN SHARAN 2ND GEN",  # Chassis 7N
