@@ -152,8 +152,10 @@ class CarController(CarControllerBase):
       if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or self.test:
         self.test = False
         self.warn_repeat_timer += 1
-        if not CS.steering_recovered or self.warn_repeat_timer >= 20:
+        if not CS.steering_recovered:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
+        elif self.warn_repeat_timer >= 20:
+          hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverChime"]
           if self.warn_repeat_timer >= 40:
             self.warn_repeat_timer = 0
         else:
