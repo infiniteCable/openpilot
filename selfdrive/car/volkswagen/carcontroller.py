@@ -61,7 +61,7 @@ class CarController(CarControllerBase):
       # MQB racks reset the uninterrupted steering timer after a single frame
       # of HCA disabled; this is done whenever output happens to be zero.
 
-      if CC.latActive and not CS.out.accFaulted:
+      if CC.latActive:
         self.hca_enabled = True
         self.hca_standby_timer = 0
         new_steer = int(round(actuators.steer * self.CCP.STEER_MAX))
@@ -105,11 +105,11 @@ class CarController(CarControllerBase):
         ea_simulated_torque = clip(apply_steer * 2, -self.CCP.STEER_MAX, self.CCP.STEER_MAX)
         if abs(CS.out.steeringTorque) > abs(ea_simulated_torque):
           ea_simulated_torque = CS.out.steeringTorque
-        can_sends.append(self.CCS.create_eps_update(self.packer_pt, CANBUS.cam, CS.eps_stock_values, ea_simulated_torque))
+        can_sends.append(self.CCS.create_eps_update(self.packer_pt, CANBUS.pt, CS.eps_stock_values, ea_simulated_torque))
 
     # **** Acceleration Controls ******************************************** #
     
-    if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
+    if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and CC.longActive:
       self.long_ctrl = True
     else: 
       self.long_ctrl = False
@@ -118,9 +118,9 @@ class CarController(CarControllerBase):
       if self.frame % 20 == 0:
         target_accel = actuators.accel
         if target_accel > 0:
-          scaling = 10
+          scaling = 40
         elif target_accel < 0:
-          scaling = 10
+          scaling = 40
         else:
           scaling = 1
         #target_speed = int(actuators.speed * CV.MS_TO_KPH * ((CS.out.vEgo * CV.MS_TO_KPH) / CS.clu_speed))
