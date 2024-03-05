@@ -50,12 +50,16 @@ class CarD:
 
     # set alternative experiences from parameters
     disengage_on_accelerator = self.params.get_bool("DisengageOnAccelerator")
+    not_disengage_lat_on_brake = self.params.get_bool("NotDisengageLatOnBrake")
     self.CP.alternativeExperience = 0
     if not disengage_on_accelerator:
       self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
+    if not_disengage_lat_on_brake:
+      self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.ALLOW_LATERAL_ON_BRAKE
 
     car_recognized = self.CP.carName != 'mock'
     openpilot_enabled_toggle = self.params.get_bool("OpenpilotEnabledToggle")
+    self.lateral_only = self.params.get_bool("EngageLatOnly")
 
     controller_available = self.CI.CC is not None and openpilot_enabled_toggle and not self.CP.dashcamOnly
 
