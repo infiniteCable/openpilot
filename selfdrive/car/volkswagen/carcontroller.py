@@ -33,6 +33,7 @@ class CarController(CarControllerBase):
 
     self.warn_repeat_timer = 0
 
+    self.long_ctrl = False
     self.gra_send_up = False
     self.gra_send_down = False
     self.gra_speed = 0
@@ -107,12 +108,17 @@ class CarController(CarControllerBase):
         can_sends.append(self.CCS.create_eps_update(self.packer_pt, CANBUS.cam, CS.eps_stock_values, ea_simulated_torque))
 
     # **** Acceleration Controls ******************************************** #
-
+    
     if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and not CS.out.accFaulted and CC.longActive:
+      self.long_ctrl = True
+    else: 
+      self.long_ctrl = False
+      
+    if self.long_ctrl:
       if self.frame % 20 == 0:
         target_accel = actuators.accel
         if target_accel > 0:
-          scaling = 40
+          scaling = 10
         elif target_accel < 0:
           scaling = 10
         else:
@@ -177,7 +183,7 @@ class CarController(CarControllerBase):
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
                                                              cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
 
-      elif self.CP.openpilotLongitudinalControl and CC.longActive and not CS.out.cruiseState.enabled:
+      elif self.long_ctrl:
         can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, up=self.gra_send_up, down=self.gra_send_down))
         self.gra_send_up = False
         self.gra_send_down = False
