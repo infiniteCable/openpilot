@@ -78,13 +78,6 @@ class CarInterface(CarInterfaceBase):
     else:
       ret.steerActuatorDelay = 0.2
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
-      #ret.lateralTuning.pid.kpBP = [0.]
-      #ret.lateralTuning.pid.kiBP = [0.]
-      #ret.lateralTuning.pid.kf = 0.00006
-      #ret.lateralTuning.pid.kpV = [0.6]
-      #ret.lateralTuning.pid.kiV = [0.2]
-
-    # Global longitudinal tuning defaults, can be overridden per-vehicle
 
     ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
     if experimental_long:
@@ -104,22 +97,7 @@ class CarInterface(CarInterfaceBase):
     ret.longitudinalTuning.kpV = [0.1]
     ret.longitudinalTuning.kiV = [0.0]
 
-    # Per-chassis tuning values, override tuning defaults here if desired
-    # this has been moved, keep following values as reference for now
-    # candidate == CAR.POLO_MK6:
-    #  ret.mass = 1151
-    #  ret.wheelbase = 2.47
     ret.minEnableSpeed = -1.
-
-    #  #ret.lateralTuning.init('torque')
-    #  #ret.lateralTuning.torque.useSteeringAngle = False
-    #  #ret.lateralTuning.torque.kp = 1.0
-    #  #ret.lateralTuning.torque.kf = 1.0
-    #  #ret.lateralTuning.torque.ki = 0.1
-    #  #ret.lateralTuning.torque.friction = 0.10
-    #  #ret.lateralTuning.torque.latAccelFactor = 1.0
-    #  #ret.lateralTuning.torque.latAccelOffset = 0.0
-    #  #ret.lateralTuning.torque.steeringAngleDeadzoneDeg = 0.0
 
     ret.autoResumeSng = ret.minEnableSpeed == -1
 
