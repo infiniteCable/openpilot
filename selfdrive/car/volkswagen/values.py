@@ -131,7 +131,7 @@ class VolkswagenPQPlatformConfig(PlatformConfig):
     self.flags |= VolkswagenFlags.PQ
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=False, kw_only=True)
 class VolkswagenCarSpecs(CarSpecs):
   centerToFrontRatio: float = 0.45
   steerRatio: float = 13.2
