@@ -76,7 +76,7 @@ class CarInterface(CarInterfaceBase):
       ret.steerActuatorDelay = 0.2
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
     else:
-      ret.steerActuatorDelay = 0.22
+      ret.steerActuatorDelay = 0.1
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
 
     ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
