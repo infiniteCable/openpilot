@@ -134,7 +134,7 @@ class VolkswagenPQPlatformConfig(PlatformConfig):
 @dataclass(frozen=True, kw_only=True)
 class VolkswagenCarSpecs(CarSpecs):
   centerToFrontRatio: float = 0.45
-  steerRatio: float = 15.6
+  steerRatio: float = 15.7
 
 
 class Footnote(Enum):
