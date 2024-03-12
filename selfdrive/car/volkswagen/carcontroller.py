@@ -124,7 +124,8 @@ class CarController(CarControllerBase):
         #else:
         #  scaling = 1
         speed_corr = CS.clu_speed - (CS.out.vEgo * CV.MS_TO_KPH)
-        self.target_speed = int(round((actuators.speed * CV.MS_TO_KPH) + speed_corr))
+        #self.target_speed = int(round((actuators.speed * CV.MS_TO_KPH) + speed_corr))
+        self.target_speed = int(round(((actuators.accel / 2) * CV.MS_TO_KPH) + speed_corr))
         #self.target_speed = int(max(CS.clu_speed + (target_accel * scaling), 0))
         self.gra_speed = int(CS.gra_speed)
         speed_diff = abs(self.target_speed - self.gra_speed)
