@@ -115,13 +115,13 @@ class CarController(CarControllerBase):
       self.long_ctrl = False
 
     if self.long_ctrl:
-      if self.frame % 20 == 0:
+      if self.frame % 10 == 0:
         speed_corr = CS.clu_speed - (CS.out.vEgo * CV.MS_TO_KPH)
         #self.target_speed = int(round((actuators.speed * CV.MS_TO_KPH) + speed_corr))
-        self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH) * 3) + speed_corr))
+        self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH) * 2) + speed_corr))
         self.gra_speed = int(CS.gra_speed)
         speed_diff = abs(self.target_speed - self.gra_speed)
-        self.gra_button_timer = max(int(200 / speed_diff) if speed_diff != 0 else 200, 20)
+        self.gra_button_timer = max(int(200 / speed_diff) if speed_diff != 0 else 200, 10)
 
       if self.gra_button_frame >= self.gra_button_timer:
         if self.target_speed > self.gra_speed:
