@@ -116,17 +116,9 @@ class CarController(CarControllerBase):
 
     if self.long_ctrl:
       if self.frame % 20 == 0:
-        #target_accel = actuators.accel
-        #if target_accel > 0:
-        #  scaling = 40
-        #elif target_accel < 0:
-        #  scaling = 40
-        #else:
-        #  scaling = 1
         speed_corr = CS.clu_speed - (CS.out.vEgo * CV.MS_TO_KPH)
         #self.target_speed = int(round((actuators.speed * CV.MS_TO_KPH) + speed_corr))
         self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH)) + speed_corr))
-        #self.target_speed = int(max(CS.clu_speed + (target_accel * scaling), 0))
         self.gra_speed = int(CS.gra_speed)
         speed_diff = abs(self.target_speed - self.gra_speed)
         self.gra_button_timer = max(int(200 / speed_diff) if speed_diff != 0 else 200, 20)
