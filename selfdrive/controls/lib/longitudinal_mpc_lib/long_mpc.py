@@ -246,6 +246,7 @@ class LongitudinalMpc:
     self.last_cloudlog_t = 0
     self.status = False
     self.crash_cnt = 0.0
+    self.lead_dist = 0.0
     self.solution_status = 0
     # timers
     self.solve_time = 0.0
@@ -337,6 +338,7 @@ class LongitudinalMpc:
 
     lead_xv_0 = self.process_lead(radarstate.leadOne)
     lead_xv_1 = self.process_lead(radarstate.leadTwo)
+    self.lead_dist = lead_xv_0
 
     # To estimate a safe distance from a moving lead, we calculate how much stopping
     # distance that lead needs as a minimum. We can add that to the current distance
