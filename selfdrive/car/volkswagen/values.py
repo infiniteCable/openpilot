@@ -104,6 +104,14 @@ class CarControllerParams:
         "laneAssistDeactivated": 10,          # "Lane Assist deactivated." silent with persistent icon afterward
       }
 
+      self.ACC_04 = {
+        "ACC_Texte": 0,
+        "ACC_Texte_Zusatzanz": 0,
+        "ACC_Status_Zusatzanz": 0,
+        "ACC_Texte_braking_guard": 0,
+        "ACC_Warnhinweis": 0,
+      }
+
 
 class CANBUS:
   pt = 0 # directly connected to engine can bus
