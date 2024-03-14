@@ -156,6 +156,18 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
   return packer.make_can_msg("ACC_02", bus, values)
 
 
+def create_acc_04_hud_control(packer, bus, acc_warn_state):
+  acc_04_values = {
+    "ACC_Texte": acc_warn_state["ACC_Texte"],
+    "ACC_Texte_Zusatzanz": acc_warn_state["ACC_Texte_Zusatzanz"],
+    "ACC_Status_Zusatzanz": acc_warn_state["ACC_Status_Zusatzanz"],
+    "ACC_Texte_braking_guard": acc_warn_state["ACC_Texte_braking_guard"],
+    "ACC_Warnhinweis": acc_warn_state["ACC_Warnhinweis"],
+  }
+    
+  return packer.make_can_msg("ACC_04", bus, acc_04_values)
+
+
 def create_bap(packer, bus, id, data):
   values = {
     "Stream": data,
