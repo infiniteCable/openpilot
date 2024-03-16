@@ -115,7 +115,7 @@ class CarController(CarControllerBase):
       self.long_ctrl = False
 
     if self.long_ctrl:
-      if self.frame % 10 == 0:
+      if self.frame % self.CCP.GRA_STEP == 0:
         speed_corr = CS.clu_speed - (CS.out.vEgo * CV.MS_TO_KPH)
         #self.target_speed = int(round((actuators.speed * CV.MS_TO_KPH) + speed_corr))
         self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH) * 2) + speed_corr))
@@ -169,15 +169,15 @@ class CarController(CarControllerBase):
     #if self.frame % 100 == 0:
     #  self.send_bap_ldw(can_sends)
 
-    if self.frame % self.CCP.ACC_HUD_STEP == 0 and self.CP.openpilotLongitudinalControl:
-      lead_distance = 0
-      if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
-        lead_distance = 512 if CS.upscale_lead_car_signal else 8
-      acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
-      # FIXME: follow the recent displayed-speed updates, also use mph_kmh toggle to fix display rounding problem?
-      set_speed = hud_control.setSpeed * CV.MS_TO_KPH
-      can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.cam, acc_hud_status, set_speed,
-                                                       lead_distance, hud_control.leadDistanceBars))
+    #if self.frame % self.CCP.FCW_HUD_STEP == 0:
+    #  fcw_alert = 0
+    #  if hud_control.visualAlert in (VisualAlert.fcw):
+    #    fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
+    #  elif model.dist:
+    #    fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
+    #  else:
+    #    fcw_alert = self.CCP.FCW_MESSAGES["none"]
+    #  can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
     # **** Stock ACC Button Controls **************************************** #
 
