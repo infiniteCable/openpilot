@@ -166,12 +166,12 @@ class CarController(CarControllerBase):
 
     if self.frame % self.CCP.FCW_HUD_STEP == 0:
       fcw_alert = self.CCP.FCW_MESSAGES["none"]
-      if hud_control.visualAlert in (VisualAlert.fcw):
+      if hud_control.visualAlert == VisualAlert.fcw:
         fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
       #elif model.dist:
       #  fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
       fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"] # for testing
-      #can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
+      can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
     # **** Stock ACC Button Controls **************************************** #
 
