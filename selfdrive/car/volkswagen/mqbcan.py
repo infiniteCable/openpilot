@@ -165,11 +165,18 @@ def create_fcw_hud_control(packer, bus, fcw_hud_status):
     acc_warn = 0
     
   acc_04_values = {
-    "ACC_Texte": 0
+    "ACC_Texte_Sekundaeranz": 0,
     "ACC_Texte_Zusatzanz": 0,
     "ACC_Status_Zusatzanz": 0,
+    "ACC_Texte": 0,
     "ACC_Texte_braking_guard": 0,
     "ACC_Warnhinweis": acc_warn,
+    "ACC_Zeitluecke_Abstandswarner": 0,
+    "ACC_Abstand_Abstandswarner": 0,
+    "ACC_Tempolimit": 0,
+    "ACC_Charisma_FahrPr": 0,
+    "ACC_Charisma_Status": 0,
+    "ACC_Texte_Abstandswarner": 0,
   }
     
   return packer.make_can_msg("ACC_04", bus, acc_04_values)
