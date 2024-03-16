@@ -153,6 +153,7 @@ class LongitudinalPlanner:
     longitudinalPlan.hasLead = sm['radarState'].leadOne.status
     longitudinalPlan.longitudinalPlanSource = self.mpc.source
     longitudinalPlan.fcw = self.fcw
+    longitudinalPlan.leadDistance = self.mpc.lead_dist
 
     longitudinalPlan.solverExecutionTime = self.mpc.solve_time
 
