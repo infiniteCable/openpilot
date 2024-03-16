@@ -156,13 +156,20 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
   return packer.make_can_msg("ACC_02", bus, values)
 
 
-def create_acc_04_hud_control(packer, bus, acc_warn_state):
+def create_fcw_hud_control(packer, bus, fcw_hud_status):
+  if fcw_hud_status == 1:
+    acc_warn = 1
+  elif fcw_hud_status == 2:
+    acc_warn = 1
+  else:
+    acc_warn = 0
+    
   acc_04_values = {
-    "ACC_Texte": acc_warn_state["ACC_Texte"],
-    "ACC_Texte_Zusatzanz": acc_warn_state["ACC_Texte_Zusatzanz"],
-    "ACC_Status_Zusatzanz": acc_warn_state["ACC_Status_Zusatzanz"],
-    "ACC_Texte_braking_guard": acc_warn_state["ACC_Texte_braking_guard"],
-    "ACC_Warnhinweis": acc_warn_state["ACC_Warnhinweis"],
+    "ACC_Texte": 0
+    "ACC_Texte_Zusatzanz": 0,
+    "ACC_Status_Zusatzanz": 0,
+    "ACC_Texte_braking_guard": 0,
+    "ACC_Warnhinweis": acc_warn,
   }
     
   return packer.make_can_msg("ACC_04", bus, acc_04_values)
