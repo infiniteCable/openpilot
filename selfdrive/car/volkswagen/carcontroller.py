@@ -116,7 +116,6 @@ class CarController(CarControllerBase):
     if self.long_ctrl:
       if self.frame % self.CCP.GRA_STEP == 0:
         speed_corr = CS.clu_speed - (CS.out.vEgo * CV.MS_TO_KPH)
-        #self.target_speed = int(round((actuators.speed * CV.MS_TO_KPH) + speed_corr))
         self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH) * 2) + speed_corr))
         self.gra_speed = int(CS.gra_speed)
         speed_diff = abs(self.target_speed - self.gra_speed)
@@ -168,9 +167,8 @@ class CarController(CarControllerBase):
       fcw_alert = self.CCP.FCW_MESSAGES["none"]
       if hud_control.visualAlert == VisualAlert.fcw:
         fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
-      #elif model.dist:
-      #  fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
-      fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"] # for testing
+      elif actuators.distance < actuators.safeDistance:
+        fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
       can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
     # **** Stock ACC Button Controls **************************************** #
