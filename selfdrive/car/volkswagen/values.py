@@ -72,6 +72,8 @@ class CarControllerParams:
 
     else:
       self.LDW_STEP = 10                  # LDW_02 message frequency 10Hz
+      self.GRA_STEP = 10                  # GRA Button frequency
+      self.FCW_HUD_STEP = 10              # ACC_04 frequency
       self.ACC_HUD_STEP = 6               # ACC_02 message frequency 16Hz
       self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
       self.STEER_DELTA_UP = 10            # Max HCA reached in 1.50s (STEER_MAX / (50Hz * 1.50))
