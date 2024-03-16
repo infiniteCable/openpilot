@@ -171,7 +171,7 @@ class CarController(CarControllerBase):
       #elif model.dist:
       #  fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
       fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"] # for testing
-      can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
+      #can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
     # **** Stock ACC Button Controls **************************************** #
 
