@@ -247,6 +247,7 @@ class LongitudinalMpc:
     self.status = False
     self.crash_cnt = 0.0
     self.lead_dist = 0.0
+    self.lead_safe_dist = 0.0
     self.solution_status = 0
     # timers
     self.solve_time = 0.0
@@ -409,10 +410,12 @@ class LongitudinalMpc:
       if any((lead_0_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0):
         self.source = 'lead0'
         self.lead_dist = lead_0_obstacle
+        self.lead_safe_dist = max((get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0]
       if any((lead_1_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0) and \
          (lead_1_obstacle[0] - lead_0_obstacle[0]):
         self.source = 'lead1'
         self.lead_dist = lead_1_obstacle
+        self.lead_safe_dist = max((get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0])
 
   def run(self):
     # t0 = time.monotonic()
