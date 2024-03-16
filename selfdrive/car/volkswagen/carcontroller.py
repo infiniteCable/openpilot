@@ -42,7 +42,6 @@ class CarController(CarControllerBase):
     self.gra_button_frame = 0
 
     self.bap_ldw_mode = 0
-    self.test = False
 
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
@@ -144,13 +143,9 @@ class CarController(CarControllerBase):
 
     # **** HUD Controls ***************************************************** #
 
-    if CS.bap_ldw_01 is not None or CS.bap_ldw_01_rec != 0:
-      self.test = True
-
     if self.frame % self.CCP.LDW_STEP == 0:
       hud_alert = 0
-      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw) or self.test:
-        self.test = False
+      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw):
         self.warn_repeat_timer += 1
         if not CS.steering_recovered:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
