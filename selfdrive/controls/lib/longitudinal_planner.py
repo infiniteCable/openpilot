@@ -154,6 +154,7 @@ class LongitudinalPlanner:
     longitudinalPlan.longitudinalPlanSource = self.mpc.source
     longitudinalPlan.fcw = self.fcw
     longitudinalPlan.leadDistance = self.mpc.lead_dist
+    longitudinalPlan.leadSafeDistance = self.mpc.lead_safe_dist
 
     longitudinalPlan.solverExecutionTime = self.mpc.solve_time
 
