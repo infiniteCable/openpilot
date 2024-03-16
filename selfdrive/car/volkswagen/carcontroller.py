@@ -169,15 +169,15 @@ class CarController(CarControllerBase):
     #if self.frame % 100 == 0:
     #  self.send_bap_ldw(can_sends)
 
-    #if self.frame % self.CCP.FCW_HUD_STEP == 0:
-    #  fcw_alert = 0
-    #  if hud_control.visualAlert in (VisualAlert.fcw):
-    #    fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
-    #  elif model.dist:
-    #    fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
-    #  else:
-    #    fcw_alert = self.CCP.FCW_MESSAGES["none"]
-    #  can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
+    if self.frame % self.CCP.FCW_HUD_STEP == 0:
+      fcw_alert = 0
+      if hud_control.visualAlert in (VisualAlert.fcw):
+        fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
+      #elif model.dist:
+      #  fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
+      else:
+        fcw_alert = self.CCP.FCW_MESSAGES["none"]
+      can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
     # **** Stock ACC Button Controls **************************************** #
 
