@@ -104,12 +104,10 @@ class CarControllerParams:
         "laneAssistDeactivated": 10,          # "Lane Assist deactivated." silent with persistent icon afterward
       }
 
-      self.ACC_04 = {
-        "ACC_Texte": 0,
-        "ACC_Texte_Zusatzanz": 0,
-        "ACC_Status_Zusatzanz": 0,
-        "ACC_Texte_braking_guard": 0,
-        "ACC_Warnhinweis": 0,
+      self.FCW_MESSAGES = {
+        "none": 0,                            # Nothing to display
+        "distanceWarning": 1,                 # "Distance Warning
+        "frontCollisionWarning": 2,           # "Front Collision Warning
       }
 
 
