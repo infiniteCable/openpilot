@@ -1,4 +1,6 @@
-from cereal import car
+import cereal.messaging as messaging
+
+from cereal import car, custom
 from opendbc.can.packer import CANPacker
 from openpilot.common.numpy_fast import clip
 from openpilot.common.conversions import Conversions as CV
@@ -47,6 +49,8 @@ class CarController(CarControllerBase):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
+    custom_reserved0 = self.sm['CustomReserved0']
+    custom_reserved0.update()
 
     # **** Steering Controls ************************************************ #
 
@@ -167,7 +171,7 @@ class CarController(CarControllerBase):
       fcw_alert = self.CCP.FCW_MESSAGES["none"]
       if hud_control.visualAlert == VisualAlert.fcw:
         fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
-      elif actuators.distance < actuators.safeDistance:
+      elif custom_reserved0.distance < custom_reserved0.safeDistance and custom_reserved0.leadDetected:
         fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
       can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
