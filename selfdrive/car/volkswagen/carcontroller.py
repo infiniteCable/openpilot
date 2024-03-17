@@ -46,17 +46,23 @@ class CarController(CarControllerBase):
     self.bap_ldw_mode = 0
 
     self.sm = messaging.SubMaster(['CustomReserved0'])
-    self.custom_reserved0 = custom.CustomReserved0
+    self.distance = 0.0
+    self.safe_distance = 0.0
+    self.lead_detected = False
 
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
     self.sm.update()
-    if self.sm.valid['CustomReserved0']:
-      self.custom_reserved0 = self.sm['CustomReserved0']
+    if self.sm.valid['CustomReserved0'] and self.sm.updated['CustomReserved0']:
+      self.distance = self.sm['CustomReserved0'].distance
+      self.safe_distance = self.sm['CustomReserved0'].safeDistance
+      self.lead_detected = self.sm['CustomReserved0'].leadDetected
     else:
-      self.custom_reserved0 = custom.CustomReserved0
+      self.distance = 0.0
+      self.safe_distance = 0.0
+      self.lead_detected = False
 
     # **** Steering Controls ************************************************ #
 
