@@ -179,7 +179,7 @@ class CarController(CarControllerBase):
       fcw_alert = self.CCP.FCW_MESSAGES["none"]
       if hud_control.visualAlert == VisualAlert.fcw:
         fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
-      elif custom_reserved0.distance < custom_reserved0.safeDistance and custom_reserved0.leadDetected:
+      elif self.distance < self.safe_distance and self.lead_detected:
         fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
       can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
