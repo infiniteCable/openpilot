@@ -153,9 +153,17 @@ class LongitudinalPlanner:
     longitudinalPlan.hasLead = sm['radarState'].leadOne.status
     longitudinalPlan.longitudinalPlanSource = self.mpc.source
     longitudinalPlan.fcw = self.fcw
-    #longitudinalPlan.distance = self.mpc.lead_dist
-    #longitudinalPlan.safeDistance = self.mpc.lead_safe_dist
 
     longitudinalPlan.solverExecutionTime = self.mpc.solve_time
 
     pm.send('longitudinalPlan', plan_send)
+
+    # Custom fork data
+    custom_data0_send = messaging.new_message('CustomReserved0')
+    custom_data0_send.valid = sm.all_checks(service_list=['carState', 'controlsState'])
+    custom_reserved0 = custom_data0_send.CustomReserved0
+    
+    custom_reserved0.distance = self.mpc.lead_dist
+    custom_reserved0.safeDistance = self.mpc.lead_safe_dist
+
+    pm.send('CustomReserved0', custom_data0_send)
