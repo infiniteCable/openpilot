@@ -54,15 +54,11 @@ class CarController(CarControllerBase):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
-    self.sm.update()
-    if self.sm.valid['CustomReserved0'] and self.sm.updated['CustomReserved0']:
+    self.sm.update(0)
+    if self.sm.updated['CustomReserved0']:
       self.distance = self.sm['CustomReserved0'].distance
       self.safe_distance = self.sm['CustomReserved0'].safeDistance
       self.lead_detected = self.sm['CustomReserved0'].leadDetected
-    else:
-      self.distance = 0.0
-      self.safe_distance = 0.0
-      self.lead_detected = False
 
     # **** Steering Controls ************************************************ #
 
