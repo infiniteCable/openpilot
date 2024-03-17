@@ -46,13 +46,17 @@ class CarController(CarControllerBase):
     self.bap_ldw_mode = 0
 
     self.sm = messaging.SubMaster(['CustomReserved0'])
+    self.custom_reserved0 = custom.CustomReserved0
 
   def update(self, CC, CS, ext_bus, now_nanos):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
     self.sm.update()
-    custom_reserved0 = self.sm['CustomReserved0']
+    if self.sm.valid['CustomReserved0']:
+      self.custom_reserved0 = self.sm['CustomReserved0']
+    else:
+      self.custom_reserved0 = custom.CustomReserved0
 
     # **** Steering Controls ************************************************ #
 
