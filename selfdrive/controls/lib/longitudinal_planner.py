@@ -156,15 +156,8 @@ class LongitudinalPlanner:
 
     longitudinalPlan.solverExecutionTime = self.mpc.solve_time
 
+    longitudinalPlan.hasRightLaneDEPRECATED = bool(self.mpc.lead_detected)
+    longitudinalPlan.aTargetMinDEPRECATED = float(self.mpc.lead_safe_dist)
+    longitudinalPlan.aTargetMaxDEPRECATED = float(self.mpc.lead_dist)
+
     pm.send('longitudinalPlan', plan_send)
-
-    # Custom fork data
-    longitudinalPlanIC_send = messaging.new_message('longitudinalPlanIC')
-    longitudinalPlanIC_send.valid = sm.all_checks(service_list=['carState', 'controlsState'])
-    longitudinalPlanIC = longitudinalPlanIC_send.longitudinalPlanIC
-    
-    longitudinalPlanIC.distance = float(self.mpc.lead_dist)
-    longitudinalPlanIC.safeDistance = float(self.mpc.lead_safe_dist)
-    longitudinalPlanIC.leadDetected = bool(self.mpc.lead_detected)
-
-    pm.send('longitudinalPlanIC', longitudinalPlanIC_send)
