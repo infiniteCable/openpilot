@@ -165,5 +165,6 @@ class LongitudinalPlanner:
     
     custom_reserved0.distance = self.mpc.lead_dist
     custom_reserved0.safeDistance = self.mpc.lead_safe_dist
+    custom_reserved0.leadDetected = self.mpc.lead_detected
 
     pm.send('CustomReserved0', custom_data0_send)
