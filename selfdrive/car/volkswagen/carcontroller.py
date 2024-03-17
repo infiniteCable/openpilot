@@ -45,7 +45,7 @@ class CarController(CarControllerBase):
 
     self.bap_ldw_mode = 0
 
-    self.sm = messaging.SubMaster(['customReserved0'])
+    self.sm = messaging.SubMaster(['Event'])
     self.distance = 0.0
     self.safe_distance = 0.0
     self.lead_detected = False
@@ -55,10 +55,10 @@ class CarController(CarControllerBase):
     hud_control = CC.hudControl
     can_sends = []
     self.sm.update(0)
-    if self.sm.updated['customReserved0']:
-      self.distance = self.sm['customReserved0'].distance
-      self.safe_distance = self.sm['customReserved0'].safeDistance
-      self.lead_detected = self.sm['customReserved0'].leadDetected
+    if self.sm.updated['Event']:
+      self.distance = self.sm['Event'].customReserved0.distance
+      self.safe_distance = self.sm['Event'].customReserved0.safeDistance
+      self.lead_detected = self.sm['Event'].customReserved0.leadDetected
 
     # **** Steering Controls ************************************************ #
 
