@@ -159,12 +159,12 @@ class LongitudinalPlanner:
     pm.send('longitudinalPlan', plan_send)
 
     # Custom fork data
-    longitudinalPlanIC_send = messaging.new_message('longitudinalPlanIC')
-    longitudinalPlanIC_send.valid = sm.all_checks(service_list=['carState', 'controlsState'])
-    longitudinalPlanIC = longitudinalPlanIC_send.longitudinalPlanIC
+    customReserved0_send = messaging.new_message('CustomReserved0')
+    customReserved0_send.valid = sm.all_checks(service_list=['carState', 'controlsState'])
+    customReserved0 = customReserved0_send.CustomReserved0
     
-    longitudinalPlanIC.distance = float(self.mpc.lead_dist)
-    longitudinalPlanIC.safeDistance = float(self.mpc.lead_safe_dist)
-    longitudinalPlanIC.leadDetected = bool(self.mpc.lead_detected)
+    customReserved0.distance = float(self.mpc.lead_dist)
+    customReserved0.safeDistance = float(self.mpc.lead_safe_dist)
+    customReserved0.leadDetected = bool(self.mpc.lead_detected)
 
-    pm.send('longitudinalPlanIC', longitudinalPlanIC_send)
+    pm.send('CustomReserved0', customReserved0_send)
