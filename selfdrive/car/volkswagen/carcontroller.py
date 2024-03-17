@@ -1,6 +1,6 @@
 import cereal.messaging as messaging
 
-from cereal import car, custom
+from cereal import car
 from opendbc.can.packer import CANPacker
 from openpilot.common.numpy_fast import clip
 from openpilot.common.conversions import Conversions as CV
@@ -45,7 +45,7 @@ class CarController(CarControllerBase):
 
     self.bap_ldw_mode = 0
 
-    self.sm = messaging.SubMaster(['longitudinalPlanIC'])
+    self.sm = messaging.SubMaster(['CustomReserved0'])
     self.distance = 0.0
     self.safe_distance = 0.0
     self.lead_detected = False
@@ -55,10 +55,10 @@ class CarController(CarControllerBase):
     hud_control = CC.hudControl
     can_sends = []
     self.sm.update(0)
-    if self.sm.updated['longitudinalPlanIC']:
-      self.distance = self.sm['longitudinalPlanIC'].distance
-      self.safe_distance = self.sm['longitudinalPlanIC'].safeDistance
-      self.lead_detected = self.sm['longitudinalPlanIC'].leadDetected
+    if self.sm.updated['CustomReserved0']:
+      self.distance = self.sm['CustomReserved0'].distance
+      self.safe_distance = self.sm['CustomReserved0'].safeDistance
+      self.lead_detected = self.sm['CustomReserved0'].leadDetected
 
     # **** Steering Controls ************************************************ #
 
