@@ -7,7 +7,7 @@ from typing import SupportsFloat
 
 import cereal.messaging as messaging
 
-from cereal import car, log
+from cereal import car, log, custom
 from cereal.visionipc import VisionIpcClient, VisionStreamType
 
 
@@ -599,8 +599,6 @@ class Controls:
       actuators.steer, actuators.steeringAngleDeg, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
                                                                              self.steer_limited, self.desired_curvature,
                                                                              self.sm['liveLocationKalman'])
-      actuators.distance = long_plan.distance
-      actuators.safeDistance = long_plan.safeDistance
       
     else:
       lac_log = log.ControlsState.LateralDebugState.new_message()
