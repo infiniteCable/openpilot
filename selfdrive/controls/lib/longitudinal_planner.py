@@ -163,8 +163,8 @@ class LongitudinalPlanner:
     custom_data0_send.valid = sm.all_checks(service_list=['carState', 'controlsState'])
     custom_reserved0 = custom_data0_send.CustomReserved0
     
-    custom_reserved0.distance = self.mpc.lead_dist
-    custom_reserved0.safeDistance = self.mpc.lead_safe_dist
-    custom_reserved0.leadDetected = self.mpc.lead_detected
+    custom_reserved0.distance = float(self.mpc.lead_dist)
+    custom_reserved0.safeDistance = float(self.mpc.lead_safe_dist)
+    custom_reserved0.leadDetected = bool(self.mpc.lead_detected)
 
     pm.send('CustomReserved0', custom_data0_send)
