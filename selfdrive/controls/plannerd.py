@@ -27,7 +27,7 @@ def plannerd_thread():
   cloudlog.info("plannerd got CarParams: %s", CP.carName)
 
   longitudinal_planner = LongitudinalPlanner(CP)
-  pm = messaging.PubMaster(['longitudinalPlan', 'uiPlan', 'customReserved0'])
+  pm = messaging.PubMaster(['longitudinalPlan', 'uiPlan', 'Event'])
   sm = messaging.SubMaster(['carControl', 'carState', 'controlsState', 'radarState', 'modelV2'],
                            poll='modelV2', ignore_avg_freq=['radarState'])
 
