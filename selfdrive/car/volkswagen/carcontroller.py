@@ -163,7 +163,7 @@ class CarController(CarControllerBase):
     #if self.frame % 100 == 0:
     #  self.send_bap_ldw(can_sends)
 
-    if self.frame % self.CCP.FCW_HUD_STEP == 0:
+    if self.frame % self.CCP.FCW_HUD_STEP == 0 and (CC.latActive or CC.longActive):
       fcw_alert = self.CCP.FCW_MESSAGES["none"]
       if hud_control.visualAlert == VisualAlert.fcw:
         fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
