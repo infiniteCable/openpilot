@@ -227,6 +227,7 @@ class LongitudinalMpc:
     self.source = SOURCES[2]
     self.lead_dist = 0.0
     self.lead_safe_dist = 0.0
+    self.lead_detected = False
 
   def reset(self):
     # self.solver = AcadosOcpSolverCython(MODEL_NAME, ACADOS_SOLVER_TYPE, N)
@@ -250,6 +251,7 @@ class LongitudinalMpc:
     self.crash_cnt = 0.0
     self.lead_dist = 0.0
     self.lead_safe_dist = 0.0
+    self.lead_detected = False
     self.solution_status = 0
     # timers
     self.solve_time = 0.0
@@ -408,15 +410,18 @@ class LongitudinalMpc:
     # Check if it got within lead comfort range
     # TODO This should be done cleaner
     if self.mode == 'blended':
+      self.lead_detected = False
       if any((lead_0_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0):
         self.source = 'lead0'
         self.lead_dist = lead_0_obstacle
-        self.lead_safe_dist = 0.0 #max((get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0])
+        self.lead_safe_dist = max((get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0])
+        self.lead_detected = True
       if any((lead_1_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0) and \
          (lead_1_obstacle[0] - lead_0_obstacle[0]):
         self.source = 'lead1'
         self.lead_dist = lead_1_obstacle
-        self.lead_safe_dist = 0.0 #max((get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0])
+        self.lead_safe_dist = max((get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0])
+        self.lead_detected = True
 
   def run(self):
     # t0 = time.monotonic()
