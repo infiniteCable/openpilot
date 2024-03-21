@@ -55,11 +55,11 @@ class CarController(CarControllerBase):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
-    self.sm.update(0)
-    if self.sm.updated['longitudinalPlan']:
-      self.distance = self.sm['longitudinalPlan'].aTargetMaxDEPRECATED
-      self.safe_distance = self.sm['longitudinalPlan'].aTargetMinDEPRECATED
-      self.lead_detected = self.sm['longitudinalPlan'].hasRightLaneDEPRECATED
+    #self.sm.update(0)
+    #if self.sm.updated['longitudinalPlan']:
+    #  self.distance = self.sm['longitudinalPlan'].aTargetMaxDEPRECATED
+    #  self.safe_distance = self.sm['longitudinalPlan'].aTargetMinDEPRECATED
+    #  self.lead_detected = self.sm['longitudinalPlan'].hasRightLaneDEPRECATED
 
     # **** Steering Controls ************************************************ #
 
@@ -176,14 +176,14 @@ class CarController(CarControllerBase):
     #if self.frame % 100 == 0:
     #  self.send_bap_ldw(can_sends)
 
-    if self.frame % self.CCP.FCW_HUD_STEP == 0 and (CC.latActive or CC.longActive):
-      fcw_alert = self.CCP.FCW_MESSAGES["none"]
-      safe_distance = (CS.out.vEgo * CV.MS_TO_KPH / 2)
-      if hud_control.visualAlert == VisualAlert.fcw:
-        fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
-      elif self.distance < safe_distance and self.lead_detected:
-        fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
-      can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
+    #if self.frame % self.CCP.FCW_HUD_STEP == 0 and (CC.latActive or CC.longActive):
+    #  fcw_alert = self.CCP.FCW_MESSAGES["none"]
+      #safe_distance = (CS.out.vEgo * CV.MS_TO_KPH / 2)
+    #  if hud_control.visualAlert == VisualAlert.fcw:
+    #    fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
+      #elif (self.distance < safe_distance) and self.lead_detected:
+      #  fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
+    #  can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
     # **** Stock ACC Button Controls **************************************** #
 
