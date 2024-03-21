@@ -22,6 +22,7 @@ class CarController(CarControllerBase):
     self.CCS = pqcan if CP.flags & VolkswagenFlags.PQ else mqbcan
     self.packer_pt = CANPacker(dbc_name)
     self.bap = Bap()
+    self.ext_bus = CANBUS.pt if CP.networkLocation == car.CarParams.NetworkLocation.fwdCamera else CANBUS.cam
 
     self.apply_steer_last = 0
     self.gra_acc_counter_last = None
@@ -50,7 +51,7 @@ class CarController(CarControllerBase):
     self.safe_distance = 0.0
     self.lead_detected = False
 
-  def update(self, CC, CS, ext_bus, now_nanos):
+  def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
@@ -203,7 +204,8 @@ class CarController(CarControllerBase):
 
     self.gra_acc_counter_last = CS.gra_stock_values["COUNTER"]
     self.frame += 1
-    return new_actuators, can_sends, self.eps_timer_soft_disable_alert
+
+    return new_actuators, can_sends
 
   def send_bap_ldw(self, can_sends):
     bap_dest_dbc = "BAP_LDW_10"
@@ -254,4 +256,3 @@ class CarController(CarControllerBase):
             for (id, data) in can_frames:
              # can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
               can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest_dbc, int.from_bytes(data)))
-
