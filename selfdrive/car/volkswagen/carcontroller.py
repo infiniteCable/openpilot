@@ -59,7 +59,7 @@ class CarController(CarControllerBase):
     if self.sm.updated['longitudinalPlan']:
       self.distance = self.sm['longitudinalPlan'].aTargetMaxDEPRECATED
       self.safe_distance = self.sm['longitudinalPlan'].aTargetMinDEPRECATED
-      self.lead_detected = self.sm['longitudinalPlan'].hasRightLaneDEPRECATED
+      self.lead_detected = self.sm['longitudinalPlan'].hasLead
 
     # **** Steering Controls ************************************************ #
 
@@ -178,7 +178,7 @@ class CarController(CarControllerBase):
 
     if self.frame % self.CCP.FCW_HUD_STEP == 0 and (CC.latActive or CC.longActive):
       fcw_alert = self.CCP.FCW_MESSAGES["none"]
-      safe_distance = (CS.out.vEgo * CV.MS_TO_KPH / 2)
+      safe_distance = (CS.out.vEgo * CV.MS_TO_KPH) / 2
       if hud_control.visualAlert == VisualAlert.fcw:
         fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
       elif (self.distance < safe_distance) and self.lead_detected:
