@@ -182,8 +182,8 @@ class CarController(CarControllerBase):
       safe_distance = (CS.out.vEgo * CV.MS_TO_KPH) / 2
       if hud_control.visualAlert == VisualAlert.fcw:
         fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
-      #elif self.distance < safe_distance:
-      fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
+      elif self.distance < safe_distance:
+        fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
       can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
     # **** Stock ACC Button Controls **************************************** #
