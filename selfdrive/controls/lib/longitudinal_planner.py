@@ -156,8 +156,7 @@ class LongitudinalPlanner:
 
     longitudinalPlan.solverExecutionTime = self.mpc.solve_time
 
-    longitudinalPlan.hasRightLaneDEPRECATED = bool(self.mpc.lead_detected)
-    longitudinalPlan.aTargetMinDEPRECATED = float(self.mpc.lead_safe_dist)
-    longitudinalPlan.aTargetMaxDEPRECATED = float(self.mpc.lead_dist)
+    longitudinalPlan.aTargetMinDEPRECATED = float(self.mpc.lead_dist)
+    longitudinalPlan.aTargetMaxDEPRECATED = float(self.mpc.lead_safe_dist)
 
     pm.send('longitudinalPlan', plan_send)
