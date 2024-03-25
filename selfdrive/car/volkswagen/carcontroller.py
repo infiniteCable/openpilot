@@ -128,10 +128,10 @@ class CarController(CarControllerBase):
     if self.long_ctrl:
       if self.frame % self.CCP.GRA_STEP == 0:
         speed_corr = CS.clu_speed - (CS.out.vEgo * CV.MS_TO_KPH)
-        self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH) * 2.8) + speed_corr))
+        self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH) * 2.4) + speed_corr))
         self.gra_speed = int(CS.gra_speed)
         speed_diff = abs(self.target_speed - self.gra_speed)
-        self.gra_button_timer = max(int(200 / speed_diff) if speed_diff != 0 else 200, 10)
+        self.gra_button_timer = max(int(200 / speed_diff) if speed_diff != 0 else 200, 20)
 
       if self.gra_button_frame >= self.gra_button_timer:
         if self.target_speed > self.gra_speed:
@@ -161,7 +161,7 @@ class CarController(CarControllerBase):
         if not CS.steering_recovered:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
         elif self.warn_repeat_timer >= 20:
-          hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverChime"]
+          hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverSilent"]
           if self.warn_repeat_timer >= 40:
             self.warn_repeat_timer = 0
         else:
@@ -180,8 +180,8 @@ class CarController(CarControllerBase):
       safe_distance = (CS.out.vEgo * CV.MS_TO_KPH) / 2
       if hud_control.visualAlert == VisualAlert.fcw:
         fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
-      elif self.distance < safe_distance:
-        fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
+      #elif self.distance < safe_distance:
+      fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
       can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
     # **** Stock ACC Button Controls **************************************** #
