@@ -175,14 +175,14 @@ class CarController(CarControllerBase):
     #if self.frame % 100 == 0:
     #  self.send_bap_ldw(can_sends)
 
-    if self.frame % self.CCP.FCW_HUD_STEP == 0:
-      fcw_alert = self.CCP.FCW_MESSAGES["none"]
+    if self.frame % self.CCP.DIST_WARN_HUD_STEP == 0:
+      dist_warn = self.CCP.DIST_WARN_MESSAGES["none"]
       safe_distance = (CS.out.vEgo * CV.MS_TO_KPH) / 2
-      if hud_control.visualAlert == VisualAlert.fcw:
-        fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
-      #elif self.distance < safe_distance:
-      fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
-      can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
+      #if hud_control.visualAlert == VisualAlert.fcw:
+      #  fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
+      if self.distance < safe_distance:
+        dist_warn = self.CCP.DIST_WARN_MESSAGES["distanceWarning"]
+      can_sends.append(self.CCS.create_distance_warning(self.packer_pt, CANBUS.cam, dist_warn))
 
     # **** Stock ACC Button Controls **************************************** #
 
