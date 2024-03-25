@@ -413,12 +413,12 @@ class LongitudinalMpc:
     if self.mode == 'blended':
       if any((lead_0_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0):
         self.source = 'lead0'
-        self.lead_dist = lead_xv_0[0]
+        self.lead_dist = lead_xv_0[0,1]
         self.lead_safe_dist = lead_0_obstacle[0]
       if any((lead_1_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0) and \
          (lead_1_obstacle[0] - lead_0_obstacle[0]):
         self.source = 'lead1'
-        self.lead_dist = lead_xv_1[0]
+        self.lead_dist = lead_xv_1[0,1]
         self.lead_safe_dist = lead_1_obstacle[0]
            
   def run(self):
