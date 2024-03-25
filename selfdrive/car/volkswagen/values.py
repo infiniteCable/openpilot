@@ -110,6 +110,7 @@ class CarControllerParams:
       self.DIST_WARN_MESSAGES = {
         "none": 0,                            # Nothing to display
         "distanceWarning": 1,                 # "Distance Warning
+        "takeOver": 2,
       }
 
       self.FCW_MESSAGES = {
