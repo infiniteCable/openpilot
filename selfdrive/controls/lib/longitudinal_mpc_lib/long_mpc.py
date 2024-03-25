@@ -351,6 +351,9 @@ class LongitudinalMpc:
     self.params[:,0] = ACCEL_MIN
     self.params[:,1] = self.max_a
 
+    self.lead_dist = 999.9
+    self.lead_safe_dist = 999.9
+
     # Update in ACC mode or ACC/e2e blend
     if self.mode == 'acc':
       self.params[:,5] = LEAD_DANGER_FACTOR
@@ -368,6 +371,13 @@ class LongitudinalMpc:
 
       # These are not used in ACC mode
       x[:], v[:], a[:], j[:] = 0.0, 0.0, 0.0, 0.0
+
+      if self.source == 'lead0':
+        self.lead_dist = lead_xv_0[0,0]
+        self.lead_safe_dist = lead_0_obstacle[0]
+      elif self.source == 'lead1':
+        self.lead_dist = lead_xv_1[0,0]
+        self.lead_safe_dist = lead_1_obstacle[0]
 
     elif self.mode == 'blended':
       self.params[:,5] = 1.0
@@ -407,9 +417,6 @@ class LongitudinalMpc:
 
     # Check if it got within lead comfort range
     # TODO This should be done cleaner
-    self.lead_dist = 999.9
-    self.lead_safe_dist = 999.9
-    
     if self.mode == 'blended':
       if any((lead_0_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0):
         self.source = 'lead0'
