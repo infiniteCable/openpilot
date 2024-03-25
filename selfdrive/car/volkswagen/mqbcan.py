@@ -159,14 +159,16 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
 def create_distance_warning(packer, bus, dist_warn):
   if dist_warn == 1:
     acc_warn = 1
+    acc_text = 0
   elif dist_warn == 2:
+    acc_warn = 0
     acc_text = 9
     
   acc_04_values = {
     "ACC_Texte_Sekundaeranz": 0,
     "ACC_Texte_Zusatzanz": 0,
     "ACC_Status_Zusatzanz": 0,
-    "ACC_Texte": 0,
+    "ACC_Texte": acc_text,
     "ACC_Texte_braking_guard": 0,
     "ACC_Warnhinweis": acc_warn,
     "ACC_Zeitluecke_Abstandswarner": 0,
