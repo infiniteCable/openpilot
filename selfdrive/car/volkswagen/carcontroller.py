@@ -47,9 +47,8 @@ class CarController(CarControllerBase):
     self.bap_ldw_mode = 0
 
     self.sm = messaging.SubMaster(['longitudinalPlan'])
-    self.distance = 0.0
-    self.safe_distance = 0.0
-    self.lead_detected = False
+    self.distance = 999.9
+    self.safe_distance = 999.9
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -60,7 +59,6 @@ class CarController(CarControllerBase):
       self.sm.update()
       self.distance = self.sm['longitudinalPlan'].aTargetMaxDEPRECATED
       self.safe_distance = self.sm['longitudinalPlan'].aTargetMinDEPRECATED
-      self.lead_detected = self.sm['longitudinalPlan'].hasLead
 
     # **** Steering Controls ************************************************ #
 
