@@ -159,8 +159,8 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
 def create_distance_warning(packer, bus, dist_warn):
   if dist_warn == 1:
     acc_warn = 1
-  else:
-    acc_warn = 0
+  elif dist_warn == 2:
+    acc_text = 9
     
   acc_04_values = {
     "ACC_Texte_Sekundaeranz": 0,
@@ -183,12 +183,12 @@ def create_distance_warning(packer, bus, dist_warn):
 def create_fcw(packer, bus, fcw_alert):
   
   acc_15_values = {
-    "AWV_Warnung": 4, #fcw_alert,
+    "AWV_Warnung": fcw_alert,
     "AWV_Texte": 0,
     "AWV_Status_Anzeige": 2,
     "AWV_Einstellung_System_FSG": 0,
     "AWV_Einstellung_Warnung_FSG": 0,
-    "AWV_Warnlevel": 60, #fcw_alert * 10,
+    "AWV_Warnlevel": fcw_alert * 10,
   }
     
   return packer.make_can_msg("ACC_15", bus, acc_15_values)
