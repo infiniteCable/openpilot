@@ -184,6 +184,15 @@ class CarController(CarControllerBase):
         dist_warn = self.CCP.DIST_WARN_MESSAGES["distanceWarning"]
       can_sends.append(self.CCS.create_distance_warning(self.packer_pt, CANBUS.cam, dist_warn))
 
+    if self.frame % self.CCP.FCW_HUD_STEP == 0:
+      fcw_alert = self.CCP.FCW_MESSAGES["none"]
+      safe_distance = (CS.out.vEgo * CV.MS_TO_KPH) / 2
+      if hud_control.visualAlert == VisualAlert.fcw:
+        fcw_alert = self.CCP.FCW_MESSAGES["fcwTakeOver"]
+      elif self.safe_distance < safe_distance:
+        fcw_alert = self.CCP.FCW_MESSAGES["fcwWarningUrgent"]
+      can_sends.append(self.CCS.create_fcw(self.packer_pt, CANBUS.cam, fcw_alert))
+
     # **** Stock ACC Button Controls **************************************** #
 
     gra_send_ready = CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
