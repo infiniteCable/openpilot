@@ -55,11 +55,10 @@ class CarController(CarControllerBase):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
-    self.sm.update(0)
-    if self.sm.updated['longitudinalPlan']:
-      self.distance = self.sm['longitudinalPlan'].aTargetMaxDEPRECATED
-      self.safe_distance = self.sm['longitudinalPlan'].aTargetMinDEPRECATED
-      self.lead_detected = self.sm['longitudinalPlan'].hasLead
+    self.sm.update()
+    self.distance = self.sm['longitudinalPlan'].aTargetMaxDEPRECATED
+    self.safe_distance = self.sm['longitudinalPlan'].aTargetMinDEPRECATED
+    self.lead_detected = self.sm['longitudinalPlan'].hasLead
 
     # **** Steering Controls ************************************************ #
 
@@ -181,8 +180,8 @@ class CarController(CarControllerBase):
       safe_distance = (CS.out.vEgo * CV.MS_TO_KPH) / 2
       if hud_control.visualAlert == VisualAlert.fcw:
         fcw_alert = self.CCP.FCW_MESSAGES["frontCollisionWarning"]
-      elif self.distance < safe_distance:
-        fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
+      #elif self.distance < safe_distance:
+      fcw_alert = self.CCP.FCW_MESSAGES["distanceWarning"]
       can_sends.append(self.CCS.create_fcw_hud_control(self.packer_pt, CANBUS.cam, fcw_alert))
 
     # **** Stock ACC Button Controls **************************************** #
