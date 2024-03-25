@@ -180,6 +180,20 @@ def create_distance_warning(packer, bus, dist_warn):
   return packer.make_can_msg("ACC_04", bus, acc_04_values)
 
 
+def create_fcw(packer, bus, fcw_alert):
+  
+  acc_15_values = {
+    "AWV_Warnung": fcw_alert,
+    "AWV_Texte": 0,
+    "AWV_Status_Anzeige": 0,
+    "AWV_Einstellung_System_FSG": 0,
+    "AWV_Einstellung_Warnung_FSG": 0,
+    "AWV_Warnlevel": fcw_alert * 10,
+  }
+    
+  return packer.make_can_msg("ACC_15", bus, acc_15_values)
+
+
 def create_bap(packer, bus, id, data):
   values = {
     "Stream": data,
