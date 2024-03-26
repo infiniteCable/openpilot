@@ -156,7 +156,8 @@ class CarController(CarControllerBase):
 
     if self.frame % self.CCP.LDW_STEP == 0:
       hud_alert = 0
-      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw, VisualAlert.fcw):
+      safe_distance = CS.out.vEgo * 2
+      if (hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw, VisualAlert.fcw)) or self.safe_distance < safe_distance:
         self.warn_repeat_timer += 1
         if not CS.steering_recovered:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
@@ -177,10 +178,10 @@ class CarController(CarControllerBase):
 
     if self.frame % self.CCP.DIST_WARN_HUD_STEP == 0:
       dist_warn = self.CCP.DIST_WARN_MESSAGES["none"]
-      safe_distance = (CS.out.vEgo * CV.MS_TO_KPH) / 2
-      if hud_control.visualAlert == VisualAlert.fcw:
+      safe_distance = CS.out.vEgo * 2
+      if hud_control.visualAlert == VisualAlert.fcw or self.safe_distance < safe_distance:
         dist_warn = self.CCP.DIST_WARN_MESSAGES["takeOver"]
-      elif self.safe_distance <= 0: #self.distance < safe_distance:
+      elif self.distance < safe_distance:
         dist_warn = self.CCP.DIST_WARN_MESSAGES["distanceWarning"]
       can_sends.append(self.CCS.create_distance_warning(self.packer_pt, CANBUS.cam, dist_warn))
 
