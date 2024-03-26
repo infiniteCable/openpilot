@@ -168,9 +168,9 @@ def create_distance_warning(packer, bus, dist_warn):
     acc_warn = 1
   elif dist_warn == 2:
     #acc_txt_bg = 5
-    acc_text = 8
+    #acc_text = 9
     acc_stat_zus = 6
-    acc_txt_zus = 30
+    acc_txt_zus = 4
     
   acc_04_values = {
     "ACC_Texte_Sekundaeranz": 0,
