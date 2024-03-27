@@ -131,16 +131,16 @@ class CarController(CarControllerBase):
         speed_corr = CS.clu_speed - (CS.out.vEgo * CV.MS_TO_KPH)
         
         # calculate target speed base on model accel with factor and correction
-        #self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH) * 2.7) + speed_corr))
+        self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH) * 2.7) + speed_corr))
         
         # calculate target speed by acceleration from car comparing the model acceleration
-        if abs(actuators.accel) > 0.1:
-          if CS.out.aEgo < actuators.accel:
-            self.speed_diff = min(self.speed_diff + 1, 20)
-          elif CS.out.aEgo > actuators.accel:
-            self.speed_diff = max(self.speed_diff - 1, -20)
+        #if abs(actuators.accel) > 0.1:
+        #  if CS.out.aEgo < actuators.accel:
+        #    self.speed_diff = min(self.speed_diff + 1, 20)
+        #  elif CS.out.aEgo > actuators.accel:
+        #    self.speed_diff = max(self.speed_diff - 1, -20)
             
-        self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (self.speed_diff * CV.MS_TO_KPH)) + speed_corr))
+        #self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (self.speed_diff * CV.MS_TO_KPH)) + speed_corr))
         
         self.gra_speed = int(CS.gra_speed)
         speed_diff = abs(self.target_speed - self.gra_speed)        
