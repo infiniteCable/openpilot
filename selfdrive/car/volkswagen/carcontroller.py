@@ -136,9 +136,9 @@ class CarController(CarControllerBase):
         # calculate target speed by acceleration from car comparing the model acceleration
         if abs(actuators.accel) > 0.1:
           if CS.out.aEgo < actuators.accel:
-            self.speed_diff = self.speed_diff + 1 if abs(self.speed_diff) < 20 else self.speed_diff
+            self.speed_diff = min(self.speed_diff + 1, 20)
           elif CS.out.aEgo > actuators.accel:
-            self.speed_diff = self.speed_diff - 1 if abs(self.speed_diff) < 20 else self.speed_diff
+            self.speed_diff = max(self.speed_diff - 1, -20)
             
         self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (self.speed_diff * CV.MS_TO_KPH)) + speed_corr))
         
