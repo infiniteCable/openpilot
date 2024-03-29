@@ -191,10 +191,10 @@ class CarController(CarControllerBase):
 
     if self.frame % self.CCP.DIST_WARN_HUD_STEP == 0:
       dist_warn = self.CCP.DIST_WARN_MESSAGES["none"]
-      distance_law = CS.out.vEgo * 2 if CS.out.vEgo * CV.MS_TO_KPH >= 60 else CS.out.vEgo
+      distance = CS.out.vEgo # * 2 if CS.out.vEgo * CV.MS_TO_KPH >= 60 else CS.out.vEgo
       if hud_control.visualAlert == VisualAlert.fcw:
         dist_warn = self.CCP.DIST_WARN_MESSAGES["takeOver"]
-      elif self.distance < distance_law:
+      elif self.distance < distance:
         dist_warn = self.CCP.DIST_WARN_MESSAGES["distanceWarning"]
       can_sends.append(self.CCS.create_distance_warning(self.packer_pt, CANBUS.cam, dist_warn))
 
