@@ -1,4 +1,5 @@
 #include "selfdrive/ui/qt/onroad/alerts.h"
+#include "common/params.h"
 
 #include <QPainter>
 #include <map>
@@ -10,6 +11,8 @@ void OnroadAlerts::updateState(const UIState &s) {
   if (!alert.equal(a)) {
     alert = a;
     update();
+    auto params = Params();
+    params.putBool("EnableScreenEvent", true);
   }
 }
 
