@@ -1,4 +1,5 @@
 #include "selfdrive/ui/qt/onroad/onroad_home.h"
+#include "common/params.h"
 
 #include <QPainter>
 
@@ -81,6 +82,8 @@ void OnroadWindow::mousePressEvent(QMouseEvent* e) {
 #endif
   // propagation event to parent(HomeWindow)
   QWidget::mousePressEvent(e);
+  auto params = Params();
+  params.putBool("EnableScreenEvent", true);
 }
 
 void OnroadWindow::createMapWidget() {
