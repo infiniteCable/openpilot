@@ -73,7 +73,7 @@ class CarController(CarControllerBase):
       # MQB racks reset the uninterrupted steering timer after a single frame
       # of HCA disabled; this is done whenever output happens to be zero.
 
-      if CC.latActive:
+      if CC.latActive and not CS.out.accFaulted:
         self.hca_enabled = True
         self.hca_standby_timer = 0
         new_steer = int(round(actuators.steer * self.CCP.STEER_MAX))
@@ -161,7 +161,7 @@ class CarController(CarControllerBase):
     if self.frame % self.CCP.LDW_STEP == 0:
       hud_alert = 0
       safe_distance = CS.out.vEgo * 2
-      if (hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw, VisualAlert.fcw)):
+      if (hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw, VisualAlert.fcw)) or (CS.out.accFaulted and CC.latActive):
         self.warn_repeat_timer += 1
         if not CS.steering_recovered:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
