@@ -146,7 +146,7 @@ class CarController(CarControllerBase):
       safe_distance = CS.out.vEgo * 2
       if (hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw, VisualAlert.fcw)):
         self.warn_repeat_timer += 1
-        if CS.motor_stop:
+        if not CS.start_stop_recovered:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
         elif self.warn_repeat_timer >= 20:
           hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOver"]
