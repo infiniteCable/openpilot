@@ -144,7 +144,7 @@ class CarController(CarControllerBase):
     if self.frame % self.CCP.LDW_STEP == 0:
       hud_alert = 0
       safe_distance = CS.out.vEgo * 2
-      if (hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw, VisualAlert.fcw)) or (CS.out.accFaulted and CC.latActive):
+      if (hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw, VisualAlert.fcw)):
         self.warn_repeat_timer += 1
         if not CS.steering_recovered:
           hud_alert = self.CCP.LDW_MESSAGES["none"]
