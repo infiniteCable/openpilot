@@ -24,7 +24,7 @@ class CarState(CarStateBase):
     self.clu_speed = 0
     self.bap_ldw_01 = None
     self.bap_ldw_01_rec = 0
-    self.motor_stop = False
+    self.start_stop_recovered = True
 
   def create_button_events(self, pt_cp, buttons):
     button_events = []
@@ -57,7 +57,9 @@ class CarState(CarStateBase):
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
     ret.standstill = ret.vEgoRaw <= 1
 
-    self.motor_stop = bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
+    start_stop = bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
+    if start_stop:
+      self.start_stop_recovered = False 
 
     # Update EPS position and state info. For signed values, VW sends the sign in a separate signal.
     ret.steeringAngleDeg = pt_cp.vl["LWI_01"]["LWI_Lenkradwinkel"] * (1, -1)[int(pt_cp.vl["LWI_01"]["LWI_VZ_Lenkradwinkel"])]
@@ -66,7 +68,7 @@ class CarState(CarStateBase):
     ret.steeringPressed = abs(ret.steeringTorque) > self.CCP.STEER_DRIVER_ALLOWANCE
     ret.yawRate = pt_cp.vl["ESP_02"]["ESP_Gierrate"] * (1, -1)[int(pt_cp.vl["ESP_02"]["ESP_VZ_Gierrate"])] * CV.DEG_TO_RAD
     hca_status = self.CCP.hca_status_values.get(pt_cp.vl["LH_EPS_03"]["EPS_HCA_Status"])
-    ret.steerFaultTemporary, ret.steerFaultPermanent = self.update_hca_state(hca_status, self.motor_stop)
+    ret.steerFaultTemporary, ret.steerFaultPermanent = self.update_hca_state(hca_status)
 
     # VW Emergency Assist status tracking and mitigation
     self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
@@ -183,7 +185,7 @@ class CarState(CarStateBase):
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
     ret.standstill = ret.vEgoRaw == 0
 
-    self.motor_stop = False #bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
+    start_stop = False #bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
 
     # Update EPS position and state info. For signed values, VW sends the sign in a separate signal.
     ret.steeringAngleDeg = pt_cp.vl["Lenkhilfe_3"]["LH3_BLW"] * (1, -1)[int(pt_cp.vl["Lenkhilfe_3"]["LH3_BLWSign"])]
@@ -192,7 +194,7 @@ class CarState(CarStateBase):
     ret.steeringPressed = abs(ret.steeringTorque) > self.CCP.STEER_DRIVER_ALLOWANCE
     ret.yawRate = pt_cp.vl["Bremse_5"]["Giergeschwindigkeit"] * (1, -1)[int(pt_cp.vl["Bremse_5"]["Vorzeichen_der_Giergeschwindigk"])] * CV.DEG_TO_RAD
     hca_status = self.CCP.hca_status_values.get(pt_cp.vl["Lenkhilfe_2"]["LH2_Sta_HCA"])
-    ret.steerFaultTemporary, ret.steerFaultPermanent = self.update_hca_state(hca_status, self.motor_stop)
+    ret.steerFaultTemporary, ret.steerFaultPermanent = self.update_hca_state(hca_status)
 
     # Update gas, brakes, and gearshift.
     ret.gas = pt_cp.vl["Motor_3"]["Fahrpedal_Rohsignal"] / 100.0
@@ -269,12 +271,19 @@ class CarState(CarStateBase):
     self.frame += 1
     return ret
 
-  def update_hca_state(self, hca_status, start_stop):
+  def update_hca_state(self, hca_status):
     # Treat INITIALIZING and FAULT as temporary for worst likely EPS recovery time, for cars without factory Lane Assist
     # DISABLED means the EPS hasn't been configured to support Lane Assist
     self.eps_init_complete = self.eps_init_complete or (hca_status in ("DISABLED", "READY", "ACTIVE") or self.frame > 600)
-    perm_fault = hca_status == "DISABLED" or self.eps_init_complete and hca_status in ("INITIALIZING", "FAULT") and not start_stop
-    temp_fault = hca_status == "REJECTED" or not self.eps_init_complete or start_stop
+    perm_fault = hca_status == "DISABLED" or self.eps_init_complete and hca_status in ("INITIALIZING", "FAULT")
+    temp_fault = hca_status == "REJECTED" or not self.eps_init_complete
+
+    if perm_fault and not self.start_stop_recovered:
+      temp_fault = True
+      perm_fault = False
+    else:
+      self.start_stop_recovered = True
+    
     return temp_fault, perm_fault
 
   @staticmethod
