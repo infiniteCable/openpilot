@@ -30,9 +30,6 @@ class CarController(CarControllerBase):
     self.eps_timer_soft_disable_alert = False
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
-    self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
-    self.hca_standby_timer = 0
-    self.hca_enabled = False
 
     self.warn_repeat_timer = 0
 
@@ -63,7 +60,7 @@ class CarController(CarControllerBase):
 
     # **** Steering Controls ************************************************ #
 
-    if self.frame % self.hca_steer_step == 0:
+    if self.frame % self.CCP.STEER_STEP == 0 and CS.eps_init_complete:
       # Logic to avoid HCA state 4 "refused":
       #   * Don't steer unless HCA is in state 3 "ready" or 5 "active"
       #   * Don't steer at standstill
@@ -73,9 +70,7 @@ class CarController(CarControllerBase):
       # MQB racks reset the uninterrupted steering timer after a single frame
       # of HCA disabled; this is done whenever output happens to be zero.
 
-      if CC.latActive and not CS.out.accFaulted:
-        self.hca_enabled = True
-        self.hca_standby_timer = 0
+      if CC.latActive:
         new_steer = int(round(actuators.steer * self.CCP.STEER_MAX))
         apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP)
         self.hca_frame_timer_running += self.CCP.STEER_STEP
@@ -86,31 +81,18 @@ class CarController(CarControllerBase):
             self.hca_frame_same_torque = 0
         else:
           self.hca_frame_same_torque = 0
-        hca_request = abs(apply_steer) > 0
+        hca_enabled = abs(apply_steer) > 0
       else:
-        hca_request = False
+        hca_enabled = False
         apply_steer = 0
 
-        if self.hca_enabled and self.hca_standby_timer <= 10:
-          self.hca_standby_timer += 1
-        else:
-          self.hca_enabled = False
-          self.hca_standby_timer = 0
-
-      if not hca_request:
+      if not hca_enabled:
         self.hca_frame_timer_running = 0
 
       self.eps_timer_soft_disable_alert = self.hca_frame_timer_running > self.CCP.STEER_TIME_ALERT / DT_CTRL
       self.apply_steer_last = apply_steer
-      if not CS.out.accFaulted:
-        can_sends.append(self.CCS.create_steering_control(self.packer_pt, CANBUS.pt, apply_steer, self.hca_enabled, hca_request))
-
-    # set steer command frequency to satisfy eps (no lasting perm. fault)
-    if self.hca_enabled:
-      self.hca_steer_step = self.CCP.STEER_STEP
-    else:
-      self.hca_steer_step = self.CCP.STEER_STEP_INACTIVE
-
+      can_sends.append(self.CCS.create_steering_control(self.packer_pt, CANBUS.pt, apply_steer, hca_enabled))
+    
     # **** Acceleration Controls ******************************************** #
 
     if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and CC.longActive:
