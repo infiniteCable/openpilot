@@ -55,7 +55,7 @@ class CarState(CarStateBase):
 
     ret.vEgoRaw = float(np.mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr]))
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
-    ret.standstill = ret.vEgoRaw <= 1
+    ret.standstill = ret.vEgoRaw <= 0
 
     start_stop = bool(pt_cp.vl["Motor_14"]["MO_StartStopp_Motorstopp"])
     if start_stop:
