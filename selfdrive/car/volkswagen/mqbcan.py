@@ -51,9 +51,9 @@ def create_lka_hud_control(packer, bus, ldw_stock_values, lat_active, steering_p
 
 def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resume=False):
   values = {s: gra_stock_values[s] for s in [
-    "GRA_Hauptschalter",           # GRA button, on/off
-    "GRA_Typ_Hauptschalter",       # GRA main button type
-    "GRA_Codierung",               # GRA button configuration/coding
+    "GRA_Hauptschalter",           # ACC button, on/off
+    "GRA_Typ_Hauptschalter",       # ACC main button type
+    "GRA_Codierung",               # ACC button configuration/coding
     "GRA_Tip_Stufe_2",             # unknown related to stalk type
     "GRA_ButtonTypeInfo",          # unknown related to stalk type
   ]}
@@ -62,25 +62,6 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
     "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
     "GRA_Abbrechen": cancel,
     "GRA_Tip_Wiederaufnahme": resume,
-  })
-
-  return packer.make_can_msg("GRA_ACC_01", bus, values)
-
-
-def create_gra_buttons_control(packer, bus, gra_stock_values, up=False, down=False):
-  values = {s: gra_stock_values[s] for s in [
-    "GRA_Hauptschalter",           # GRA button, on/off
-    "GRA_Abbrechen",               # GRA button cancel
-    "GRA_Typ_Hauptschalter",       # GRA main button type
-    "GRA_Codierung",               # GRA button configuration/coding
-    "GRA_Tip_Stufe_2",             # unknown related to stalk type
-    "GRA_ButtonTypeInfo",          # unknown related to stalk type
-  ]}
-  
-  values.update({
-    "COUNTER": (gra_stock_values["COUNTER"] + 1) % 16,
-    "GRA_Tip_Wiederaufnahme": up,
-    "GRA_Tip_Setzen": down,
   })
 
   return packer.make_can_msg("GRA_ACC_01", bus, values)
@@ -154,58 +135,3 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
   }
 
   return packer.make_can_msg("ACC_02", bus, values)
-
-
-def create_distance_warning(packer, bus, dist_warn):
-  acc_warn = 0
-  acc_text = 0
-  acc_txt_bg = 0
-  acc_stat_zus = 0
-  acc_txt_zus = 0
-  
-  if dist_warn == 1:
-    acc_warn = 1
-  elif dist_warn == 2:
-    acc_txt_bg = 5
-    #acc_text = 9
-    #acc_stat_zus = 6
-    #acc_txt_zus = 4
-    
-  acc_04_values = {
-    "ACC_Texte_Sekundaeranz": 0,
-    "ACC_Texte_Zusatzanz": acc_txt_zus,
-    "ACC_Status_Zusatzanz": acc_stat_zus,
-    "ACC_Texte": acc_text,
-    "ACC_Texte_braking_guard": acc_txt_bg,
-    "ACC_Warnhinweis": acc_warn,
-    "ACC_Zeitluecke_Abstandswarner": 0,
-    "ACC_Abstand_Abstandswarner": 0,
-    "ACC_Tempolimit": 0,
-    "ACC_Charisma_FahrPr": 0,
-    "ACC_Charisma_Status": 0,
-    "ACC_Texte_Abstandswarner": 0,
-  }
-    
-  return packer.make_can_msg("ACC_04", bus, acc_04_values)
-
-
-def create_fcw(packer, bus, fcw_alert):
-  
-  acc_15_values = {
-    "AWV_Warnung": fcw_alert,
-    "AWV_Texte": 0,
-    "AWV_Status_Anzeige": 2,
-    "AWV_Einstellung_System_FSG": 0,
-    "AWV_Einstellung_Warnung_FSG": 0,
-    "AWV_Warnlevel": fcw_alert * 10,
-  }
-    
-  return packer.make_can_msg("ACC_15", bus, acc_15_values)
-
-
-def create_bap(packer, bus, id, data):
-  values = {
-    "Stream": data,
-  }
-
-  return packer.make_can_msg(id, bus, values)
