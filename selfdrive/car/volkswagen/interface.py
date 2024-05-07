@@ -59,10 +59,10 @@ class CarInterface(CarInterfaceBase):
       else:
         ret.transmissionType = TransmissionType.manual
 
-      #if any(msg in fingerprint[1] for msg in (0x40, 0x86, 0xB2, 0xFD)):  # Airbag_01, LWI_01, ESP_19, ESP_21
-      ret.networkLocation = NetworkLocation.gateway
-      #else:
-      #  ret.networkLocation = NetworkLocation.fwdCamera
+      if any(msg in fingerprint[1] for msg in (0x40, 0x86, 0xB2, 0xFD)):  # Airbag_01, LWI_01, ESP_19, ESP_21
+        ret.networkLocation = NetworkLocation.gateway
+      else:
+        ret.networkLocation = NetworkLocation.fwdCamera
 
       if 0x126 in fingerprint[2]:  # HCA_01
         ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
@@ -74,29 +74,30 @@ class CarInterface(CarInterfaceBase):
       ret.steerActuatorDelay = 0.2
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
     else:
-      ret.steerActuatorDelay = 0.3
-      CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
+      ret.steerActuatorDelay = 0.1
+      ret.lateralTuning.pid.kpBP = [0.]
+      ret.lateralTuning.pid.kiBP = [0.]
+      ret.lateralTuning.pid.kf = 0.00006
+      ret.lateralTuning.pid.kpV = [0.6]
+      ret.lateralTuning.pid.kiV = [0.2]
+
+    # Global longitudinal tuning defaults, can be overridden per-vehicle
 
     ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
-    #if experimental_long:
+    if experimental_long:
       # Proof-of-concept, prep for E2E only. No radar points available. Panda ALLOW_DEBUG firmware required.
-    ret.openpilotLongitudinalControl = True
-    ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
-    #  if ret.transmissionType == TransmissionType.manual:
-    #    ret.minEnableSpeed = 4.5
+      ret.openpilotLongitudinalControl = True
+      ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
+      if ret.transmissionType == TransmissionType.manual:
+        ret.minEnableSpeed = 4.5
 
     ret.pcmCruise = not ret.openpilotLongitudinalControl
-    ret.stoppingControl = False
-    ret.startingState = False
-    ret.startAccel = 1.0
+    ret.stoppingControl = True
     ret.stopAccel = -0.55
     ret.vEgoStarting = 0.1
     ret.vEgoStopping = 0.5
     ret.longitudinalTuning.kpV = [0.1]
     ret.longitudinalTuning.kiV = [0.0]
-
-    ret.minEnableSpeed = -1.
-
     ret.autoResumeSng = ret.minEnableSpeed == -1
 
     return ret
@@ -129,4 +130,3 @@ class CarInterface(CarInterfaceBase):
     ret.events = events.to_msg()
 
     return ret
-
