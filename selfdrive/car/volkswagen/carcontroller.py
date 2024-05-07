@@ -1,5 +1,3 @@
-import cereal.messaging as messaging
-
 from cereal import car
 from opendbc.can.packer import CANPacker
 from openpilot.common.numpy_fast import clip
@@ -8,7 +6,6 @@ from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.car import apply_driver_steer_torque_limits
 from openpilot.selfdrive.car.interfaces import CarControllerBase
 from openpilot.selfdrive.car.volkswagen import mqbcan, pqcan
-from openpilot.selfdrive.car.volkswagen.bap import Bap
 from openpilot.selfdrive.car.volkswagen.values import CANBUS, CarControllerParams, VolkswagenFlags
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
@@ -21,7 +18,6 @@ class CarController(CarControllerBase):
     self.CCP = CarControllerParams(CP)
     self.CCS = pqcan if CP.flags & VolkswagenFlags.PQ else mqbcan
     self.packer_pt = CANPacker(dbc_name)
-    self.bap = Bap()
     self.ext_bus = CANBUS.pt if CP.networkLocation == car.CarParams.NetworkLocation.fwdCamera else CANBUS.cam
 
     self.apply_steer_last = 0
@@ -31,36 +27,14 @@ class CarController(CarControllerBase):
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
 
-    self.warn_repeat_timer = 0
-
-    self.long_ctrl = False
-    self.gra_send_up = False
-    self.gra_send_down = False
-    self.gra_speed = 0
-    self.target_speed = 0
-    self.gra_button_timer = 20
-    self.gra_button_frame = 0
-    self.speed_diff = 0
-
-    self.bap_ldw_mode = 0
-
-    self.sm = messaging.SubMaster(['longitudinalPlan'])
-    self.distance = 999.9
-    self.safe_distance = 999.9
-
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
     hud_control = CC.hudControl
     can_sends = []
 
-    if self.frame % 100 == 0:
-      self.sm.update()
-      self.distance = self.sm['longitudinalPlan'].aTargetMaxDEPRECATED
-      self.safe_distance = self.sm['longitudinalPlan'].aTargetMinDEPRECATED
-
     # **** Steering Controls ************************************************ #
 
-    if self.frame % self.CCP.STEER_STEP == 0 and CS.eps_init_complete:
+    if self.frame % self.CCP.STEER_STEP == 0:
       # Logic to avoid HCA state 4 "refused":
       #   * Don't steer unless HCA is in state 3 "ready" or 5 "active"
       #   * Don't steer at standstill
@@ -92,107 +66,51 @@ class CarController(CarControllerBase):
       self.eps_timer_soft_disable_alert = self.hca_frame_timer_running > self.CCP.STEER_TIME_ALERT / DT_CTRL
       self.apply_steer_last = apply_steer
       can_sends.append(self.CCS.create_steering_control(self.packer_pt, CANBUS.pt, apply_steer, hca_enabled))
-    
+
+      if self.CP.flags & VolkswagenFlags.STOCK_HCA_PRESENT:
+        # Pacify VW Emergency Assist driver inactivity detection by changing its view of driver steering input torque
+        # to the greatest of actual driver input or 2x openpilot's output (1x openpilot output is not enough to
+        # consistently reset inactivity detection on straight level roads). See commaai/openpilot#23274 for background.
+        ea_simulated_torque = clip(apply_steer * 2, -self.CCP.STEER_MAX, self.CCP.STEER_MAX)
+        if abs(CS.out.steeringTorque) > abs(ea_simulated_torque):
+          ea_simulated_torque = CS.out.steeringTorque
+        can_sends.append(self.CCS.create_eps_update(self.packer_pt, CANBUS.cam, CS.eps_stock_values, ea_simulated_torque))
+
     # **** Acceleration Controls ******************************************** #
 
-    if self.CP.openpilotLongitudinalControl and CS.out.cruiseState.enabled and CC.longActive:
-      self.long_ctrl = True
-    else:
-      self.long_ctrl = False
-
-    if self.long_ctrl:
-      if self.frame % self.CCP.GRA_STEP == 0:
-        speed_corr = CS.clu_speed - (CS.out.vEgo * CV.MS_TO_KPH)
-
-        # calculate target speed base on model accel with factor and correction
-        self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (actuators.accel * CV.MS_TO_KPH) * 2.7) + speed_corr))
-
-        # calculate target speed by acceleration from car comparing the model acceleration
-        #if abs(actuators.accel) > 0.1:
-        #  if CS.out.aEgo < actuators.accel:
-        #    self.speed_diff = min(self.speed_diff + 1, 20)
-        #  elif CS.out.aEgo > actuators.accel:
-        #    self.speed_diff = max(self.speed_diff - 1, -20)
-
-        #self.target_speed = int(round(((CS.out.vEgo * CV.MS_TO_KPH) + (self.speed_diff * CV.MS_TO_KPH)) + speed_corr))
-
-        self.gra_speed = int(CS.gra_speed)
-        speed_diff = abs(self.target_speed - self.gra_speed)
-        self.gra_button_timer = max(int(200 / speed_diff) if speed_diff != 0 else 200, 20)
-
-      if self.gra_button_frame >= self.gra_button_timer:
-        if self.target_speed > self.gra_speed:
-          self.gra_send_up = True
-          self.gra_send_down = False
-        elif self.target_speed < self.gra_speed:
-          self.gra_send_up = False
-          self.gra_send_down = True
-        else:
-          self.gra_send_up = False
-          self.gra_send_down = False
-
-        self.gra_button_frame = 0
-      else:
-        self.gra_button_frame += 1
-
-    else:
-      self.gra_send_up = False
-      self.gra_send_down = False
+    if self.frame % self.CCP.ACC_CONTROL_STEP == 0 and self.CP.openpilotLongitudinalControl:
+      acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
+      accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX) if CC.longActive else 0
+      stopping = actuators.longControlState == LongCtrlState.stopping
+      starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
+      can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
+                                                         acc_control, stopping, starting, CS.esp_hold_confirmation))
 
     # **** HUD Controls ***************************************************** #
 
     if self.frame % self.CCP.LDW_STEP == 0:
       hud_alert = 0
-      safe_distance = CS.out.vEgo * 2
-      if (hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw, VisualAlert.fcw)):
-        self.warn_repeat_timer += 1
-        if not CS.start_stop_recovered:
-          hud_alert = self.CCP.LDW_MESSAGES["none"]
-        elif self.warn_repeat_timer >= 20:
-          hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOver"]
-          if self.warn_repeat_timer >= 40:
-            self.warn_repeat_timer = 0
-        else:
-          hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOverUrgent"]
-      else:
-        self.warn_repeat_timer = 0
-      can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.cam, CS.ldw_stock_values, CC.latActive,
+      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw):
+        hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOver"]
+      can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.pt, CS.ldw_stock_values, CC.latActive,
                                                        CS.out.steeringPressed, hud_alert, hud_control))
 
-    #self.handle_bap_ldw_01(can_sends, CS.bap_ldw_01)
-    #if self.frame % 100 == 0:
-    #  self.send_bap_ldw(can_sends)
-
-    if self.frame % self.CCP.DIST_WARN_HUD_STEP == 0:
-      dist_warn = self.CCP.DIST_WARN_MESSAGES["none"]
-      distance = CS.out.vEgo # * 2 if CS.out.vEgo * CV.MS_TO_KPH >= 60 else CS.out.vEgo
-      if hud_control.visualAlert == VisualAlert.fcw:
-        dist_warn = self.CCP.DIST_WARN_MESSAGES["takeOver"]
-      elif self.distance < distance:
-        dist_warn = self.CCP.DIST_WARN_MESSAGES["distanceWarning"]
-      can_sends.append(self.CCS.create_distance_warning(self.packer_pt, CANBUS.cam, dist_warn))
-
-    #if self.frame % self.CCP.FCW_HUD_STEP == 0:
-    #  fcw_alert = self.CCP.FCW_MESSAGES["none"]
-    #  safe_distance = (CS.out.vEgo * CV.MS_TO_KPH) / 2
-    #  if hud_control.visualAlert == VisualAlert.fcw:
-    #    fcw_alert = self.CCP.FCW_MESSAGES["fcwTakeOver"]
-    #  elif self.safe_distance < safe_distance:
-    #    fcw_alert = self.CCP.FCW_MESSAGES["fcwWarningUrgent"]
-    #  can_sends.append(self.CCS.create_fcw(self.packer_pt, CANBUS.cam, fcw_alert))
+    if self.frame % self.CCP.ACC_HUD_STEP == 0 and self.CP.openpilotLongitudinalControl:
+      lead_distance = 0
+      if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
+        lead_distance = 512 if CS.upscale_lead_car_signal else 8
+      acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
+      # FIXME: follow the recent displayed-speed updates, also use mph_kmh toggle to fix display rounding problem?
+      set_speed = hud_control.setSpeed * CV.MS_TO_KPH
+      can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, set_speed,
+                                                       lead_distance, hud_control.leadDistanceBars))
 
     # **** Stock ACC Button Controls **************************************** #
 
-    gra_send_ready = CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
-    if gra_send_ready:
-      if self.CP.pcmCruise and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
-        can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
-                                                             cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
-
-      elif self.long_ctrl:
-        can_sends.append(self.CCS.create_gra_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values, up=self.gra_send_up, down=self.gra_send_down))
-        self.gra_send_up = False
-        self.gra_send_down = False
+    gra_send_ready = self.CP.pcmCruise and CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
+    if gra_send_ready and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
+      can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, self.ext_bus, CS.gra_stock_values,
+                                                           cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
 
     new_actuators = actuators.copy()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
@@ -200,55 +118,4 @@ class CarController(CarControllerBase):
 
     self.gra_acc_counter_last = CS.gra_stock_values["COUNTER"]
     self.frame += 1
-
     return new_actuators, can_sends
-
-  def send_bap_ldw(self, can_sends):
-    bap_dest_dbc = "BAP_LDW_10"
-    bap_dest_hex = 0x17331910
-
-    if self.bap_ldw_mode == 0:
-      can_frames = self.bap.send(bap_dest_hex, 0, 25, 2, bytes.fromhex("030019000401"))
-      self.send_bap(can_sends, bap_dest_dbc, can_frames)
-      self.bap_ldw_mode = 1
-
-    elif self.bap_ldw_mode == 1:
-      can_frames = self.bap.send(bap_dest_hex, 4, 25, 3, bytes.fromhex("3807E000040108003807E0"))
-      self.send_bap(can_sends, bap_dest_dbc, can_frames)
-      self.bap_ldw_mode = 2
-
-    elif self.bap_ldw_mode == 2:
-      can_frames = self.bap.send(bap_dest_hex, 4, 25, 1, bytes.fromhex("03001900040108003807E000000000000A00020001000200000000"))
-      self.send_bap(can_sends, bap_dest_dbc, can_frames)
-      self.bap_ldw_mode = 0
-
-  def send_bap(self, can_sends, can_dest, can_frames):
-    for (id, data) in can_frames:
-      can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, can_dest, int.from_bytes(data)))
-
-  def handle_bap_ldw_01(self, can_sends, bap_ldw_01):
-    bap_dest_dbc = "BAP_LDW_10"
-    bap_dest_hex = 0x17331910
-
-    if bap_ldw_01 is not None:
-      can_id, opcode, lsg_id, fct_id, bap_data = bap_ldw_01
-
-      if lsg_id == 25: # LDW
-        if opcode == 1: # get
-          if fct_id == 2: # configuration
-            can_frames = self.bap.send(bap_dest_hex, 0, lsg_id, fct_id, bytes.fromhex("030019000401"))
-            for (id, data) in can_frames:
-              #can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
-              can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest_dbc, int.from_bytes(data)))
-
-          elif fct_id == 3: # functions
-            can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, bytes.fromhex("3807E000040108003807E0"))
-            for (id, data) in can_frames:
-            #  can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
-              can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest_dbc, int.from_bytes(data)))
-
-          elif fct_id == 1: # properties
-            can_frames = self.bap.send(bap_dest_hex, 4, lsg_id, fct_id, bytes.fromhex("03001900040108003807E000000000000A00020001000200000000"))
-            for (id, data) in can_frames:
-             # can_sends.append([bap_dest_hex, 0, data, CANBUS.cam])
-              can_sends.append(self.CCS.create_bap(self.packer_pt, CANBUS.cam, bap_dest_dbc, int.from_bytes(data)))
