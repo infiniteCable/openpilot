@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 import math
 import numpy as np
@@ -155,8 +156,5 @@ class LongitudinalPlanner:
     longitudinalPlan.fcw = self.fcw
 
     longitudinalPlan.solverExecutionTime = self.mpc.solve_time
-
-    longitudinalPlan.aTargetMaxDEPRECATED = float(self.mpc.lead_dist)
-    longitudinalPlan.aTargetMinDEPRECATED = float(self.mpc.lead_safe_dist)
 
     pm.send('longitudinalPlan', plan_send)
