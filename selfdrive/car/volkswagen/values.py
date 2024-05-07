@@ -20,7 +20,6 @@ Button = namedtuple('Button', ['event_type', 'can_addr', 'can_msg', 'values'])
 
 class CarControllerParams:
   STEER_STEP = 2                           # HCA_01/HCA_1 message frequency 50Hz
-  STEER_STEP_INACTIVE = 100                # HCA_01/HCA_1 message frequency 1Hz when inactive
   ACC_CONTROL_STEP = 2                     # ACC_06/ACC_07/ACC_System frequency 50Hz
 
   # Documented lateral limits: 3.00 Nm max, rate of change 5.00 Nm/sec.
@@ -72,12 +71,9 @@ class CarControllerParams:
 
     else:
       self.LDW_STEP = 10                  # LDW_02 message frequency 10Hz
-      self.GRA_STEP = 10                  # GRA Button frequency
-      self.DIST_WARN_HUD_STEP = 10        # ACC_04 frequency
-      self.FCW_HUD_STEP = 10              # ACC_15 frequency
       self.ACC_HUD_STEP = 6               # ACC_02 message frequency 16Hz
       self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
-      self.STEER_DELTA_UP = 10            # Max HCA reached in 1.50s (STEER_MAX / (50Hz * 1.50))
+      self.STEER_DELTA_UP = 4             # Max HCA reached in 1.50s (STEER_MAX / (50Hz * 1.50))
       self.STEER_DELTA_DOWN = 10          # Min HCA reached in 0.60s (STEER_MAX / (50Hz * 0.60))
 
       if CP.transmissionType == TransmissionType.automatic:
@@ -107,26 +103,10 @@ class CarControllerParams:
         "laneAssistDeactivated": 10,          # "Lane Assist deactivated." silent with persistent icon afterward
       }
 
-      self.DIST_WARN_MESSAGES = {
-        "none": 0,                            # Nothing to display
-        "distanceWarning": 1,                 # "Distance Warning
-        "takeOver": 2,
-      }
-
-      self.FCW_MESSAGES = {
-        "none": 0,                            # Nothing to display
-        "fcwPreWarningLatent": 1,             # "latent pre warning
-        "fcwPreWarning": 2,                   # "pre warning
-        "fcwWarningUrgent": 3,                # "urgent warning
-        "fcwIntervention": 4,                 # "intervention
-        "fcwTakeOver": 5,                     # "take over
-        "fcwTurn": 6,                         # "turn
-      }
-
 
 class CANBUS:
-  pt = 0 # directly connected to engine can bus
-  cam = 1 # directly connected to comfort can bus
+  pt = 0
+  cam = 2
 
 
 class WMI(StrEnum):
@@ -178,7 +158,7 @@ class VolkswagenPQPlatformConfig(VolkswagenMQBPlatformConfig):
 @dataclass(frozen=True, kw_only=True)
 class VolkswagenCarSpecs(CarSpecs):
   centerToFrontRatio: float = 0.45
-  steerRatio: float = 14.4 # VW Polo 6C
+  steerRatio: float = 15.6
 
 
 class Footnote(Enum):
@@ -312,7 +292,7 @@ class CAR(Platforms):
       VWCarDocs("Volkswagen Polo 2018-23", footnotes=[Footnote.VW_MQB_A0]),
       VWCarDocs("Volkswagen Polo GTI 2018-23", footnotes=[Footnote.VW_MQB_A0]),
     ],
-    VolkswagenCarSpecs(mass=1151, wheelbase=2.47),
+    VolkswagenCarSpecs(mass=1230, wheelbase=2.55),
     chassis_codes={"AW"},
     wmis={WMI.VOLKSWAGEN_EUROPE_CAR},
   )
