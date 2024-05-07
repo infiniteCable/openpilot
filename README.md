@@ -1,11 +1,12 @@
 THIS PROJECT IS STILL IN PROGRESS
 
 Adaption to Seat Cupra Born (MEB)
-The EPS is not SECOC secured
 
-Panda can 0 is connected to R242 camera. (camera data filter)
-Panda can 2 is connected to sensors can bus. (camera data filter)
-Panda can 1 is connected to engine can bus. (steering command receiver)
+The EPS on engine can bus is not SECOC secured
+
+Panda can 0 is connected to R242 camera. (camera data filter) 
+Panda can 2 is connected to sensors can bus. (camera data filter) 
+Panda can 1 is connected to engine can bus. (steering command sender) 
 
 Allow lateral on brake with panda disallowing long messages on brake, simple dark mode for onroad screen (minimum brightness), turn screen of for onroad screen when no status or alert changes, panda not working for any other brands than Volkswagen. Driver monitoring is more aggressive. Enabled lateral torque controller which works good for disabled steering wheel centering.
 
