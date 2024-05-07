@@ -225,8 +225,6 @@ class LongitudinalMpc:
     self.solver = AcadosOcpSolverCython(MODEL_NAME, ACADOS_SOLVER_TYPE, N)
     self.reset()
     self.source = SOURCES[2]
-    self.lead_dist = 999.9
-    self.lead_safe_dist = 999.9
 
   def reset(self):
     # self.solver = AcadosOcpSolverCython(MODEL_NAME, ACADOS_SOLVER_TYPE, N)
@@ -248,8 +246,6 @@ class LongitudinalMpc:
     self.last_cloudlog_t = 0
     self.status = False
     self.crash_cnt = 0.0
-    self.lead_dist = 999.9
-    self.lead_safe_dist = 999.9
     self.solution_status = 0
     # timers
     self.solve_time = 0.0
@@ -351,9 +347,6 @@ class LongitudinalMpc:
     self.params[:,0] = ACCEL_MIN
     self.params[:,1] = self.max_a
 
-    self.lead_dist = 999.9
-    self.lead_safe_dist = 999.9
-
     # Update in ACC mode or ACC/e2e blend
     if self.mode == 'acc':
       self.params[:,5] = LEAD_DANGER_FACTOR
@@ -371,13 +364,6 @@ class LongitudinalMpc:
 
       # These are not used in ACC mode
       x[:], v[:], a[:], j[:] = 0.0, 0.0, 0.0, 0.0
-
-      if self.source == 'lead0':
-        self.lead_dist = lead_xv_0[0,0]
-        self.lead_safe_dist = lead_0_obstacle[0]
-      elif self.source == 'lead1':
-        self.lead_dist = lead_xv_1[0,0]
-        self.lead_safe_dist = lead_1_obstacle[0]
 
     elif self.mode == 'blended':
       self.params[:,5] = 1.0
@@ -420,14 +406,10 @@ class LongitudinalMpc:
     if self.mode == 'blended':
       if any((lead_0_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0):
         self.source = 'lead0'
-        self.lead_dist = lead_xv_0[0,0]
-        self.lead_safe_dist = lead_0_obstacle[0]
       if any((lead_1_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0) and \
          (lead_1_obstacle[0] - lead_0_obstacle[0]):
         self.source = 'lead1'
-        self.lead_dist = lead_xv_1[0,0]
-        self.lead_safe_dist = lead_1_obstacle[0]
-           
+
   def run(self):
     # t0 = time.monotonic()
     # reset = 0
