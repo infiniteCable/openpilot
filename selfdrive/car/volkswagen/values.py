@@ -69,7 +69,36 @@ class CarControllerParams:
         "laneAssistDeactivTrailer": 5,  # "Lane Assist: no function with trailer"
       }
 
-    elif CP.flags & VolkswagenFlags.MEB:
+    elif CP.flags & VolkswagenFlags.MEB: # TODO
+      self.LDW_STEP = 10                  # LDW_02 message frequency 10Hz
+      self.ACC_HUD_STEP = 6               # ACC_02 message frequency 16Hz
+      self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
+      self.STEER_DELTA_UP = 4             # Max HCA reached in 1.50s (STEER_MAX / (50Hz * 1.50))
+      self.STEER_DELTA_DOWN = 10          # Min HCA reached in 0.60s (STEER_MAX / (50Hz * 0.60))
+
+      self.shifter_values = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
+      self.hca_status_values = can_define.dv["LH_EPS_03"]["EPS_HCA_Status"]
+
+      self.BUTTONS = [
+        Button(car.CarState.ButtonEvent.Type.setCruise, "GRA_ACC_01", "GRA_Tip_Setzen", [1]),
+        Button(car.CarState.ButtonEvent.Type.resumeCruise, "GRA_ACC_01", "GRA_Tip_Wiederaufnahme", [1]),
+        Button(car.CarState.ButtonEvent.Type.accelCruise, "GRA_ACC_01", "GRA_Tip_Hoch", [1]),
+        Button(car.CarState.ButtonEvent.Type.decelCruise, "GRA_ACC_01", "GRA_Tip_Runter", [1]),
+        Button(car.CarState.ButtonEvent.Type.cancel, "GRA_ACC_01", "GRA_Abbrechen", [1]),
+        Button(car.CarState.ButtonEvent.Type.gapAdjustCruise, "GRA_ACC_01", "GRA_Verstellung_Zeitluecke", [1]),
+      ]
+
+      self.LDW_MESSAGES = {
+        "none": 0,                            # Nothing to display
+        "laneAssistUnavailChime": 1,          # "Lane Assist currently not available." with chime
+        "laneAssistUnavailNoSensorChime": 3,  # "Lane Assist not available. No sensor view." with chime
+        "laneAssistTakeOverUrgent": 4,        # "Lane Assist: Please Take Over Steering" with urgent beep
+        "emergencyAssistUrgent": 6,           # "Emergency Assist: Please Take Over Steering" with urgent beep
+        "laneAssistTakeOverChime": 7,         # "Lane Assist: Please Take Over Steering" with chime
+        "laneAssistTakeOver": 8,              # "Lane Assist: Please Take Over Steering" silent
+        "emergencyAssistChangingLanes": 9,    # "Emergency Assist: Changing lanes..." with urgent beep
+        "laneAssistDeactivated": 10,          # "Lane Assist deactivated." silent with persistent icon afterward
+      }
     
     else:
       self.LDW_STEP = 10                  # LDW_02 message frequency 10Hz
