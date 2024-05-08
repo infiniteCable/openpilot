@@ -69,6 +69,8 @@ class CarControllerParams:
         "laneAssistDeactivTrailer": 5,  # "Lane Assist: no function with trailer"
       }
 
+    elif CP.flags & VolkswagenFlags.MEB:
+    
     else:
       self.LDW_STEP = 10                  # LDW_02 message frequency 10Hz
       self.ACC_HUD_STEP = 6               # ACC_02 message frequency 16Hz
@@ -136,6 +138,7 @@ class VolkswagenFlags(IntFlag):
 
   # Static flags
   PQ = 2
+  MEB = 3
 
 
 @dataclass
@@ -145,6 +148,18 @@ class VolkswagenMQBPlatformConfig(PlatformConfig):
   # on camera-integrated cars, as we lose too many ECUs to reliably identify the vehicle
   chassis_codes: set[str] = field(default_factory=set)
   wmis: set[WMI] = field(default_factory=set)
+  
+
+@dataclass
+class VolkswagenMEBPlatformConfig(PlatformConfig):
+  dbc_dict: DbcDict = field(default_factory=lambda: dbc_dict('vw_meb', None))
+  # Volkswagen uses the VIN WMI and chassis code to match in the absence of the comma power
+  # on camera-integrated cars, as we lose too many ECUs to reliably identify the vehicle
+  chassis_codes: set[str] = field(default_factory=set)
+  wmis: set[WMI] = field(default_factory=set)
+
+  def init(self):
+    self.flags |= VolkswagenFlags.MEB
 
 
 @dataclass
@@ -180,6 +195,9 @@ class Footnote(Enum):
     "Model-years 2022 and beyond may have a combined CAN gateway and BCM, which is supported by openpilot " +
     "in software, but doesn't yet have a harness available from the comma store.",
     Column.HARDWARE)
+  VW_MEB = CarFootnote(
+    "For MEB plattform only steering is supported by openpilot.",
+    Column.HARDWARE)
 
 
 @dataclass
@@ -194,6 +212,9 @@ class VWCarDocs(CarDocs):
 
     if CP.carFingerprint in (CAR.VOLKSWAGEN_CRAFTER_MK2, CAR.VOLKSWAGEN_TRANSPORTER_T61):
       self.car_parts = CarParts([Device.threex_angled_mount, CarHarness.j533])
+
+    if CP.carFingerprint in (CAR.CUPRA_BORN_MK1):
+      self.footnotes.append(Footnote.VW_MEB)
 
 
 # Check the 7th and 8th characters of the VIN before adding a new CAR. If the
@@ -377,6 +398,14 @@ class CAR(Platforms):
     ],
     VolkswagenCarSpecs(mass=1300, wheelbase=2.64),
     chassis_codes={"5F"},
+    wmis={WMI.SEAT},
+  )
+  CUPRA_BORN_MK1 = VolkswagenMEBPlatformConfig(
+    [
+      VWCarDocs("CUPRA Born 2021"),
+    ],
+    VolkswagenCarSpecs(mass=1950, wheelbase=2.77),
+    chassis_codes={"K1"},
     wmis={WMI.SEAT},
   )
   SKODA_FABIA_MK4 = VolkswagenMQBPlatformConfig(
