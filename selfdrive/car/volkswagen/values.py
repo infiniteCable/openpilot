@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from dataclasses import dataclass, field
 from enum import Enum, IntFlag, StrEnum
 
@@ -9,7 +9,7 @@ from openpilot.common.conversions import Conversions as CV
 from openpilot.selfdrive.car import dbc_dict, CarSpecs, DbcDict, PlatformConfig, Platforms
 from openpilot.selfdrive.car.docs_definitions import CarFootnote, CarHarness, CarDocs, CarParts, Column, \
                                                      Device
-from openpilot.selfdrive.car.fw_query_definitions import FwQueryConfig, Request, p16
+from openpilot.selfdrive.car.fw_query_definitions import EcuAddrSubAddr, FwQueryConfig, Request, p16
 
 Ecu = car.CarParams.Ecu
 NetworkLocation = car.CarParams.NetworkLocation
@@ -33,6 +33,8 @@ class CarControllerParams:
   STEER_TIME_MAX = 360                     # Max time that EPS allows uninterrupted HCA steering control
   STEER_TIME_ALERT = STEER_TIME_MAX - 10   # If mitigation fails, time to soft disengage before EPS timer expires
   STEER_TIME_STUCK_TORQUE = 1.9            # EPS limits same torque to 6 seconds, reset timer 3x within that period
+
+  DEFAULT_MIN_STEER_SPEED = 0.4            # m/s, newer EPS racks fault below this speed, don't show a low speed alert
 
   ACCEL_MAX = 2.0                          # 2.0 m/s max acceleration
   ACCEL_MIN = -3.5                         # 3.5 m/s max deceleration
@@ -99,7 +101,7 @@ class CarControllerParams:
         "emergencyAssistChangingLanes": 9,    # "Emergency Assist: Changing lanes..." with urgent beep
         "laneAssistDeactivated": 10,          # "Lane Assist deactivated." silent with persistent icon afterward
       }
-    
+
     else:
       self.LDW_STEP = 10                  # LDW_02 message frequency 10Hz
       self.ACC_HUD_STEP = 6               # ACC_02 message frequency 16Hz
@@ -177,7 +179,7 @@ class VolkswagenMQBPlatformConfig(PlatformConfig):
   # on camera-integrated cars, as we lose too many ECUs to reliably identify the vehicle
   chassis_codes: set[str] = field(default_factory=set)
   wmis: set[WMI] = field(default_factory=set)
-  
+
 
 @dataclass
 class VolkswagenMEBPlatformConfig(PlatformConfig):
@@ -203,6 +205,7 @@ class VolkswagenPQPlatformConfig(VolkswagenMQBPlatformConfig):
 class VolkswagenCarSpecs(CarSpecs):
   centerToFrontRatio: float = 0.45
   steerRatio: float = 15.6
+  minSteerSpeed: float = CarControllerParams.DEFAULT_MIN_STEER_SPEED
 
 
 class Footnote(Enum):
@@ -244,6 +247,9 @@ class VWCarDocs(CarDocs):
 
     if CP.carFingerprint in (CAR.CUPRA_BORN_MK1):
       self.footnotes.append(Footnote.VW_MEB)
+
+    if abs(CP.minSteerSpeed - CarControllerParams.DEFAULT_MIN_STEER_SPEED) < 1e-3:
+      self.min_steer_speed = 0
 
 
 # Check the 7th and 8th characters of the VIN before adding a new CAR. If the
@@ -422,7 +428,8 @@ class CAR(Platforms):
   )
   SEAT_ATECA_MK1 = VolkswagenMQBPlatformConfig(
     [
-      VWCarDocs("SEAT Ateca 2018"),
+      VWCarDocs("CUPRA Ateca 2018-23"),
+      VWCarDocs("SEAT Ateca 2016-23"),
       VWCarDocs("SEAT Leon 2014-20"),
     ],
     VolkswagenCarSpecs(mass=1300, wheelbase=2.64),
@@ -485,19 +492,26 @@ class CAR(Platforms):
 def match_fw_to_car_fuzzy(live_fw_versions, vin, offline_fw_versions) -> set[str]:
   candidates = set()
 
+  # Compile all FW versions for each ECU
+  all_ecu_versions: dict[EcuAddrSubAddr, set[str]] = defaultdict(set)
+  for ecus in offline_fw_versions.values():
+    for ecu, versions in ecus.items():
+      all_ecu_versions[ecu] |= set(versions)
+
   # Check the WMI and chassis code to determine the platform
   wmi = vin[:3]
   chassis_code = vin[6:8]
 
   for platform in CAR:
     valid_ecus = set()
-    for ecu, expected_versions in offline_fw_versions[platform].items():
+    for ecu in offline_fw_versions[platform]:
       addr = ecu[1:]
       if ecu[0] not in CHECK_FUZZY_ECUS:
         continue
 
-      # Sanity check that a subset of Volkswagen FW is in the database
+      # Sanity check that live FW is in the superset of all FW, Volkswagen ECU part numbers are commonly shared
       found_versions = live_fw_versions.get(addr, [])
+      expected_versions = all_ecu_versions[ecu]
       if not any(found_version in expected_versions for found_version in found_versions):
         break
 

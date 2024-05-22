@@ -2,6 +2,7 @@
 #include "common/params.h"
 
 #include <QPainter>
+#include <QStackedLayout>
 
 #ifdef ENABLE_MAPS
 #include "selfdrive/ui/qt/maps/map_helpers.h"
