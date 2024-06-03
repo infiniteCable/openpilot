@@ -483,7 +483,7 @@ class CarState(CarStateBase):
 
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
 
-@staticmethod
+  @staticmethod
   def get_can_parser_meb(CP):
     messages = []
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
