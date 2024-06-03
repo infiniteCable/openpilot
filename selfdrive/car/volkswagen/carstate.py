@@ -35,6 +35,8 @@ class CarState(CarStateBase):
   def update(self, pt_cp, cam_cp, ext_cp, trans_type):
     if self.CP.flags & VolkswagenFlags.PQ:
       return self.update_pq(pt_cp, cam_cp, ext_cp, trans_type)
+    elif self.CP.flags & VolkswagenFlags.MEB:
+      return self.update_meb(pt_cp, cam_cp, ext_cp, trans_type)
 
     ret = car.CarState.new_message()
     # Update vehicle speed and acceleration from ABS wheel speeds.
@@ -254,6 +256,108 @@ class CarState(CarStateBase):
     self.frame += 1
     return ret
 
+  def update_meb(self, pt_cp, cam_cp, ext_cp, trans_type):
+    ret = car.CarState.new_message()
+    # Update vehicle speed and acceleration from ABS wheel speeds.
+    ret.wheelSpeeds = 0.0
+
+    ret.vEgoRaw = 0.0
+    ret.vEgo, ret.aEgo = 0.0
+    ret.standstill = ret.vEgoRaw == 0
+
+    # Update EPS position and state info. For signed values, VW sends the sign in a separate signal.
+    ret.steeringAngleDeg = 0.0
+    ret.steeringRateDeg = 0.0
+    ret.steeringTorque = 0.0
+    ret.steeringPressed = False
+    ret.yawRate = 0.0
+    hca_status = 0
+    ret.steerFaultTemporary = False
+    ret.steerFaultPermanent = False
+
+    # VW Emergency Assist status tracking and mitigation
+    #self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
+    ret.carFaultedNonCritical = False
+
+    # Update gas, brakes, and gearshift.
+    ret.gas = 0.0
+    ret.gasPressed = False
+    ret.brake = 0.0
+    brake_pedal_pressed = False
+    brake_pressure_detected = False
+    ret.brakePressed = brake_pedal_pressed or brake_pressure_detected
+    ret.parkingBrake = False
+
+    # Update gear and/or clutch position data.
+    ret.gearShifter = GearShifter.drive
+
+    # Update door and trunk/hatch lid open status.
+    ret.doorOpen = False
+
+    # Update seatbelt fastened status.
+    ret.seatbeltUnlatched = False
+
+    # Consume blind-spot monitoring info/warning LED states, if available.
+    # Infostufe: BSM LED on, Warnung: BSM LED flashing
+    if self.CP.enableBsm:
+      ret.leftBlindspot = False
+      ret.rightBlindspot = False
+
+    # Consume factory LDW data relevant for factory SWA (Lane Change Assist)
+    # and capture it for forwarding to the blind spot radar controller
+    #self.ldw_stock_values = cam_cp.vl["LDW_02"] if self.CP.networkLocation == NetworkLocation.fwdCamera else {}
+
+    # Stock FCW is considered active if the release bit for brake-jerk warning
+    # is set. Stock AEB considered active if the partial braking or target
+    # braking release bits are set.
+    # Refer to VW Self Study Program 890253: Volkswagen Driver Assistance
+    # Systems, chapter on Front Assist with Braking: Golf Family for all MQB
+    ret.stockFcw = False
+    ret.stockAeb = False
+
+    # Update ACC radar status.
+    self.acc_type = 0
+
+    # ACC okay but disabled (1), ACC ready (2), a radar visibility or other fault/disruption (6 or 7)
+    # currently regulating speed (3), driver accel override (4), brake only (5)
+    ret.cruiseState.available = False
+    ret.cruiseState.enabled = False
+
+    if self.CP.pcmCruise:
+      # Cruise Control mode; check for distance UI setting from the radar.
+      # ECM does not manage this, so do not need to check for openpilot longitudinal
+      ret.cruiseState.nonAdaptive = False
+    else:
+      # Speed limiter mode; ECM faults if we command ACC while not pcmCruise
+      ret.cruiseState.nonAdaptive = False
+
+    ret.accFaulted = False
+
+    self.esp_hold_confirmation = False
+    ret.cruiseState.standstill = self.CP.pcmCruise and self.esp_hold_confirmation
+
+    # Update ACC setpoint. When the setpoint is zero or there's an error, the
+    # radar sends a set-speed of ~90.69 m/s / 203mph.
+    if self.CP.pcmCruise:
+      ret.cruiseState.speed = 0.0
+      if ret.cruiseState.speed > 90:
+        ret.cruiseState.speed = 0
+
+    # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
+    ret.leftBlinker = False
+    ret.rightBlinker = False
+    #ret.buttonEvents = self.create_button_events(pt_cp, self.CCP.BUTTONS)
+    #self.gra_stock_values = pt_cp.vl["GRA_ACC_01"]
+
+    # Additional safety checks performed in CarInterface.
+    ret.espDisabled = False
+
+    # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
+    self.upscale_lead_car_signal = False
+
+    self.frame += 1
+    return ret
+
   def update_hca_state(self, hca_status):
     # Treat INITIALIZING and FAULT as temporary for worst likely EPS recovery time, for cars without factory Lane Assist
     # DISABLED means the EPS hasn't been configured to support Lane Assist
@@ -266,6 +370,8 @@ class CarState(CarStateBase):
   def get_can_parser(CP):
     if CP.flags & VolkswagenFlags.PQ:
       return CarState.get_can_parser_pq(CP)
+    elif CP.flags & VolkswagenFlags.MEB:
+      return CarState.get_can_parser_meb(CP)
 
     messages = [
       # sig_address, frequency
@@ -303,6 +409,8 @@ class CarState(CarStateBase):
   def get_cam_can_parser(CP):
     if CP.flags & VolkswagenFlags.PQ:
       return CarState.get_cam_can_parser_pq(CP)
+    elif CP.flags & VolkswagenFlags.MEB:
+      return CarState.get_cam_can_parser_meb(CP)
 
     messages = []
 
@@ -375,6 +483,15 @@ class CarState(CarStateBase):
 
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
 
+@staticmethod
+  def get_can_parser_meb(CP):
+    messages = []
+    return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
+
+  @staticmethod
+  def get_cam_can_parser_meb(CP):
+    messages = []
+    return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
 
 class MqbExtraSignals:
   # Additional signal and message lists for optional or bus-portable controllers
