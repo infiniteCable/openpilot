@@ -50,12 +50,10 @@ class CarInterface(CarInterfaceBase):
     elif ret.flags & VolkswagenFlags.MEB: # TODO
       # Set global MEB parameters
       ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.volkswagenMeb)]
-      ret.enableBsm = 0x30F in fingerprint[0]  # SWA_01
+      ret.enableBsm = True
       ret.transmissionType = TransmissionType.automatic
-      ret.networkLocation = NetworkLocation.fwdCamera
-      
-      if 0x126 in fingerprint[2]:  # HCA_01
-        ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
+      ret.networkLocation = NetworkLocation.gateway
+      ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
 
     else:
       # Set global MQB parameters
