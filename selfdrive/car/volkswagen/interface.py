@@ -55,6 +55,8 @@ class CarInterface(CarInterfaceBase):
       ret.networkLocation = NetworkLocation.gateway
       ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
 
+      ret.dashcamOnly = True
+
     else:
       # Set global MQB parameters
       ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.volkswagen)]
