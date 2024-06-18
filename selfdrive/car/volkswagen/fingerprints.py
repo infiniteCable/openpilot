@@ -941,9 +941,9 @@ FW_VERSIONS = {
     (Ecu.srs, 0x715, None): [
       b'\xf1\x871EA959655EH \xf1\x890381',
     ],
-    #(Ecu.eps, 0x712, None): [ # TODO not readable yet
-    #  b'\xf1\x873Q0909144L \xf1\x895081\xf1\x82\x0571N60511A1',
-    #],
+    (Ecu.eps, 0x712, None): [
+      b'\xf1\x871EA907144AQ \xf1\x895033',
+    ],
     (Ecu.fwdRadar, 0x757, None): [
       b'\xf1\x871EA907572H \xf1\x890234',
     ],
