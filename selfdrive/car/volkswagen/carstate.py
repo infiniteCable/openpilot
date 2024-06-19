@@ -493,9 +493,7 @@ class CarState(CarStateBase):
       # sig_address, frequency
       ("LWI_01", 100),      # From J500 Steering Assist with integrated sensors
       ("LH_EPS_03", 100),   # From J500 Steering Assist with integrated sensors
-      ("TSK_06", 50),       # From J623 Engine control module
       ("GRA_ACC_01", 33),   # From J533 CAN gateway (via LIN from steering wheel controls)
-      ("Motor_14", 10),     # From J623 Engine control module
       ("Airbag_02", 5),     # From J234 Airbag control module
       ("Blinkmodi_02", 1),  # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
       ("LDW_02", 10),       # From R242 Driver assistance camera
