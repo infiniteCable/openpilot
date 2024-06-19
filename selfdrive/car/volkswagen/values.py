@@ -78,7 +78,7 @@ class CarControllerParams:
       self.STEER_DELTA_UP = 4             # Max HCA reached in 1.50s (STEER_MAX / (50Hz * 1.50))
       self.STEER_DELTA_DOWN = 10          # Min HCA reached in 0.60s (STEER_MAX / (50Hz * 0.60))
 
-      #self.shifter_values = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
+      self.shifter_values = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
       self.hca_status_values = can_define.dv["LH_EPS_03"]["EPS_HCA_Status"]
 
       self.BUTTONS = [
