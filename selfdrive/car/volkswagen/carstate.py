@@ -266,17 +266,16 @@ class CarState(CarStateBase):
     ret.standstill = ret.vEgoRaw == 0
 
     # Update EPS position and state info. For signed values, VW sends the sign in a separate signal.
-    ret.steeringAngleDeg = 0.0
-    ret.steeringRateDeg = 0.0
-    ret.steeringTorque = 0.0
-    ret.steeringPressed = False
+    ret.steeringAngleDeg = pt_cp.vl["LWI_01"]["LWI_Lenkradwinkel"] * (1, -1)[int(pt_cp.vl["LWI_01"]["LWI_VZ_Lenkradwinkel"])]
+    ret.steeringRateDeg = pt_cp.vl["LWI_01"]["LWI_Lenkradw_Geschw"] * (1, -1)[int(pt_cp.vl["LWI_01"]["LWI_VZ_Lenkradw_Geschw"])]
+    ret.steeringTorque = pt_cp.vl["LH_EPS_03"]["EPS_Lenkmoment"] * (1, -1)[int(pt_cp.vl["LH_EPS_03"]["EPS_VZ_Lenkmoment"])]
+    ret.steeringPressed = abs(ret.steeringTorque) > self.CCP.STEER_DRIVER_ALLOWANCE
     ret.yawRate = 0.0
-    hca_status = 0
-    ret.steerFaultTemporary = False
-    ret.steerFaultPermanent = False
+    hca_status = self.CCP.hca_status_values.get(pt_cp.vl["LH_EPS_03"]["EPS_HCA_Status"])
+    ret.steerFaultTemporary, ret.steerFaultPermanent = self.update_hca_state(hca_status)
 
     # VW Emergency Assist status tracking and mitigation
-    #self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
+    self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
     ret.carFaultedNonCritical = False
 
     # Update gas, brakes, and gearshift.
@@ -289,13 +288,17 @@ class CarState(CarStateBase):
     ret.parkingBrake = False
 
     # Update gear and/or clutch position data.
-    ret.gearShifter = GearShifter.drive
+    ret.gearShifter = self.parse_gear_shifter(self.CCP.shifter_values.get(pt_cp.vl["Getriebe_11"]["GE_Fahrstufe"], None))
 
     # Update door and trunk/hatch lid open status.
-    ret.doorOpen = False
+    ret.doorOpen = any([pt_cp.vl["ZV_02"]["ZV_FT_offen"],
+                        pt_cp.vl["ZV_02"]["ZV_BT_offen"],
+                        pt_cp.vl["ZV_02"]["ZV_HFS_offen"],
+                        pt_cp.vl["ZV_02"]["ZV_HBFS_offen"],
+                        pt_cp.vl["ZV_02"]["ZV_HD_offen"]])
 
     # Update seatbelt fastened status.
-    ret.seatbeltUnlatched = False
+    ret.seatbeltUnlatched = pt_cp.vl["Airbag_02"]["AB_Gurtschloss_FA"] != 3
 
     # Consume blind-spot monitoring info/warning LED states, if available.
     # Infostufe: BSM LED on, Warnung: BSM LED flashing
@@ -305,7 +308,7 @@ class CarState(CarStateBase):
 
     # Consume factory LDW data relevant for factory SWA (Lane Change Assist)
     # and capture it for forwarding to the blind spot radar controller
-    #self.ldw_stock_values = cam_cp.vl["LDW_02"] if self.CP.networkLocation == NetworkLocation.fwdCamera else {}
+    self.ldw_stock_values = cam_cp.vl["LDW_02"]
 
     # Stock FCW is considered active if the release bit for brake-jerk warning
     # is set. Stock AEB considered active if the partial braking or target
@@ -344,10 +347,11 @@ class CarState(CarStateBase):
         ret.cruiseState.speed = 0
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
-    ret.leftBlinker = False
-    ret.rightBlinker = False
-    #ret.buttonEvents = self.create_button_events(pt_cp, self.CCP.BUTTONS)
-    #self.gra_stock_values = pt_cp.vl["GRA_ACC_01"]
+    # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
+    ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_links"])
+    ret.rightBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_rechts"])
+    ret.buttonEvents = self.create_button_events(pt_cp, self.CCP.BUTTONS)
+    self.gra_stock_values = pt_cp.vl["GRA_ACC_01"]
 
     # Additional safety checks performed in CarInterface.
     ret.espDisabled = False
@@ -485,7 +489,18 @@ class CarState(CarStateBase):
 
   @staticmethod
   def get_can_parser_meb(CP):
-    messages = []
+    messages = [
+      # sig_address, frequency
+      ("LWI_01", 100),      # From J500 Steering Assist with integrated sensors
+      ("LH_EPS_03", 100),   # From J500 Steering Assist with integrated sensors
+      ("TSK_06", 50),       # From J623 Engine control module
+      ("GRA_ACC_01", 33),   # From J533 CAN gateway (via LIN from steering wheel controls)
+      ("Motor_14", 10),     # From J623 Engine control module
+      ("Airbag_02", 5),     # From J234 Airbag control module
+      ("Blinkmodi_02", 1),  # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
+      ("LDW_02", 10)        # From R242 Driver assistance camera
+      ("ZV_02", 5)          # From ZV
+    ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
   @staticmethod
