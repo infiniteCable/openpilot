@@ -498,8 +498,9 @@ class CarState(CarStateBase):
       ("Motor_14", 10),     # From J623 Engine control module
       ("Airbag_02", 5),     # From J234 Airbag control module
       ("Blinkmodi_02", 1),  # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
-      ("LDW_02", 10)        # From R242 Driver assistance camera
-      ("ZV_02", 5)          # From ZV
+      ("LDW_02", 10),       # From R242 Driver assistance camera
+      ("ZV_02", 5),         # From ZV
+      ("Getriebe_11", 20),  # From J743 Auto transmission control module
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
