@@ -264,10 +264,11 @@ class CarState(CarStateBase):
       pt_cp.vl["Speed_01"]["VR_Radgeschw"],
       pt_cp.vl["Speed_01"]["HL_Radgeschw"],
       pt_cp.vl["Speed_01"]["HR_Radgeschw"],
+      1,
     )
 
-    ret.vEgoRaw = 0.0
-    ret.vEgo, ret.aEgo = 0.0
+    ret.vEgoRaw = float(np.mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr]))
+    ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
     ret.standstill = ret.vEgoRaw == 0
 
     # Update EPS position and state info. For signed values, VW sends the sign in a separate signal.
