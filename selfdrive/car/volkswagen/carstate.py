@@ -259,7 +259,12 @@ class CarState(CarStateBase):
   def update_meb(self, pt_cp, cam_cp, ext_cp, trans_type):
     ret = car.CarState.new_message()
     # Update vehicle speed and acceleration from ABS wheel speeds.
-    ret.wheelSpeeds = 0.0
+    ret.wheelSpeeds = self.get_wheel_speeds(
+      pt_cp.vl["Speed_01"]["VL_Radgeschw"],
+      pt_cp.vl["Speed_01"]["VR_Radgeschw"],
+      pt_cp.vl["Speed_01"]["HL_Radgeschw"],
+      pt_cp.vl["Speed_01"]["HR_Radgeschw"],
+    )
 
     ret.vEgoRaw = 0.0
     ret.vEgo, ret.aEgo = 0.0
@@ -499,6 +504,7 @@ class CarState(CarStateBase):
       ("LDW_02", 10),       # From R242 Driver assistance camera
       ("ZV_02", 5),         # From ZV
       ("Getriebe_11", 20),  # From J743 Auto transmission control module
+      ("Speed_01", 100),    # 
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
