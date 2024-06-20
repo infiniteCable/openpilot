@@ -287,13 +287,11 @@ class CarState(CarStateBase):
     ret.carFaultedNonCritical = False
 
     # Update gas, brakes, and gearshift.
-    ret.gas = 0.0
-    ret.gasPressed = False
-    ret.brake = 0.0
-    brake_pedal_pressed = False
-    brake_pressure_detected = False
-    ret.brakePressed = brake_pedal_pressed or brake_pressure_detected
-    ret.parkingBrake = False
+    #ret.gas = pt_cp.vl["Motor_20"]["MO_Fahrpedalrohwert_01"] / 100.0
+    ret.gasPressed = ret.gas > 0
+    #ret.brake = pt_cp.vl["ESP_05"]["ESP_Bremsdruck"] / 250.0  # FIXME: this is pressure in Bar, not sure what OP expects
+    ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
+    #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
 
     # Update gear and/or clutch position data.
     ret.gearShifter = self.parse_gear_shifter(self.CCP.shifter_values.get(pt_cp.vl["Getriebe_11"]["GE_Fahrstufe"], None))
@@ -503,6 +501,7 @@ class CarState(CarStateBase):
       ("LH_EPS_03", 100),   # From J500 Steering Assist with integrated sensors
       ("GRA_ACC_01", 33),   # From J533 CAN gateway (via LIN from steering wheel controls)
       ("Airbag_02", 5),     # From J234 Airbag control module
+      ("Motor_14", 10),     # From J623 Engine control module
       ("Blinkmodi_02", 1),  # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
       ("LDW_02", 10),       # From R242 Driver assistance camera
       ("ZV_02", 5),         # From ZV
