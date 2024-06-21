@@ -134,7 +134,7 @@ bool safety_setter_thread(std::vector<Panda *> pandas) {
     }
 
     // FORCE SAFETY MODEL FOR NOW
-    safety_model = cereal::CarParams::SafetyModel::VOLKSWAGENMEB;
+    safety_model = cereal::CarParams::SafetyModel::VOLKSWAGEN_MEB;
     safety_param = 32U;
 
     LOGW("panda %d: setting safety model: %d, param: %d, alternative experience: %d", i, (int)safety_model, safety_param, alternative_experience);
