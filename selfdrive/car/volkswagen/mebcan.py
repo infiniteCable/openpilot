@@ -6,7 +6,7 @@ def create_steering_control(packer, bus, apply_steer, lkas_enabled):
     "Contact": 0,
     "Active_02": lkas_enabled,
     "Inactive": not lkas_enabled,
-    "Data_01: 100,
+    "Data_01": 100,
   }
   return packer.make_can_msg("LANE_ASSIST_01", bus, values)
 
