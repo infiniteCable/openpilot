@@ -330,7 +330,7 @@ class CarState(CarStateBase):
     # ACC okay but disabled (1), ACC ready (2), a radar visibility or other fault/disruption (6 or 7)
     # currently regulating speed (3), driver accel override (4), brake only (5)
     ret.cruiseState.available = True
-    ret.cruiseState.enabled = False
+    ret.cruiseState.enabled = True
 
     if self.CP.pcmCruise:
       # Cruise Control mode; check for distance UI setting from the radar.
