@@ -264,7 +264,7 @@ class CarState(CarStateBase):
       pt_cp.vl["Speed_01"]["VR_Radgeschw"],
       pt_cp.vl["Speed_01"]["HL_Radgeschw"],
       pt_cp.vl["Speed_01"]["HR_Radgeschw"],
-      0.5,
+      1,
     )
 
     ret.vEgoRaw = float(np.mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr]))
