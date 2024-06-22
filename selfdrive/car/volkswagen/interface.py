@@ -52,7 +52,7 @@ class CarInterface(CarInterfaceBase):
       ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.volkswagenMeb)]
       ret.enableBsm = True
       ret.transmissionType = TransmissionType.direct
-      ret.networkLocation = NetworkLocation.gateway
+      ret.networkLocation = NetworkLocation.fwdCamera
       ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
 
       #ret.dashcamOnly = True
