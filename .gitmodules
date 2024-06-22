@@ -5,7 +5,7 @@
   path = opendbc
   url = ../../infiniteCable/opendbc.git
 [submodule "msgq"]
-  path = msgq
+  path = msgq_repo
   url = ../../infiniteCable/msgq.git
 [submodule "rednose_repo"]
   path = rednose_repo
