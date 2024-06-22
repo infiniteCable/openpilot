@@ -96,7 +96,9 @@ class CarInterface(CarInterfaceBase):
 
     # Global longitudinal tuning defaults, can be overridden per-vehicle
 
-    if not ret.flags & VolkswagenFlags.MEB:
+    if ret.flags & VolkswagenFlags.MEB:
+      ret.experimentalLongitudinalAvailable = True
+    else:
       ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
     if experimental_long:
       # Proof-of-concept, prep for E2E only. No radar points available. Panda ALLOW_DEBUG firmware required.
