@@ -1,22 +1,10 @@
-THIS PROJECT IS STILL IN PROGRESS
-Part 1: Harness build (in progress)
-Part 2: can bus command sniffing (open)
-Part 3: Steering command tests with C3x (open)
-Part 4: ACC command tests with C3x (open)
-Part 5: HUD commands with second external panda (open)
+Adaption to MQBA0 EPS 2Q1909144J 6030 used in a PQ26 no radar non ACC car (Volkswagen Polo 6C [Polo 6R Facelift])
+PQ26 can be seen as nearly identical to MQB regarding can bus communication.
 
-Adaption to Seat Cupra Born (MEB)
+Panda can 0 is directly connected to engine can bus.
+Panda can 1 is directly connected to comfort can bus.
 
-Steering and ACC receiver on engine can bus and HUD receiver on control and view can bus seem not to be SECOC secured. Security is done between J533 and original sender but not beginning from J533 and actual receiver.
-
-Panda can 0 is intercepting sensors can bus directed to sensors. (camera + radar data filter) 
-Panda can 2 is intercepting sensors can bus directed to J533. (camera data filter) 
-Panda can 1 is connected to engine can bus. (steering and acc command sender)
-A second panda will be connected to control and view can bus. (hud command sender)
-
-
-
-Allow lateral on brake with panda disallowing long messages on brake, simple dark mode for onroad screen (minimum brightness), turn screen of for onroad screen when no status or alert changes, panda not working for any other brands than Volkswagen. Driver monitoring is more aggressive. Enabled lateral torque controller which works good for disabled steering wheel centering.
+Allow lateral on brake with panda disallowing long messages on brake, still working on bap allowing the use of the car lane assist activation menu, no car Alert for steering unavailable on start stop Motor stop active, simple dark mode for onroad screen (minimum brightness), turn screen of for onroad screen when no status or alert changes, using GRA controls as exp. long control (still on progress), panda not working for any other brands than Volkswagen. Driver monitoring is more aggressive. Enabled lateral torque controller which works good for disabled steering wheel centering.
 
 [![openpilot on the comma 3X](https://github.com/commaai/openpilot/assets/8762862/f09e6d29-db2d-4179-80c2-51e8d92bdb5c)](https://comma.ai/shop/comma-3x)
 
