@@ -95,8 +95,9 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kiV = [0.2]
 
     # Global longitudinal tuning defaults, can be overridden per-vehicle
-    
-    ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs or ret.flags & VolkswagenFlags.MEB
+
+    if not ret.flags & VolkswagenFlags.MEB:
+      ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
     if experimental_long:
       # Proof-of-concept, prep for E2E only. No radar points available. Panda ALLOW_DEBUG firmware required.
       ret.openpilotLongitudinalControl = True
