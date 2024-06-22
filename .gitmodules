@@ -1,12 +1,12 @@
 [submodule "panda"]
   path = panda
-  url = ../../commaai/panda.git
+  url = ../../infiniteCable/panda.git
 [submodule "opendbc"]
   path = opendbc
-  url = ../../commaai/opendbc.git
+  url = ../../infiniteCable/opendbc.git
 [submodule "msgq"]
   path = msgq_repo
-  url = ../../commaai/msgq.git
+  url = ../../infiniteCable/msgq.git
 [submodule "rednose_repo"]
   path = rednose_repo
   url = ../../commaai/rednose.git
