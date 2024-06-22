@@ -66,10 +66,10 @@ class Car:
     controller_available = self.CI.CC is not None and openpilot_enabled_toggle and not self.CP.dashcamOnly
 
     self.CP.passive = not controller_available or self.CP.dashcamOnly
-    #if self.CP.passive:
-    #  safety_config = car.CarParams.SafetyConfig.new_message()
-    #  safety_config.safetyModel = car.CarParams.SafetyModel.noOutput
-    #  self.CP.safetyConfigs = [safety_config]
+    if self.CP.passive:
+      safety_config = car.CarParams.SafetyConfig.new_message()
+      safety_config.safetyModel = car.CarParams.SafetyModel.noOutput
+      self.CP.safetyConfigs = [safety_config]
 
     # Write previous route's CarParams
     prev_cp = self.params.get("CarParamsPersistent")
