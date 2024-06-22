@@ -139,6 +139,7 @@ class CarControllerParams:
 
 class CANBUS:
   pt = 0
+  pt2 = 1
   cam = 2
 
 
