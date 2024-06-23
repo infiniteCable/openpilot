@@ -1065,6 +1065,7 @@ struct LongitudinalPlan @0xe00b5b3eba12876c {
   allowThrottle @38: Bool;
   allowBrake @39: Bool;
 
+
   solverExecutionTime @35 :Float32;
 
   enum LongitudinalPlanSource {
