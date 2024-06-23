@@ -260,12 +260,18 @@ class CarState(CarStateBase):
     ret = car.CarState.new_message()
     # Update vehicle speed and acceleration from ABS wheel speeds.
     ret.wheelSpeeds = self.get_wheel_speeds(
-      pt_cp.vl["ESP_21"]["VESP_v_Signal"], #pt_cp.vl["ESP_MEB_01"]["VL_Radgeschw"],
-      pt_cp.vl["ESP_21"]["VESP_v_Signal"], #pt_cp.vl["ESP_MEB_01"]["VR_Radgeschw"],
-      pt_cp.vl["ESP_21"]["VESP_v_Signal"], #pt_cp.vl["ESP_MEB_01"]["HL_Radgeschw"],
-      pt_cp.vl["ESP_21"]["VESP_v_Signal"], #pt_cp.vl["ESP_MEB_01"]["HR_Radgeschw"],
-      #1,
+      pt_cp.vl["ESP_MEB_01"]["VL_Radgeschw"],
+      pt_cp.vl["ESP_MEB_01"]["VR_Radgeschw"],
+      pt_cp.vl["ESP_MEB_01"]["HL_Radgeschw"],
+      pt_cp.vl["ESP_MEB_01"]["HR_Radgeschw"],
+      1,
     )
+    #ret.wheelSpeeds = self.get_wheel_speeds(
+    #  pt_cp.vl["ESP_21"]["VESP_v_Signal"],
+    #  pt_cp.vl["ESP_21"]["VESP_v_Signal"],
+    #  pt_cp.vl["ESP_21"]["VESP_v_Signal"],
+    #  pt_cp.vl["ESP_21"]["VESP_v_Signal"],
+    #)
 
     ret.vEgoRaw = float(np.mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr]))
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
@@ -502,6 +508,7 @@ class CarState(CarStateBase):
       ("ZV_02", 5),         # From ZV
       ("Getriebe_11", 100), # From J743 Auto transmission control module
       ("ESP_MEB_01", 100),  #
+      ("ESP_21", 30),       #
       ("ACC_01", 16),       #
       ("ACC_02", 50),       #
     ]
