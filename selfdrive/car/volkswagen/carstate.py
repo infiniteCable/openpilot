@@ -329,27 +329,22 @@ class CarState(CarStateBase):
 
     # ACC okay but disabled (1), ACC ready (2), a radar visibility or other fault/disruption (6 or 7)
     # currently regulating speed (3), driver accel override (4), brake only (5)
-    ret.cruiseState.available = False
-    ret.cruiseState.enabled = False
+    ret.cruiseState.available = bool(pt_cp.vl["ACC_02"]["ACC_Ready"])
+    ret.cruiseState.enabled = bool(pt_cp.vl["ACC_02"]["ACC_Active"])
 
-    if self.CP.pcmCruise:
-      # Cruise Control mode; check for distance UI setting from the radar.
-      # ECM does not manage this, so do not need to check for openpilot longitudinal
-      ret.cruiseState.nonAdaptive = False
-    else:
-      # Speed limiter mode; ECM faults if we command ACC while not pcmCruise
-      ret.cruiseState.nonAdaptive = False
+    ret.cruiseState.nonAdaptive = bool(pt_cp.vl["ACC_01"]["ACC_Limiter_Mode"])
 
     ret.accFaulted = False
 
     self.esp_hold_confirmation = False
     ret.cruiseState.standstill = self.CP.pcmCruise and self.esp_hold_confirmation
 
-    # Update ACC setpoint. When the setpoint is zero or there's an error, the
-    # radar sends a set-speed of ~90.69 m/s / 203mph.
+    # Update ACC setpoint
     if self.CP.pcmCruise:
-      ret.cruiseState.speed = 0.0
-      if ret.cruiseState.speed > 90:
+      cruiseSpeed5 = pt_cp.vl["ACC_02"]["ACC_Set_Speed_2"]
+      cruiseSpeed1 = pt_cp.vl["ACC_02"]["ACC_Set_Speed_1"] // 3
+      ret.cruiseState.speed = cruiseSpeed1 + cruiseSpeed5
+      if ret.cruiseState.speed < 20:
         ret.cruiseState.speed = 0
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
@@ -507,6 +502,7 @@ class CarState(CarStateBase):
       ("ZV_02", 5),         # From ZV
       ("Getriebe_11", 100), # From J743 Auto transmission control module
       ("Speed_01", 100),    # 
+      ("ACC_02", 50),       # 
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
