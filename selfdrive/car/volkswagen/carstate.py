@@ -329,7 +329,7 @@ class CarState(CarStateBase):
 
     # ACC okay but disabled (1), ACC ready (2), a radar visibility or other fault/disruption (6 or 7)
     # currently regulating speed (3), driver accel override (4), brake only (5)
-    ret.cruiseState.available = True
+    ret.cruiseState.available = False
     ret.cruiseState.enabled = False
 
     if self.CP.pcmCruise:
