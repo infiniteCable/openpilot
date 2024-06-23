@@ -260,10 +260,10 @@ class CarState(CarStateBase):
     ret = car.CarState.new_message()
     # Update vehicle speed and acceleration from ABS wheel speeds.
     ret.wheelSpeeds = self.get_wheel_speeds(
-      pt_cp.vl["Speed_01"]["VL_Radgeschw"],
-      pt_cp.vl["Speed_01"]["VR_Radgeschw"],
-      pt_cp.vl["Speed_01"]["HL_Radgeschw"],
-      pt_cp.vl["Speed_01"]["HR_Radgeschw"],
+      pt_cp.vl["ESP_MEB_01"]["VL_Radgeschw"],
+      pt_cp.vl["ESP_MEB_01"]["VR_Radgeschw"],
+      pt_cp.vl["ESP_MEB_01"]["HL_Radgeschw"],
+      pt_cp.vl["ESP_MEB_01"]["HR_Radgeschw"],
       1,
     )
 
@@ -288,7 +288,7 @@ class CarState(CarStateBase):
 
     # Update gas, brakes, and gearshift.
     #ret.gas = pt_cp.vl["Motor_20"]["MO_Fahrpedalrohwert_01"] / 100.0
-    ret.gasPressed = ret.gas > 0
+    ret.gasPressed = bool(pt_cp.vl["ESP_MEB_01"]["Accelerator_Higher_Speed"])
     #ret.brake = pt_cp.vl["ESP_05"]["ESP_Bremsdruck"] / 250.0  # FIXME: this is pressure in Bar, not sure what OP expects
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
@@ -501,7 +501,7 @@ class CarState(CarStateBase):
       ("LDW_02", 10),       # From R242 Driver assistance camera
       ("ZV_02", 5),         # From ZV
       ("Getriebe_11", 100), # From J743 Auto transmission control module
-      ("Speed_01", 100),    #
+      ("ESP_MEB_01", 100),  #
       ("ACC_01", 16),       #
       ("ACC_02", 50),       #
     ]
