@@ -329,7 +329,7 @@ class CarState(CarStateBase):
 
     # ACC okay but disabled (1), ACC ready (2), a radar visibility or other fault/disruption (6 or 7)
     # currently regulating speed (3), driver accel override (4), brake only (5)
-    ret.cruiseState.available = False
+    ret.cruiseState.available =  bool(pt_cp.vl["ACC_02"]["ACC_ready"])
     ret.cruiseState.enabled = False
 
     if self.CP.pcmCruise:
@@ -507,6 +507,7 @@ class CarState(CarStateBase):
       ("ZV_02", 5),         # From ZV
       ("Getriebe_11", 100), # From J743 Auto transmission control module
       ("Speed_01", 100),    # 
+      ("ACC_02", 50),       # 
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
