@@ -501,8 +501,9 @@ class CarState(CarStateBase):
       ("LDW_02", 10),       # From R242 Driver assistance camera
       ("ZV_02", 5),         # From ZV
       ("Getriebe_11", 100), # From J743 Auto transmission control module
-      ("Speed_01", 100),    # 
-      ("ACC_02", 50),       # 
+      ("Speed_01", 100),    #
+      ("ACC_01", 16),       #
+      ("ACC_02", 50),       #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
