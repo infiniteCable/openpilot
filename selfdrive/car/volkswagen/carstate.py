@@ -345,11 +345,12 @@ class CarState(CarStateBase):
     self.esp_hold_confirmation = False
     ret.cruiseState.standstill = self.CP.pcmCruise and self.esp_hold_confirmation
 
-    # Update ACC setpoint. When the setpoint is zero or there's an error, the
-    # radar sends a set-speed of ~90.69 m/s / 203mph.
+    # Update ACC setpoint
     if self.CP.pcmCruise:
-      ret.cruiseState.speed = 0.0
-      if ret.cruiseState.speed > 90:
+      cruiseSpeed5 = pt_cp.vl["ACC_02"]["ACC_Set_Speed_2"]
+      cruiseSpeed1 = pt_cp.vl["ACC_02"]["ACC_Set_Speed_1"] // 3
+      ret.cruiseState.speed = cruiseSpeed1 + cruiseSpeed5
+      if ret.cruiseState.speed < 20:
         ret.cruiseState.speed = 0
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
