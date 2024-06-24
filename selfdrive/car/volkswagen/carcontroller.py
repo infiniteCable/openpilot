@@ -33,6 +33,7 @@ class CarController(CarControllerBase):
     self.eps_timer_soft_disable_alert = False
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
+    self.hca_step = self.CCP.STEER_STEP_STANDBY
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -41,7 +42,7 @@ class CarController(CarControllerBase):
 
     # **** Steering Controls ************************************************ #
 
-    if self.frame % self.CCP.STEER_STEP == 0:
+    if self.frame % self.hca_stepP == 0:
       # Logic to avoid HCA state 4 "refused":
       #   * Don't steer unless HCA is in state 3 "ready" or 5 "active"
       #   * Don't steer at standstill
@@ -69,6 +70,10 @@ class CarController(CarControllerBase):
 
       if not hca_enabled:
         self.hca_frame_timer_running = 0
+        self.hca_step = self.CCP.STEER_STEP_STANDBY
+      else:
+        self.hca_step = self.CCP.STEER_STEP
+        
 
       self.eps_timer_soft_disable_alert = self.hca_frame_timer_running > self.CCP.STEER_TIME_ALERT / DT_CTRL
       self.apply_steer_last = apply_steer
