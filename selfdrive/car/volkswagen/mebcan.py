@@ -8,7 +8,7 @@ def create_steering_control(packer, bus, apply_steer, lkas_enabled):
     "Inactive": not lkas_enabled,
     "Data_01": 100,
   }
-  return packer.make_can_msg("LANE_ASSIST_01", bus, values)
+  return packer.make_can_msg("MEB_Lane_Assist_01", bus, values)
 
 
 def create_lka_hud_control(packer, bus, ldw_stock_values, lat_active, steering_pressed, hud_alert, hud_control):
