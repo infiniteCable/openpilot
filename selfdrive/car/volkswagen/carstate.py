@@ -508,7 +508,7 @@ class CarState(CarStateBase):
       ("ZV_02", 5),         # From ZV
       ("Getriebe_11", 100), # From J743 Auto transmission control module
       ("ESP_21", 30),       #
-      ("ESP_MEB_01", 100),  #
+      ("MEB_ESP_01", 100),  #
       ("MEB_ACC_01", 16),   #
       ("MEB_ACC_02", 50),   #
     ]
