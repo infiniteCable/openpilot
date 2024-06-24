@@ -340,7 +340,7 @@ class CarState(CarStateBase):
 
     ret.cruiseState.nonAdaptive = bool(pt_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
 
-    ret.accFaulted = bool(pt_cp.vl["MEB_ACC_01"]["ACC_Faultless"])
+    ret.accFaulted = not bool(pt_cp.vl["MEB_ACC_01"]["ACC_Faultless"])
 
     self.esp_hold_confirmation = bool(pt_cp.vl["MEB_Drive_State_01"]["Standstill"])
     ret.cruiseState.standstill = self.CP.pcmCruise and self.esp_hold_confirmation
