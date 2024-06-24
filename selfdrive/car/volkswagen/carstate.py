@@ -511,7 +511,7 @@ class CarState(CarStateBase):
       ("MEB_ESP_01", 100),        #
       ("MEB_ACC_01", 16),         #
       ("MEB_ACC_02", 50),         #
-      ("MEB_Drive_State_01", 50), #
+      ("MEB_Drive_State_01", 20), #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
