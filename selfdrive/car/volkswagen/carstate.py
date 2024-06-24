@@ -260,10 +260,10 @@ class CarState(CarStateBase):
     ret = car.CarState.new_message()
     # Update vehicle speed and acceleration from ABS wheel speeds.
     ret.wheelSpeeds = self.get_wheel_speeds(
-      pt_cp.vl["ESP_MEB_01"]["VL_Radgeschw"],
-      pt_cp.vl["ESP_MEB_01"]["VR_Radgeschw"],
-      pt_cp.vl["ESP_MEB_01"]["HL_Radgeschw"],
-      pt_cp.vl["ESP_MEB_01"]["HR_Radgeschw"],
+      pt_cp.vl["MEB_ESP_01"]["VL_Radgeschw"],
+      pt_cp.vl["MEB_ESP_01"]["VR_Radgeschw"],
+      pt_cp.vl["MEB_ESP_01"]["HL_Radgeschw"],
+      pt_cp.vl["MEB_ESP_01"]["HR_Radgeschw"],
       1,
     )
     #ret.wheelSpeeds = self.get_wheel_speeds(
@@ -294,7 +294,7 @@ class CarState(CarStateBase):
 
     # Update gas, brakes, and gearshift.
     #ret.gas = pt_cp.vl["Motor_20"]["MO_Fahrpedalrohwert_01"] / 100.0
-    ret.gasPressed = bool(pt_cp.vl["ESP_MEB_01"]["Accelerator_Higher_Speed"])
+    ret.gasPressed = bool(pt_cp.vl["MEB_ESP_01"]["Accelerator_Higher_Speed"])
     #ret.brake = pt_cp.vl["ESP_05"]["ESP_Bremsdruck"] / 250.0  # FIXME: this is pressure in Bar, not sure what OP expects
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
@@ -335,10 +335,10 @@ class CarState(CarStateBase):
 
     # ACC okay but disabled (1), ACC ready (2), a radar visibility or other fault/disruption (6 or 7)
     # currently regulating speed (3), driver accel override (4), brake only (5)
-    ret.cruiseState.available = bool(pt_cp.vl["ACC_02"]["ACC_Ready"])
-    ret.cruiseState.enabled = bool(pt_cp.vl["ACC_02"]["ACC_Active"])
+    ret.cruiseState.available = bool(pt_cp.vl["MEB_ACC_02"]["ACC_Ready"])
+    ret.cruiseState.enabled = bool(pt_cp.vl["MEB_ACC_02"]["ACC_Active"])
 
-    ret.cruiseState.nonAdaptive = bool(pt_cp.vl["ACC_01"]["ACC_Limiter_Mode"])
+    ret.cruiseState.nonAdaptive = bool(pt_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
 
     ret.accFaulted = False
 
@@ -347,8 +347,8 @@ class CarState(CarStateBase):
 
     # Update ACC setpoint
     if self.CP.pcmCruise:
-      cruiseSpeed5 = pt_cp.vl["ACC_02"]["ACC_Set_Speed_2"]
-      cruiseSpeed1 = pt_cp.vl["ACC_02"]["ACC_Set_Speed_1"] // 3
+      cruiseSpeed5 = pt_cp.vl["MEB_ACC_02"]["ACC_Set_Speed_2"]
+      cruiseSpeed1 = pt_cp.vl["MEB_ACC_02"]["ACC_Set_Speed_1"] // 3
       ret.cruiseState.speed = cruiseSpeed1 + cruiseSpeed5
       if ret.cruiseState.speed < 20:
         ret.cruiseState.speed = 0
@@ -507,10 +507,10 @@ class CarState(CarStateBase):
       ("LDW_02", 10),       # From R242 Driver assistance camera
       ("ZV_02", 5),         # From ZV
       ("Getriebe_11", 100), # From J743 Auto transmission control module
-      ("ESP_MEB_01", 100),  #
       ("ESP_21", 30),       #
-      ("ACC_01", 16),       #
-      ("ACC_02", 50),       #
+      ("ESP_MEB_01", 100),  #
+      ("MEB_ACC_01", 16),   #
+      ("MEB_ACC_02", 50),   #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
