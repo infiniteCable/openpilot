@@ -42,7 +42,7 @@ class CarController(CarControllerBase):
 
     # **** Steering Controls ************************************************ #
 
-    if self.frame % self.hca_stepP == 0:
+    if self.frame % self.hca_step == 0:
       # Logic to avoid HCA state 4 "refused":
       #   * Don't steer unless HCA is in state 3 "ready" or 5 "active"
       #   * Don't steer at standstill
