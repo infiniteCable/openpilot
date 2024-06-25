@@ -333,7 +333,7 @@ class CarState(CarStateBase):
     # Update ACC state
     self.acc_type               = 2
     self.acc_status             = self.CCP.acc_status_values.get(pt_cp.vl["MEB_ACC_02"]["ACC_State"])
-    ret.cruiseState.available   = self.acc_status in ("READY")
+    ret.cruiseState.available   = self.acc_status in ("READY", "PRE_INACTIVE", "ACTIVE", "PRE_ACTIVE")
     ret.cruiseState.enabled     = self.acc_status in ("ACTIVE", "PRE_ACTIVE")
     ret.cruiseState.nonAdaptive = bool(pt_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
     ret.accFaulted              = self.acc_status in ("FAULT")
