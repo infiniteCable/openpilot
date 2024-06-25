@@ -292,7 +292,7 @@ class CarState(CarStateBase):
     self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
 
     # Update gas, brakes, and gearshift.
-    ret.gasPressed = bool(pt_cp.vl["MEB_ESP_01"]["Accelerator_Higher_Speed"])
+    ret.gasPressed = bool(pt_cp.vl["MEB_ESP_02"]["Accelerator"])
     ret.gas = 1 if ret.gasPressed else 0
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
     ret.brake = 1 if ret.brakePressed else 0
@@ -502,6 +502,7 @@ class CarState(CarStateBase):
       ("ESP_21", 30),             #
       ("ESP_24", 20),             #
       ("MEB_ESP_01", 100),        #
+      ("MEB_ESP_02", 100),        #
       ("MEB_ACC_01", 16),         #
       ("MEB_ACC_02", 50),         #
       ("MEB_Drive_State_01", 20), #
