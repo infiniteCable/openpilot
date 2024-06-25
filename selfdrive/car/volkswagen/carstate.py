@@ -290,13 +290,12 @@ class CarState(CarStateBase):
 
     # VW Emergency Assist status tracking and mitigation
     self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
-    ret.carFaultedNonCritical = False
 
     # Update gas, brakes, and gearshift.
-    #ret.gas = pt_cp.vl["Motor_20"]["MO_Fahrpedalrohwert_01"] / 100.0
     ret.gasPressed = bool(pt_cp.vl["MEB_ESP_01"]["Accelerator_Higher_Speed"])
-    #ret.brake = pt_cp.vl["ESP_05"]["ESP_Bremsdruck"] / 250.0  # FIXME: this is pressure in Bar, not sure what OP expects
+    ret.gas = 1 if ret.gasPressed else 0
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
+    ret.brake = 1 if ret.brakePressed else 0
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
 
     # Update gear and/or clutch position data.
@@ -322,11 +321,8 @@ class CarState(CarStateBase):
     # and capture it for forwarding to the blind spot radar controller
     self.ldw_stock_values = pt_cp.vl["LDW_02"]
 
-    # Stock FCW is considered active if the release bit for brake-jerk warning
-    # is set. Stock AEB considered active if the partial braking or target
-    # braking release bits are set.
-    # Refer to VW Self Study Program 890253: Volkswagen Driver Assistance
-    # Systems, chapter on Front Assist with Braking: Golf Family for all MQB
+    # Stock FCW
+    # Stock AEB
     ret.stockFcw = False
     ret.stockAeb = False
 
@@ -357,7 +353,7 @@ class CarState(CarStateBase):
     self.gra_stock_values = pt_cp.vl["GRA_ACC_01"]
 
     # Additional safety checks performed in CarInterface.
-    ret.espDisabled = False
+    ret.espDisabled = bool(pt_cp.vl["ESP_24"]["ESP_Off_Lampe"])
 
     # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
     self.upscale_lead_car_signal = False
@@ -504,6 +500,7 @@ class CarState(CarStateBase):
       ("ZV_02", 5),               # From ZV
       ("Getriebe_11", 100),       # From J743 Auto transmission control module
       ("ESP_21", 30),             #
+      ("ESP_24", 20),             #
       ("MEB_ESP_01", 100),        #
       ("MEB_ACC_01", 16),         #
       ("MEB_ACC_02", 50),         #
