@@ -330,17 +330,13 @@ class CarState(CarStateBase):
     ret.stockFcw = False
     ret.stockAeb = False
 
-    # Update ACC radar status.
-    self.acc_type = 2
-
-    # ACC okay but disabled (1), ACC ready (2), a radar visibility or other fault/disruption (6 or 7)
-    # currently regulating speed (3), driver accel override (4), brake only (5)
-    ret.cruiseState.available = bool(pt_cp.vl["MEB_ACC_02"]["ACC_Ready"])
-    ret.cruiseState.enabled = bool(pt_cp.vl["MEB_ACC_02"]["ACC_Active"])
-
+    # Update ACC state
+    self.acc_type               = 2
+    self.acc_status             = self.CCP.acc_status_values.get(pt_cp.vl["MEB_ACC_02"]["ACC_State"])
+    ret.cruiseState.available   = self.acc_status in ("READY")
+    ret.cruiseState.enabled     = self.acc_status in ("ACTIVE", "PRE_ACTIVE")
     ret.cruiseState.nonAdaptive = bool(pt_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
-
-    ret.accFaulted = False #not bool(pt_cp.vl["MEB_ACC_01"]["ACC_Faultless"])
+    ret.accFaulted              = self.acc_status in ("FAULT")
 
     self.esp_hold_confirmation = bool(pt_cp.vl["MEB_Drive_State_01"]["Standstill"])
     ret.cruiseState.standstill = self.CP.pcmCruise and self.esp_hold_confirmation
