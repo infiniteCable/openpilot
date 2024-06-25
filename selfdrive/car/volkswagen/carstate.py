@@ -342,7 +342,7 @@ class CarState(CarStateBase):
       cruiseSpeed5 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_2"]
       cruiseSpeed1 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_1"] // 3
       ret.cruiseState.speed = cruiseSpeed1 + cruiseSpeed5
-      if ret.cruiseState.speed < 20:
+      if ret.cruiseState.speed > 90:
         ret.cruiseState.speed = 0
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
