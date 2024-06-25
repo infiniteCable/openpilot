@@ -98,15 +98,15 @@ class CarController(CarControllerBase):
 #      can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
 #                                                         acc_control, stopping, starting, CS.esp_hold_confirmation))
 #
-#    # **** HUD Controls ***************************************************** #
-#
-#    if self.frame % self.CCP.LDW_STEP == 0:
-#      hud_alert = 0
-#      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw):
-#        hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOver"]
-#      can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.pt, CS.ldw_stock_values, CC.latActive,
-#                                                       CS.out.steeringPressed, hud_alert, hud_control))
-#
+    # **** HUD Controls ***************************************************** #
+
+    if self.frame % self.CCP.LDW_STEP == 0:
+      hud_alert = 0
+      if hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw):
+        hud_alert = self.CCP.LDW_MESSAGES["laneAssistTakeOver"]
+      can_sends.append(self.CCS.create_lka_hud_control(self.packer_pt, CANBUS.pt, CS.ldw_stock_values, CC.latActive,
+                                                       CS.out.steeringPressed, hud_alert, hud_control))
+
 #    if self.frame % self.CCP.ACC_HUD_STEP == 0 and self.CP.openpilotLongitudinalControl:
 #      lead_distance = 0
 #      if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
@@ -127,7 +127,7 @@ class CarController(CarControllerBase):
     new_actuators = actuators.as_builder()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
     new_actuators.steerOutputCan = self.apply_steer_last
-#
-#    self.gra_acc_counter_last = CS.gra_stock_values["COUNTER"]
+
+    self.gra_acc_counter_last = CS.gra_stock_values["COUNTER"]
     self.frame += 1
     return new_actuators, can_sends
