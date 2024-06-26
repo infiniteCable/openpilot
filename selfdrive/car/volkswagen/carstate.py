@@ -323,7 +323,7 @@ class CarState(CarStateBase):
 
     # Stock FCW
     # Stock AEB
-    ret.stockFcw = False
+    ret.stockFcw = bool(pt_cp.vl["MEB_ACC_01"]["FCW_Active"])
     ret.stockAeb = False
 
     # Update ACC state
