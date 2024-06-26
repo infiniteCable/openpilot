@@ -45,12 +45,6 @@ void OnroadWindow::updateState(const UIState &s) {
     return;
   }
 
-  if (s.scene.map_on_left) {
-    split->setDirection(QBoxLayout::LeftToRight);
-  } else {
-    split->setDirection(QBoxLayout::RightToLeft);
-  }
-
   alerts->updateState(s);
   nvg->updateState(s);
 
