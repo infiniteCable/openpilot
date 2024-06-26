@@ -8,10 +8,7 @@ $Cxx.namespace("cereal");
 # cereal, so use these if you want custom events in your fork.
 
 # you can rename the struct, but don't change the identifier
-struct LongitudinalPlanIC @0x81c2f05a394cf4af {
-  distance @0 :Float32; # m
-  safeDistance @1 :Float32; # m
-  leadDetected @2 :Bool;
+struct CustomReserved0 @0x81c2f05a394cf4af {
 }
 
 struct CustomReserved1 @0xaedffd8f31e7b55d {
