@@ -293,9 +293,9 @@ class CarState(CarStateBase):
 
     # Update gas, brakes, and gearshift.
     ret.gasPressed = bool(pt_cp.vl["MEB_ESP_02"]["Accelerator"])
-    ret.gas = 1 if ret.gasPressed else 0
+    #ret.gas = 1 if ret.gasPressed else 0
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
-    ret.brake = 1 if ret.brakePressed else 0
+    #ret.brake = 1 if ret.brakePressed else 0
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
 
     # Update gear and/or clutch position data.
