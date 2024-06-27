@@ -154,7 +154,6 @@ class Controls:
     self.personality = self.read_personality_param()
     self.v_cruise_helper = VCruiseHelper(self.CP)
     self.recalibrating_seen = False
-    self.frame = 0
 
     self.can_log_mono_time = 0
 
