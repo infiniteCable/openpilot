@@ -25,6 +25,7 @@ non_tested_cars = [
   HONDA.HONDA_ODYSSEY_CHN,
   VOLKSWAGEN.VOLKSWAGEN_CRAFTER_MK2,  # need a route from an ACC-equipped Crafter
   SUBARU.SUBARU_FORESTER_HYBRID,
+  VOLKSWAGEN.CUPRA_BORN_MK1, # ToDo
 ]
 
 
