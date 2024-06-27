@@ -346,7 +346,6 @@ class CarState(CarStateBase):
         ret.cruiseState.speed = 0
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
-    # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
     ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_links"])
     ret.rightBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_rechts"])
     ret.buttonEvents = self.create_button_events(pt_cp, self.CCP.BUTTONS)
