@@ -339,8 +339,8 @@ class CarState(CarStateBase):
 
     # Update ACC setpoint
     if self.CP.pcmCruise:
-      cruiseSpeed5 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_2"]
-      cruiseSpeed1 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_1"] // 3
+      cruiseSpeed5 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_2"] * CV.KPH_TO_MS
+      cruiseSpeed1 = (pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_1"] // 3) * CV.KPH_TO_MS
       ret.cruiseState.speed = cruiseSpeed1 + cruiseSpeed5
       if ret.cruiseState.speed > 90:
         ret.cruiseState.speed = 0
