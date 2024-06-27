@@ -56,12 +56,12 @@ void OnroadWindow::updateState(const UIState &s) {
   }
 }
 
-void OnroadWindow::mousePressEvent(QMouseEvent* e) {
+//void OnroadWindow::mousePressEvent(QMouseEvent* e) {
   // propagation event to parent(HomeWindow)
-  QWidget::mousePressEvent(e);
-  auto params = Params();
-  params.putBool("EnableScreenEvent", true);
-}
+//  QWidget::mousePressEvent(e);
+//  auto params = Params();
+//  params.putBool("EnableScreenEvent", true);
+//}
 
 void OnroadWindow::offroadTransition(bool offroad) {
   alerts->clear();
