@@ -107,7 +107,8 @@ class CarInterface(CarInterfaceBase):
       if ret.transmissionType == TransmissionType.manual:
         ret.minEnableSpeed = 4.5
 
-    ret.pcmCruise = not ret.openpilotLongitudinalControl if not ret.flags & VolkswagenFlags.MEB
+    if not ret.flags & VolkswagenFlags.MEB:
+      ret.pcmCruise = not ret.openpilotLongitudinalControl
     ret.stoppingControl = True
     ret.stopAccel = -0.55
     ret.vEgoStarting = 0.1
