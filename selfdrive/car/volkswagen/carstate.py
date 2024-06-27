@@ -293,9 +293,9 @@ class CarState(CarStateBase):
 
     # Update gas, brakes, and gearshift.
     ret.gasPressed = bool(pt_cp.vl["MEB_ESP_02"]["Accelerator"])
-    ret.gas = 1 if ret.gasPressed else 0
+    #ret.gas = 1 if ret.gasPressed else 0
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
-    ret.brake = 1 if ret.brakePressed else 0
+    #ret.brake = 1 if ret.brakePressed else 0
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
 
     # Update gear and/or clutch position data.
@@ -326,24 +326,23 @@ class CarState(CarStateBase):
     ret.stockFcw = bool(pt_cp.vl["MEB_ACC_01"]["FCW_Active"])
     ret.stockAeb = False
 
+    self.esp_hold_confirmation = bool(pt_cp.vl["MEB_Drive_State_01"]["Standstill"])
+
+    cruiseSpeed5 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_2"]
+    cruiseSpeed1 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_1"] // 3
+
     # Update ACC state
     self.acc_type               = 2
     self.acc_status             = self.CCP.acc_status_values.get(pt_cp.vl["MEB_ACC_02"]["ACC_State"])
+    ret.accFaulted              = self.acc_status in ("FAULT")
+    
     ret.cruiseState.available   = self.acc_status in ("READY", "PRE_INACTIVE", "ACTIVE", "PRE_ACTIVE")
     ret.cruiseState.enabled     = self.acc_status in ("ACTIVE", "PRE_ACTIVE")
     ret.cruiseState.nonAdaptive = bool(pt_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
-    ret.accFaulted              = self.acc_status in ("FAULT")
-
-    self.esp_hold_confirmation = bool(pt_cp.vl["MEB_Drive_State_01"]["Standstill"])
-    ret.cruiseState.standstill = self.CP.pcmCruise and self.esp_hold_confirmation
-
-    # Update ACC setpoint
-    if self.CP.pcmCruise:
-      cruiseSpeed5 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_2"] * CV.KPH_TO_MS
-      cruiseSpeed1 = (pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_1"] // 3) * CV.KPH_TO_MS
-      ret.cruiseState.speed = cruiseSpeed1 + cruiseSpeed5
-      if ret.cruiseState.speed > 90:
-        ret.cruiseState.speed = 0
+    ret.cruiseState.standstill  = self.esp_hold_confirmation
+    ret.cruiseState.speed       = (cruiseSpeed1 + cruiseSpeed5) * CV.KPH_TO_MS
+    if ret.cruiseState.speed > 90:
+      ret.cruiseState.speed = 0
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
     ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_links"])
