@@ -115,7 +115,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     locationdPermanentError @118;
     paramsdTemporaryError @50;
     paramsdPermanentError @119;
-    lateralOnly @121;
+    lateralOnly @122;
     actuatorsApiUnavailable @120;
     espActive @121;
 
