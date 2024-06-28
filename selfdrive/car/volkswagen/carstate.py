@@ -260,10 +260,10 @@ class CarState(CarStateBase):
     ret = car.CarState.new_message()
     # Update vehicle speed and acceleration from ABS wheel speeds.
     ret.wheelSpeeds = self.get_wheel_speeds(
-      pt_cp.vl["MEB_ESP_01"]["VL_Radgeschw"],
-      pt_cp.vl["MEB_ESP_01"]["VR_Radgeschw"],
-      pt_cp.vl["MEB_ESP_01"]["HL_Radgeschw"],
-      pt_cp.vl["MEB_ESP_01"]["HR_Radgeschw"],
+      cam_cp.vl["MEB_ESP_01"]["VL_Radgeschw"],
+      cam_cp.vl["MEB_ESP_01"]["VR_Radgeschw"],
+      cam_cp.vl["MEB_ESP_01"]["HL_Radgeschw"],
+      cam_cp.vl["MEB_ESP_01"]["HR_Radgeschw"],
       1,
     )
     #ret.wheelSpeeds = self.get_wheel_speeds(
@@ -278,8 +278,8 @@ class CarState(CarStateBase):
     ret.standstill = ret.vEgoRaw == 0
 
     # Update EPS position and state info. For signed values, VW sends the sign in a separate signal.
-    ret.steeringAngleDeg = pt_cp.vl["LWI_01"]["LWI_Lenkradwinkel"] * (1, -1)[int(pt_cp.vl["LWI_01"]["LWI_VZ_Lenkradwinkel"])]
-    ret.steeringRateDeg = pt_cp.vl["LWI_01"]["LWI_Lenkradw_Geschw"] * (1, -1)[int(pt_cp.vl["LWI_01"]["LWI_VZ_Lenkradw_Geschw"])]
+    ret.steeringAngleDeg = cam_cp.vl["LWI_01"]["LWI_Lenkradwinkel"] * (1, -1)[int(cam_cp.vl["LWI_01"]["LWI_VZ_Lenkradwinkel"])]
+    ret.steeringRateDeg = cam_cp.vl["LWI_01"]["LWI_Lenkradw_Geschw"] * (1, -1)[int(cam_cp.vl["LWI_01"]["LWI_VZ_Lenkradw_Geschw"])]
     ret.steeringTorque = cam_cp.vl["LH_EPS_03"]["EPS_Lenkmoment"] * (1, -1)[int(cam_cp.vl["LH_EPS_03"]["EPS_VZ_Lenkmoment"])]
     ret.steeringPressed = abs(ret.steeringTorque) > self.CCP.STEER_DRIVER_ALLOWANCE
     ret.yawRate = 0.0
@@ -292,9 +292,9 @@ class CarState(CarStateBase):
     self.eps_stock_values = cam_cp.vl["LH_EPS_03"]
 
     # Update gas, brakes, and gearshift.
-    ret.gasPressed = bool(pt_cp.vl["MEB_ESP_02"]["Accelerator"])
+    ret.gasPressed = bool(cam_cp.vl["MEB_ESP_02"]["Accelerator"])
     #ret.gas = 1 if ret.gasPressed else 0
-    ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
+    ret.brakePressed = bool(cam_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
     #ret.brake = 1 if ret.brakePressed else 0
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
 
@@ -302,14 +302,14 @@ class CarState(CarStateBase):
     ret.gearShifter = self.parse_gear_shifter(self.CCP.shifter_values.get(cam_cp.vl["Getriebe_11"]["GE_Fahrstufe"], None))
 
     # Update door and trunk/hatch lid open status.
-    ret.doorOpen = any([pt_cp.vl["ZV_02"]["ZV_FT_offen"],
-                        pt_cp.vl["ZV_02"]["ZV_BT_offen"],
-                        pt_cp.vl["ZV_02"]["ZV_HFS_offen"],
-                        pt_cp.vl["ZV_02"]["ZV_HBFS_offen"],
-                        pt_cp.vl["ZV_02"]["ZV_HD_offen"]])
+    ret.doorOpen = any([cam_cp.vl["ZV_02"]["ZV_FT_offen"],
+                        cam_cp.vl["ZV_02"]["ZV_BT_offen"],
+                        cam_cp.vl["ZV_02"]["ZV_HFS_offen"],
+                        cam_cp.vl["ZV_02"]["ZV_HBFS_offen"],
+                        cam_cp.vl["ZV_02"]["ZV_HD_offen"]])
 
     # Update seatbelt fastened status.
-    ret.seatbeltUnlatched = pt_cp.vl["Airbag_02"]["AB_Gurtschloss_FA"] != 3
+    ret.seatbeltUnlatched = cam_cp.vl["Airbag_02"]["AB_Gurtschloss_FA"] != 3
 
     # Consume blind-spot monitoring info/warning LED states, if available.
     # Infostufe: BSM LED on, Warnung: BSM LED flashing
@@ -349,13 +349,13 @@ class CarState(CarStateBase):
         ret.cruiseState.speed = 0
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
-    ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_links"])
-    ret.rightBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_rechts"])
-    ret.buttonEvents = self.create_button_events(pt_cp, self.CCP.BUTTONS)
-    self.gra_stock_values = pt_cp.vl["GRA_ACC_01"]
+    ret.leftBlinker = bool(cam_cp.vl["Blinkmodi_02"]["BM_links"])
+    ret.rightBlinker = bool(cam_cp.vl["Blinkmodi_02"]["BM_rechts"])
+    ret.buttonEvents = self.create_button_events(cam_cp, self.CCP.BUTTONS)
+    self.gra_stock_values = cam_cp.vl["GRA_ACC_01"]
 
     # Additional safety checks performed in CarInterface.
-    ret.espDisabled = bool(pt_cp.vl["ESP_24"]["ESP_Off_Lampe"])
+    ret.espDisabled = bool(cam_cp.vl["ESP_24"]["ESP_Off_Lampe"])
 
     # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
     self.upscale_lead_car_signal = False
@@ -492,17 +492,7 @@ class CarState(CarStateBase):
   def get_can_parser_meb(CP):
     messages = [
       # sig_address, frequency
-      ("LWI_01", 100),            # From J500 Steering Assist with integrated sensors
-      ("GRA_ACC_01", 33),         # From J533 CAN gateway (via LIN from steering wheel controls)
-      ("Airbag_02", 5),           # From J234 Airbag control module
-      ("Motor_14", 10),           # From J623 Engine control module
-      ("Blinkmodi_02", 2),        # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
       ("LDW_02", 10),             # From R242 Driver assistance camera
-      ("ZV_02", 5),               # From ZV
-      ("ESP_21", 50),             #
-      ("ESP_24", 20),             #
-      ("MEB_ESP_01", 100),        #
-      ("MEB_ESP_02", 100),        #
       ("MEB_ACC_01", 17),         #
       ("MEB_ACC_02", 50),         #
       ("MEB_Drive_State_01", 20), #
@@ -513,8 +503,18 @@ class CarState(CarStateBase):
   def get_cam_can_parser_meb(CP):
     messages = [
       # sig_address, frequency
+      ("LWI_01", 100),            # From J500 Steering Assist with integrated sensors
+      ("GRA_ACC_01", 33),         # From J533 CAN gateway (via LIN from steering wheel controls)
+      ("Airbag_02", 5),           # From J234 Airbag control module
+      ("Motor_14", 10),           # From J623 Engine control module
+      ("Blinkmodi_02", 2),        # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
       ("LH_EPS_03", 100),         # From J500 Steering Assist with integrated sensors
       ("Getriebe_11", 100),       # From J743 Auto transmission control module
+      ("ZV_02", 5),               # From ZV
+      ("ESP_21", 50),             #
+      ("ESP_24", 20),             #
+      ("MEB_ESP_01", 100),        #
+      ("MEB_ESP_02", 100),        #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
 
