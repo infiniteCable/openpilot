@@ -330,6 +330,8 @@ class CarState(CarStateBase):
 
     cruiseSpeed5 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_2"]
     cruiseSpeed1 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_1"] // 3
+    cruiseSpeed_tmp = (cruiseSpeed1 + cruiseSpeed5)
+    cruiseSpeed = cruiseSpeed_tmp + (cruiseSpeed_tmp - 10) // 40
 
     # Update ACC state
     self.acc_type               = 2
@@ -342,7 +344,7 @@ class CarState(CarStateBase):
     ret.cruiseState.standstill  = self.esp_hold_confirmation
     
     if self.CP.pcmCruise:
-      ret.cruiseState.speed = (cruiseSpeed1 + cruiseSpeed5) * CV.KPH_TO_MS
+      ret.cruiseState.speed = cruiseSpeed * CV.KPH_TO_MS
       if ret.cruiseState.speed > 50: # settable maximum 180km/h
         ret.cruiseState.speed = 0
 
