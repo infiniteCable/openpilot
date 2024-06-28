@@ -49,7 +49,7 @@ class CarInterface(CarInterfaceBase):
 
     elif ret.flags & VolkswagenFlags.MEB: # TODO
       # Set global MEB parameters
-      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.volkswagen)]
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.volkswagenMeb)]
       ret.enableBsm = True
       ret.transmissionType = TransmissionType.direct
       ret.networkLocation = NetworkLocation.fwdCamera
