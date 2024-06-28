@@ -488,22 +488,22 @@ class CarState(CarStateBase):
   def get_can_parser_meb(CP):
     messages = [
       # sig_address, frequency
-      ("LWI_01", 100),            # From J500 Steering Assist with integrated sensors
-      ("LH_EPS_03", 100),         # From J500 Steering Assist with integrated sensors
-      ("GRA_ACC_01", 33),         # From J533 CAN gateway (via LIN from steering wheel controls)
-      ("Airbag_02", 5),           # From J234 Airbag control module
-      ("Motor_14", 10),           # From J623 Engine control module
-      ("Blinkmodi_02", 2),        # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
-      ("LDW_02", 10),             # From R242 Driver assistance camera
-      ("ZV_02", 5),               # From ZV
-      ("Getriebe_11", 100),       # From J743 Auto transmission control module
-      ("ESP_21", 50),             #
-      ("ESP_24", 20),             #
-      ("MEB_ESP_01", 100),        #
-      ("MEB_ESP_02", 100),        #
-      ("MEB_ACC_01", 17),         #
-      ("MEB_ACC_02", 50),         #
-      ("MEB_Drive_State_01", 20), #
+      ("LWI_01", 0), #100),            # From J500 Steering Assist with integrated sensors
+      ("LH_EPS_03", 0), # 100),         # From J500 Steering Assist with integrated sensors
+      ("GRA_ACC_01", 0), # 33),         # From J533 CAN gateway (via LIN from steering wheel controls)
+      ("Airbag_02", 0), # 5),           # From J234 Airbag control module
+      ("Motor_14", 0), # 10),           # From J623 Engine control module
+      ("Blinkmodi_02", 0), # 2),        # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
+      ("LDW_02", 0), # 10),             # From R242 Driver assistance camera
+      ("ZV_02", 0), # 5),               # From ZV
+      ("Getriebe_11", 0), # 100),       # From J743 Auto transmission control module
+      ("ESP_21", 0), # 50),             #
+      ("ESP_24", 0), # 20),             #
+      ("MEB_ESP_01", 0), # 100),        #
+      ("MEB_ESP_02", 0), # 100),        #
+      ("MEB_ACC_01", 0), # 17),         #
+      ("MEB_ACC_02", 0), # 50),         #
+      ("MEB_Drive_State_01", 0), # 20), #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
