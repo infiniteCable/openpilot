@@ -561,7 +561,6 @@ FW_QUERY_CONFIG = FwQueryConfig(
       rx_offset=VOLKSWAGEN_RX_OFFSET,
       bus=bus,
       obd_multiplexing=obd_multiplexing,
-      auxiliary=True,
     ),
     Request(
       [VOLKSWAGEN_VERSION_REQUEST_MULTI],
@@ -569,7 +568,6 @@ FW_QUERY_CONFIG = FwQueryConfig(
       whitelist_ecus=[Ecu.engine, Ecu.transmission],
       bus=bus,
       obd_multiplexing=obd_multiplexing,
-      auxiliary=True,
     ),
   ]],
   non_essential_ecus={Ecu.eps: list(CAR)},
