@@ -280,7 +280,7 @@ class CarState(CarStateBase):
     # Update EPS position and state info. For signed values, VW sends the sign in a separate signal.
     ret.steeringAngleDeg = pt_cp.vl["LWI_01"]["LWI_Lenkradwinkel"] * (1, -1)[int(pt_cp.vl["LWI_01"]["LWI_VZ_Lenkradwinkel"])]
     ret.steeringRateDeg = pt_cp.vl["LWI_01"]["LWI_Lenkradw_Geschw"] * (1, -1)[int(pt_cp.vl["LWI_01"]["LWI_VZ_Lenkradw_Geschw"])]
-    ret.steeringTorque = pt_cp.vl["LH_EPS_03"]["EPS_Lenkmoment"] * (1, -1)[int(pt_cp.vl["LH_EPS_03"]["EPS_VZ_Lenkmoment"])]
+    ret.steeringTorque = cam_cp.vl["LH_EPS_03"]["EPS_Lenkmoment"] * (1, -1)[int(cam_cp.vl["LH_EPS_03"]["EPS_VZ_Lenkmoment"])]
     ret.steeringPressed = abs(ret.steeringTorque) > self.CCP.STEER_DRIVER_ALLOWANCE
     ret.yawRate = 0.0
     #hca_status = self.CCP.hca_status_values.get(pt_cp.vl["LH_EPS_03"]["EPS_HCA_Status"])
@@ -289,7 +289,7 @@ class CarState(CarStateBase):
     ret.steerFaultPermanent = False
 
     # VW Emergency Assist status tracking and mitigation
-    self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
+    self.eps_stock_values = cam_cp.vl["LH_EPS_03"]
 
     # Update gas, brakes, and gearshift.
     ret.gasPressed = bool(pt_cp.vl["MEB_ESP_02"]["Accelerator"])
@@ -299,7 +299,7 @@ class CarState(CarStateBase):
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
 
     # Update gear and/or clutch position data.
-    ret.gearShifter = self.parse_gear_shifter(self.CCP.shifter_values.get(pt_cp.vl["Getriebe_11"]["GE_Fahrstufe"], None))
+    ret.gearShifter = self.parse_gear_shifter(self.CCP.shifter_values.get(cam_cp.vl["Getriebe_11"]["GE_Fahrstufe"], None))
 
     # Update door and trunk/hatch lid open status.
     ret.doorOpen = any([pt_cp.vl["ZV_02"]["ZV_FT_offen"],
@@ -493,14 +493,12 @@ class CarState(CarStateBase):
     messages = [
       # sig_address, frequency
       ("LWI_01", 100),            # From J500 Steering Assist with integrated sensors
-      ("LH_EPS_03", 100),         # From J500 Steering Assist with integrated sensors
       ("GRA_ACC_01", 33),         # From J533 CAN gateway (via LIN from steering wheel controls)
       ("Airbag_02", 5),           # From J234 Airbag control module
       ("Motor_14", 10),           # From J623 Engine control module
       ("Blinkmodi_02", 2),        # From J519 BCM (sent at 1Hz when no lights active, 50Hz when active)
       ("LDW_02", 10),             # From R242 Driver assistance camera
       ("ZV_02", 5),               # From ZV
-      ("Getriebe_11", 100),       # From J743 Auto transmission control module
       ("ESP_21", 50),             #
       ("ESP_24", 20),             #
       ("MEB_ESP_01", 100),        #
@@ -513,7 +511,11 @@ class CarState(CarStateBase):
 
   @staticmethod
   def get_cam_can_parser_meb(CP):
-    messages = []
+    messages = [
+      # sig_address, frequency
+      ("LH_EPS_03", 100),         # From J500 Steering Assist with integrated sensors
+      ("Getriebe_11", 100),       # From J743 Auto transmission control module
+    ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
 
 class MqbExtraSignals:
