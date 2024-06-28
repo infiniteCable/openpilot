@@ -341,7 +341,7 @@ class CarState(CarStateBase):
     ret.cruiseState.nonAdaptive = bool(pt_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
     ret.cruiseState.standstill  = self.esp_hold_confirmation
     ret.cruiseState.speed       = (cruiseSpeed1 + cruiseSpeed5) * CV.KPH_TO_MS
-    if ret.cruiseState.speed > 90:
+    if ret.cruiseState.speed > 50: # settable maximum 180km/h
       ret.cruiseState.speed = 0
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
