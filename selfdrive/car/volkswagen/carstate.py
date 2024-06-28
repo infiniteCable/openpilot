@@ -331,7 +331,7 @@ class CarState(CarStateBase):
     cruiseSpeed5 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_2"]
     cruiseSpeed1 = pt_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_1"] // 3
     cruiseSpeed_tmp = (cruiseSpeed1 + cruiseSpeed5)
-    cruiseSpeed = cruiseSpeed_tmp + (cruiseSpeed_tmp - 10) // 40
+    cruiseSpeed = cruiseSpeed_tmp + (cruiseSpeed_tmp - 6) // 40
 
     # Update ACC state
     self.acc_type               = 2
