@@ -52,7 +52,7 @@ class CarController(CarControllerBase):
       # MQB racks reset the uninterrupted steering timer after a single frame
       # of HCA disabled; this is done whenever output happens to be zero.
 
-      if CP.flags & VolkswagenFlags.MEB:
+      if self.CP.flags & VolkswagenFlags.MEB:
         if CC.latActive:
           apply_angle = actuators.steeringAngleDeg
           apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
