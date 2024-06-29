@@ -61,7 +61,7 @@ class CarController(CarControllerBase):
           hca_enabled = False
           apply_angle = 0
           
-        self.last_angle = clip(apply_angle, -90.0000, 90.0000)
+        self.apply_angle_last = clip(apply_angle, -90.0000, 90.0000)
         torque_wind_down = 100 if hca_enabled and full_torque_condition else 0
         can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, torque_wind_down))
 
@@ -137,6 +137,7 @@ class CarController(CarControllerBase):
     new_actuators = actuators.as_builder()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
     new_actuators.steerOutputCan = self.apply_steer_last
+    new_actuators.steeringAngleDeg = self.apply_angle_last
 
     self.gra_acc_counter_last = CS.gra_stock_values["COUNTER"]
     self.frame += 1
