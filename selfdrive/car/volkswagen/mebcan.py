@@ -1,7 +1,7 @@
 def create_steering_control(packer, bus, apply_steer, lkas_enabled):
   
   values = {
-    "Torque": abs(apply_steer) * 10,
+    "Torque": abs(apply_steer),
     "Active": lkas_enabled,
     "VZ": 1 if apply_steer < 0 and lkas_enabled == 1 else 0,
     "Active_02": lkas_enabled,
