@@ -53,6 +53,7 @@ class CarInterface(CarInterfaceBase):
       ret.enableBsm = True
       ret.transmissionType = TransmissionType.direct
       ret.networkLocation = NetworkLocation.fwdCamera
+      ret.steerControlType = car.CarParams.SteerControlType.angle
       #ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
 
       #ret.dashcamOnly = True
