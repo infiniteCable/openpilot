@@ -5,7 +5,7 @@ def create_steering_control_angle(packer, bus, apply_angle, lkas_enabled, torque
     "VZ": 1 if apply_angle < 0 and lkas_enabled == 1 else 0,
     "Active_02": lkas_enabled,
     "Inactive": not lkas_enabled,
-    "State": 60 if lkas_enabled else 0,
+    "State": torque_wind_down if lkas_enabled else 0,
   }
   return packer.make_can_msg("MEB_Lane_Assist_01", bus, values)
 
