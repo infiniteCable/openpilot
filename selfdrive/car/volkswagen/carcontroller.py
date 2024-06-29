@@ -3,7 +3,7 @@ from opendbc.can.packer import CANPacker
 from openpilot.common.numpy_fast import clip
 from openpilot.common.conversions import Conversions as CV
 from openpilot.common.realtime import DT_CTRL
-from openpilot.selfdrive.car import apply_driver_steer_torque_limits
+from openpilot.selfdrive.car import apply_driver_steer_torque_limits, apply_std_steer_angle_limit
 from openpilot.selfdrive.car.interfaces import CarControllerBase
 from openpilot.selfdrive.car.volkswagen import mqbcan, pqcan, mebcan
 from openpilot.selfdrive.car.volkswagen.values import CANBUS, CarControllerParams, VolkswagenFlags
@@ -55,7 +55,7 @@ class CarController(CarControllerBase):
       if CP.flags & VolkswagenFlags.MEB:
         if CC.latActive:
           apply_angle = actuators.steeringAngleDeg
-          apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.params)
+          apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
           full_torque_condition = abs(CS.out.steeringTorque) < self.CCP.STEER_MAX
         else:
           hca_enabled = False
