@@ -57,6 +57,7 @@ class CarController(CarControllerBase):
           apply_angle = actuators.steeringAngleDeg
           apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
           full_torque_condition = abs(CS.out.steeringTorque) < self.CCP.STEER_MAX
+          hca_enabled = abs(apply_angle) > 0
         else:
           hca_enabled = False
           apply_angle = 0
