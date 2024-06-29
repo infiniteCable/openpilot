@@ -335,7 +335,7 @@ class CarState(CarStateBase):
 
     # Update ACC state
     self.acc_type               = 2
-    self.acc_status             = self.CCP.acc_status_values.get(camt_cp.vl["MEB_ACC_02"]["ACC_State"])
+    self.acc_status             = self.CCP.acc_status_values.get(cam_cp.vl["MEB_ACC_02"]["ACC_State"])
     ret.accFaulted              = self.acc_status in ("FAULT")
     
     ret.cruiseState.available   = self.acc_status in ("READY", "PRE_INACTIVE", "ACTIVE", "PRE_ACTIVE")
