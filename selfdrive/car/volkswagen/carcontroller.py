@@ -62,7 +62,7 @@ class CarController(CarControllerBase):
           apply_angle = 0
           
         self.apply_angle_last = clip(apply_angle, -90.0000, 90.0000)
-        torque_wind_down = 127 - 127 / self.CCP.STEER_MAX * CS.out.steeringTorque if hca_enabled and CS.out.steeringTorque < self.CCP.STEER_MAX else 0
+        torque_wind_down = 125 - 125 / self.CCP.STEER_MAX * CS.out.steeringTorque if hca_enabled and CS.out.steeringTorque < self.CCP.STEER_MAX else 0
         can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, torque_wind_down))
 
       else:
