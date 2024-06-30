@@ -56,12 +56,12 @@ class CarController(CarControllerBase):
         if CC.latActive:
           apply_angle = actuators.steeringAngleDeg
           apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
-          hca_enabled = abs(apply_angle) > 0
+          hca_enabled = True #abs(apply_angle) > 0
         else:
           hca_enabled = False
           apply_angle = 0
           
-        self.apply_angle_last = clip(apply_angle, -90.0000, 90.0000)
+        self.apply_angle_last = clip(apply_angle, -120.0000, 120.0000)
         torque_wind_down = 125 - 125 / self.CCP.STEER_MAX * CS.out.steeringTorque if hca_enabled and CS.out.steeringTorque < self.CCP.STEER_MAX else 0
         can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, torque_wind_down))
 
