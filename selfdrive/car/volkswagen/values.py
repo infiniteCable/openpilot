@@ -78,8 +78,8 @@ class CarControllerParams:
       self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
       self.TORQUE_WIND_DOWN_MAX = 125     # 
       self.ANGLE_MAX = 360
-      self.ANGLE_RATE_LIMIT_UP = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[16., 8., .3])
-      self.ANGLE_RATE_LIMIT_DOWN = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[16., 8., .3])
+      self.ANGLE_RATE_LIMIT_UP = AngleRateLimit(speed_bp=[0.], angle_v=[20.])
+      self.ANGLE_RATE_LIMIT_DOWN = AngleRateLimit(speed_bp=[0.], angle_v=[20.])
 
       self.shifter_values = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
       self.hca_status_values = can_define.dv["LH_EPS_03"]["EPS_HCA_Status"]
