@@ -292,10 +292,12 @@ class CarState(CarStateBase):
     self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
 
     # Update gas, brakes, and gearshift.
-    ret.gasPressed = bool(pt_cp.vl["MEB_ESP_02"]["Accelerator"])
-    #ret.gas = 1 if ret.gasPressed else 0
+    ret.gasPressed = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"] > 0
+    ret.gas = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"]
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
-    #ret.brake = 1 if ret.brakePressed else 0
+    ret.brake = pt_cp.vl["MEB_ESP_01"]["VL_Brake_Pressure"]
+    brake_light = bool(pt_cp.vl["MEB_Light_01"]["Brake_Light"])
+    ret.regenBraking = brake_light and not ret.brakePressed and not ret.standstill
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
 
     # Update gear and/or clutch position data.
@@ -504,6 +506,8 @@ class CarState(CarStateBase):
       ("ESP_24", 20),             #
       ("MEB_ESP_01", 100),        #
       ("MEB_ESP_02", 100),        #
+      ("MEB_ESP_03", 10),         #
+      ("MEB_Light_01", 5),        #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
