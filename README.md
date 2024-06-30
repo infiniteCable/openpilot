@@ -15,7 +15,7 @@ Part 5: HUD commands with second external panda (open)
 
 Adaption to Seat Cupra Born (MEB)
 
-Steering and ACC receiver on engine can bus and HUD receiver on control and view can bus seem not to be SECOC secured. Security is done between J533 and original sender but not beginning from J533 and actual receiver.
+Guess:Steering and ACC receiver on engine can bus and HUD receiver on control and view can bus seem not to be SECOC secured. Security is done between J533 and original sender but not beginning from J533 and actual receiver. Actually maniupating i don't see SECOC have any effect on manipulating steering data. It just works.
 
 Panda can 0 is intercepting sensors can bus directed to J533. (camera + radar data filter + sender) 
 
