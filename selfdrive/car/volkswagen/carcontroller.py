@@ -34,6 +34,7 @@ class CarController(CarControllerBase):
     self.eps_timer_soft_disable_alert = False
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
+    self.torque_wind_down_max = 125
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -61,8 +62,12 @@ class CarController(CarControllerBase):
           hca_enabled = False
           apply_angle = 0
           
+        torque_wind_down_user = self.torque_wind_down_max - self.torque_wind_down_max / 100 * CS.out.steeringTorque if hca_enabled and CS.out.steeringTorque < 100 else 0
+        angle_diff = abs(apply_angle - self.apply_angle_last)
+        torque_wind_down_angle = self.torque_wind_down_max * angle_diff if hca_enabled else 0
+        torque_wind_down = min(torque_wind_down_user, torque_wind_down_angle)
+        torque_wind_down = clip(torque_wind_down, 0, self.torque_wind_down_max)
         self.apply_angle_last = clip(apply_angle, -120.0000, 120.0000)
-        torque_wind_down = 125 - 125 / 100 * CS.out.steeringTorque if hca_enabled and CS.out.steeringTorque < 100 else 0
         can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, torque_wind_down))
 
       else:
