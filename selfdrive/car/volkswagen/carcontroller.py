@@ -62,13 +62,15 @@ class CarController(CarControllerBase):
           hca_enabled = False
           apply_angle = 0
 
-        #torque_wind_down_user  = self.CCP.TORQUE_WIND_DOWN_MAX - self.CCP.TORQUE_WIND_DOWN_MAX / self.CCP.STEER_DRIVER_ALLOWANCE * CS.out.steeringTorque if hca_enabled and CS.out.steeringTorque < 100 else 0
+        torque_wind_down_user      = self.CCP.TORQUE_WIND_DOWN_MAX - self.CCP.TORQUE_WIND_DOWN_MAX / self.CCP.STEER_DRIVER_ALLOWANCE * CS.out.steeringTorque
+        torque_wind_down_user_clip = clip(torque_wind_down_user, 0 , self.CCP.TORQUE_WIND_DOWN_MAX)
+        torque_wind_down           =  torque_wind_down_user_clip if hca_enabled else 0
         #angle_diff             = abs(abs(apply_angle) - abs(self.apply_angle_last))
         #torque_wind_down_angle = self.CCP.TORQUE_WIND_DOWN_MAX * angle_diff if hca_enabled else 0
         #torque_wind_down       = min(torque_wind_down_user, torque_wind_down_angle)
         #torque_wind_down       = clip(torque_wind_down, 0, self.CCP.TORQUE_WIND_DOWN_MAX)
         self.apply_angle_last  = clip(apply_angle, -self.CCP.ANGLE_MAX, self.CCP.ANGLE_MAX)
-        can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, self.CCP.TORQUE_WIND_DOWN_MAX))
+        can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, torque_wind_down))
 
       else:
         if CC.latActive:
