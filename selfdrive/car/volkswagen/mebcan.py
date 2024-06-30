@@ -2,7 +2,7 @@ def create_steering_control_angle(packer, bus, apply_angle, lkas_enabled, torque
   values = {
     "Steering_Angle": abs(apply_angle),
     "Active": lkas_enabled,
-    "VZ": 1 if apply_angle < 0 and lkas_enabled == 1 else 0,
+    "VZ": 1 if apply_angle > 0 and lkas_enabled == 1 else 0,
     "Active_02": lkas_enabled,
     "Inactive": not lkas_enabled,
     "Torque_Wind_Down": torque_wind_down if lkas_enabled else 0,
