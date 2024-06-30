@@ -1,18 +1,29 @@
 THIS PROJECT IS STILL IN PROGRESS
-Part 1: Harness build (in progress)
-Part 2: can bus command sniffing (open)
-Part 3: Steering command tests with C3x (open)
+
+DO NOT USE!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Part 1: Harness build (done at Gateway/J533/ICAS1 which could be acc controlling capable) -> will be documented (camera harness also possible for steering only)
+
+Part 2: can bus command sniffing (in progress) -> all signals are possible candidates at the moment
+
+Part 3: Steering command tests with C3x (tuning in progress with new MEB signal (no counter, no checksum, seems to be angle controlled) -> works)
+
 Part 4: ACC command tests with C3x (open)
+
 Part 5: HUD commands with second external panda (open)
+
 
 Adaption to Seat Cupra Born (MEB)
 
 Steering and ACC receiver on engine can bus and HUD receiver on control and view can bus seem not to be SECOC secured. Security is done between J533 and original sender but not beginning from J533 and actual receiver.
 
-Panda can 0 is intercepting sensors can bus directed to sensors. (camera + radar data filter) 
-Panda can 2 is intercepting sensors can bus directed to J533. (camera data filter) 
-Panda can 1 is connected to engine can bus. (steering and acc command sender)
-A second panda will be connected to control and view can bus. (hud command sender)
+Panda can 0 is intercepting sensors can bus directed to J533. (camera + radar data filter + sender) 
+
+Panda can 2 is intercepting sensors can bus directed to sensors. (camera + radar data filter + receiver) 
+
+Panda can 1 is connected to engine can bus. (no function at the moment, because filtering + sending to J533 works)
+
+A second panda can be connected to control and view can bus. (hud command sender)
 
 
 
