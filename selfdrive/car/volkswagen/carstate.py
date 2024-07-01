@@ -297,7 +297,7 @@ class CarState(CarStateBase):
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
     ret.brake = pt_cp.vl["MEB_ESP_01"]["VL_Brake_Pressure"]
     brake_light = bool(pt_cp.vl["MEB_Light_01"]["Brake_Light"])
-    ret.regenBraking = brake_light and not ret.brakePressed and not ret.standstill
+    #ret.regenBraking = brake_light and not ret.brakePressed and not ret.standstill
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
 
     # Update gear and/or clutch position data.
@@ -341,7 +341,7 @@ class CarState(CarStateBase):
     ret.accFaulted              = self.acc_status in ("FAULT")
     
     ret.cruiseState.available   = self.acc_status in ("READY", "PRE_INACTIVE", "ACTIVE", "PRE_ACTIVE")
-    ret.cruiseState.enabled     = self.acc_status in ("ACTIVE", "PRE_ACTIVE")
+    ret.cruiseState.enabled     = self.acc_status in ("ACTIVE", "PRE_ACTIVE", "USER_OVERWRITE", "PRE_USER_OVERWRITE")
     ret.cruiseState.nonAdaptive = bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
     ret.cruiseState.standstill  = self.esp_hold_confirmation
     
