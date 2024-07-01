@@ -58,7 +58,7 @@ class CarController(CarControllerBase):
           hca_enabled = True
           apply_angle = actuators.steeringAngleDeg
           apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
-          apply_angle = clip(apply_angle, CS.out.steeringAngleDeg - 20, CS.out.steeringAngleDeg + 20)
+          apply_angle = clip(apply_angle, CS.out.steeringAngleDeg - 10, CS.out.steeringAngleDeg + 10)
 
           # torque wind down as lazy counter
           torque_wind_down_by_angle = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 10 # maximum angle change torque is reached with 10 degrees
