@@ -34,7 +34,7 @@ class CarController(CarControllerBase):
     self.eps_timer_soft_disable_alert = False
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
-    self.torque_wind_down_max = 125
+    self.torque_wind_down = self.CCP.TORQUE_WIND_DOWN_MIN
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -55,22 +55,28 @@ class CarController(CarControllerBase):
 
       if self.CP.flags & VolkswagenFlags.MEB:
         if CC.latActive:
+          hca_enabled = True
           apply_angle = actuators.steeringAngleDeg
           apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
-          hca_enabled = True
+
+          # torque wind down as lazy counter
+          angle_diff  = abs(abs(apply_angle) - abs(self.apply_angle_last))
+          torque_wind_down_factor = self.CCP.TORQUE_WIND_DOWN_MAX * angle_diff / 5 # maximum angle change torque is reached with 5 degrees
+          torque_wind_down_target = clip(torque_wind_down_factor, self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX)
+
+          if CS.out.steeringPressed and self.torque_wind_down > self.CCP.TORQUE_WIND_DOWN_MIN:
+            self.torque_wind_down -= 1 # user action results in decreasing the angle change torque
+          elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MAX:
+            if self.torque_wind_down < torque_wind_down_target:
+              self.torque_wind_down += 1
+            elif self.torque_wind_down > torque_wind_down_target:
+              self.torque_wind_down -= 1
+        
         else:
           hca_enabled = False
           apply_angle = 0
 
-        # torque wind down has to be a lazy counter TBD
-        #torque_wind_down_user      = self.CCP.TORQUE_WIND_DOWN_MAX - self.CCP.TORQUE_WIND_DOWN_MAX / self.CCP.STEER_DRIVER_ALLOWANCE * CS.out.steeringTorque
-        #torque_wind_down_user_clip = clip(torque_wind_down_user, self.CCP.TORQUE_WIND_DOWN_MIN , self.CCP.TORQUE_WIND_DOWN_MAX)
-        #torque_wind_down           =  torque_wind_down_user_clip if hca_enabled else 0
-        #angle_diff             = abs(abs(apply_angle) - abs(self.apply_angle_last))
-        #torque_wind_down_angle = self.CCP.TORQUE_WIND_DOWN_MAX * angle_diff if hca_enabled else 0
-        #torque_wind_down       = min(torque_wind_down_user, torque_wind_down_angle)
-        #torque_wind_down       = clip(torque_wind_down, 0, self.CCP.TORQUE_WIND_DOWN_MAX)
-        self.apply_angle_last  = clip(apply_angle, -self.CCP.ANGLE_MAX, self.CCP.ANGLE_MAX)
+        self.apply_angle_last = clip(apply_angle, -self.CCP.ANGLE_MAX, self.CCP.ANGLE_MAX)
         can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, self.CCP.TORQUE_WIND_DOWN_MAX))
 
       else:
