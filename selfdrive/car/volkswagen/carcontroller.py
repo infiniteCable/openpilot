@@ -34,7 +34,7 @@ class CarController(CarControllerBase):
     self.eps_timer_soft_disable_alert = False
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
-    self.torque_wind_down = self.CCP.TORQUE_WIND_DOWN_MIN
+    self.torque_wind_down = 0
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
