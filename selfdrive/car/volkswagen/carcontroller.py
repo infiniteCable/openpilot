@@ -61,15 +61,18 @@ class CarController(CarControllerBase):
           apply_angle = clip(apply_angle, CS.out.steeringAngleDeg - 10, CS.out.steeringAngleDeg + 10)
 
           # torque wind down as lazy counter
-          torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [0, 80], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
+          torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [1, 20], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
+          force_wind_down = True if CS.out.vEgoRaw < 1 else False
           torque_wind_down_by_angle = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 10 # maximum angle change torque is reached with 10 degrees
           torque_wind_down_target = clip(torque_wind_down_by_angle, torque_wind_down_min_by_speed, self.CCP.TORQUE_WIND_DOWN_MAX)
 
-          if self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:
+          if force_wind_down and self.torque_wind_down > 0:  # EPS fault prevention / possibly before standstill OP lane assist deactivation
+            self.torque_wind_down -= 1
+          elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
             self.torque_wind_down += 1
-          elif CS.out.steeringPressed and self.torque_wind_down > self.CCP.TORQUE_WIND_DOWN_MIN:
-            self.torque_wind_down -= 1 # user action results in decreasing the angle change torque
-          elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MAX:
+          elif CS.out.steeringPressed and self.torque_wind_down > self.CCP.TORQUE_WIND_DOWN_MIN: # user action results in decreasing the angle change torque
+            self.torque_wind_down -= 1
+          elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MAX: # following angle change target
             if self.torque_wind_down < torque_wind_down_target:
               self.torque_wind_down += 1
             elif self.torque_wind_down > torque_wind_down_target:
