@@ -44,14 +44,14 @@ class CarController(CarControllerBase):
     # **** Steering Controls ************************************************ #
 
     if self.frame % self.CCP.STEER_STEP == 0:
-      # Logic to avoid HCA state 4 "refused":
-      #   * Don't steer unless HCA is in state 3 "ready" or 5 "active"
-      #   * Don't steer at standstill
-      #   * Don't send > 3.00 Newton-meters torque
-      #   * Don't send the same torque for > 6 seconds
-      #   * Don't send uninterrupted steering for > 360 seconds
-      # MQB racks reset the uninterrupted steering timer after a single frame
-      # of HCA disabled; this is done whenever output happens to be zero.
+      # Logic to avoid HCA refused state
+      #   * angle change torque as counter near zero before standstill OP lane assist deactivation
+      # MEB rack can be used continously without found time limits yet
+      # Angle change counter is used to:
+      #   * prevent sudden fluctuating
+      #   * avoid HCA refused
+      #   * easy user intervention
+      #   * keep it near maximum regarding speed to get full torque in shortest time
 
       if self.CP.flags & VolkswagenFlags.MEB:
         if CC.latActive:
@@ -87,6 +87,15 @@ class CarController(CarControllerBase):
         can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, self.torque_wind_down))
 
       else:
+        # Logic to avoid HCA state 4 "refused":
+        #   * Don't steer unless HCA is in state 3 "ready" or 5 "active"
+        #   * Don't steer at standstill
+        #   * Don't send > 3.00 Newton-meters torque
+        #   * Don't send the same torque for > 6 seconds
+        #   * Don't send uninterrupted steering for > 360 seconds
+        # MQB racks reset the uninterrupted steering timer after a single frame
+        # of HCA disabled; this is done whenever output happens to be zero.
+        
         if CC.latActive:
           new_steer = int(round(actuators.steer * self.CCP.STEER_MAX))
           apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP)
