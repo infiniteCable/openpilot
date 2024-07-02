@@ -44,16 +44,16 @@ class CarController(CarControllerBase):
     # **** Steering Controls ************************************************ #
 
     if self.frame % self.CCP.STEER_STEP == 0:
-      # Logic to avoid HCA refused state
-      #   * angle change torque as counter near zero before standstill OP lane assist deactivation
-      # MEB rack can be used continously without found time limits yet
-      # Angle change counter is used to:
-      #   * prevent sudden fluctuating
-      #   * avoid HCA refused
-      #   * easy user intervention
-      #   * keep it near maximum regarding speed to get full torque in shortest time
-
       if self.CP.flags & VolkswagenFlags.MEB:
+        # Logic to avoid HCA refused state
+        #   * angle change torque as counter near zero before standstill OP lane assist deactivation
+        # MEB rack can be used continously without found time limits yet
+        # Angle change counter is used to:
+        #   * prevent sudden fluctuations at low speeds
+        #   * avoid HCA refused
+        #   * easy user intervention
+        #   * keep it near maximum regarding speed to get full torque in shortest time
+        
         if CC.latActive:
           hca_enabled = True
           apply_angle = actuators.steeringAngleDeg
