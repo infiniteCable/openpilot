@@ -283,10 +283,8 @@ class CarState(CarStateBase):
     ret.steeringTorque = pt_cp.vl["LH_EPS_03"]["EPS_Lenkmoment"] * (1, -1)[int(pt_cp.vl["LH_EPS_03"]["EPS_VZ_Lenkmoment"])]
     ret.steeringPressed = abs(ret.steeringTorque) > self.CCP.STEER_DRIVER_ALLOWANCE
     ret.yawRate = 0.0
-    #hca_status = self.CCP.hca_status_values.get(pt_cp.vl["LH_EPS_03"]["EPS_HCA_Status"])
-    #ret.steerFaultTemporary, ret.steerFaultPermanent = self.update_hca_state(hca_status)
-    ret.steerFaultTemporary = False
-    ret.steerFaultPermanent = False
+    hca_status = self.CCP.hca_status_values.get(pt_cp.vl["MEB_EPS_01"]["LatCon_HCA_Status"])
+    ret.steerFaultTemporary, ret.steerFaultPermanent = self.update_hca_state(hca_status)
 
     # VW Emergency Assist status tracking and mitigation
     self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
@@ -502,6 +500,7 @@ class CarState(CarStateBase):
       ("LH_EPS_03", 100),         # From J500 Steering Assist with integrated sensors
       ("Getriebe_11", 100),       # From J743 Auto transmission control module
       ("ZV_02", 5),               # From ZV
+      ("MEB_EPS_01", 100),        #
       ("ESP_21", 50),             #
       ("ESP_24", 20),             #
       ("MEB_ESP_01", 100),        #
