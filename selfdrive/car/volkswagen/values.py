@@ -79,8 +79,8 @@ class CarControllerParams:
       self.TORQUE_WIND_DOWN_MAX = 125     # 
       self.TORQUE_WIND_DOWN_MIN = 20      # 
       self.ANGLE_MAX = 360
-      self.ANGLE_RATE_LIMIT_UP = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 1.6, .3])
-      self.ANGLE_RATE_LIMIT_DOWN = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 7.0, 0.8])
+      self.ANGLE_RATE_LIMIT_UP = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[20., 7.0, .8])
+      self.ANGLE_RATE_LIMIT_DOWN = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[20., 7.0, 0.8])
 
       self.shifter_values = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
       self.hca_status_values = can_define.dv["LH_EPS_03"]["EPS_HCA_Status"]
