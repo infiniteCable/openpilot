@@ -34,6 +34,7 @@ class CarController(CarControllerBase):
     self.eps_timer_soft_disable_alert = False
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
+    self.lat_active_prev = False
     self.torque_wind_down = 0
 
   def update(self, CC, CS, now_nanos):
@@ -56,19 +57,18 @@ class CarController(CarControllerBase):
         
         if CC.latActive:
           hca_enabled = True
+          self.lat_active_prev = False
+          
           apply_angle = actuators.steeringAngleDeg
           apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
-          apply_angle = clip(apply_angle, CS.out.steeringAngleDeg - 10, CS.out.steeringAngleDeg + 10)
+          apply_angle = clip(apply_angle, CS.out.steeringAngleDeg - 20, CS.out.steeringAngleDeg + 20)
 
           # torque wind down as lazy counter
-          torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [1, 20], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
-          force_wind_down_low = True if CS.out.vEgoRaw < 0.3 or not CS.out.cruiseState.available else False
+          torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [0, 20], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
           torque_wind_down_by_angle = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 5 # maximum angle change torque is reached with 5 degrees
           torque_wind_down_target = clip(torque_wind_down_by_angle, torque_wind_down_min_by_speed, self.CCP.TORQUE_WIND_DOWN_MAX)
 
-          if force_wind_down_low: # EPS fault prevention (EPS originally expects decrementing to 0 before stops)
-            self.torque_wind_down = 10
-          elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
+          if self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
             self.torque_wind_down += 1
           elif CS.out.steeringPressed and self.torque_wind_down > self.CCP.TORQUE_WIND_DOWN_MIN: # user action results in decreasing the angle change torque
             self.torque_wind_down -= 1
@@ -79,9 +79,14 @@ class CarController(CarControllerBase):
               self.torque_wind_down -= 1
         
         else:
-          hca_enabled = False
-          self.torque_wind_down = 0
-          apply_angle = 0
+          if self.lat_active_prev and self.torque_wind_down > 0: # decrement angle change torque to zero before disabling lane assist to prevent EPS fault
+            apply_angle = CS.out.steeringAngleDeg
+            self.torque_wind_down -= 1
+          else:
+            hca_enabled = False
+            self.lat_active_prev = False
+            self.torque_wind_down = 0
+            apply_angle = 0
 
         self.apply_angle_last = clip(apply_angle, -self.CCP.ANGLE_MAX, self.CCP.ANGLE_MAX)
         can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, self.torque_wind_down))
