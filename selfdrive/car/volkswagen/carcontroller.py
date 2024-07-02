@@ -35,7 +35,6 @@ class CarController(CarControllerBase):
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
     self.torque_wind_down = 0
-    self.torque_wind_down_fault_prev_timer = 0
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -63,17 +62,11 @@ class CarController(CarControllerBase):
 
           # torque wind down as lazy counter
           torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [1, 20], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
-          force_wind_down = True if CS.out.vEgoRaw < 1 else False
+          force_wind_down = True if CS.out.vEgoRaw < 0.5 else False
           torque_wind_down_by_angle = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 5 # maximum angle change torque is reached with 5 degrees
           torque_wind_down_target = clip(torque_wind_down_by_angle, torque_wind_down_min_by_speed, self.CCP.TORQUE_WIND_DOWN_MAX)
-          self.torque_wind_down_fault_prev_timer += 1
-          
-          if self.torque_wind_down_fault_prev_timer >= 50:
-            self.torque_wind_down_fault_prev_timer = 0
-            
 
-          if self.torque_wind_down_fault_prev_timer >= 50: # EPS fault prevention (EPS originally expects decrementing to 0 before stops)
-            self.torque_wind_down_fault_prev_timer = 0
+          if force_wind_down: # EPS fault prevention (EPS originally expects decrementing to 0 before stops)
             self.torque_wind_down = 1
           elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
             self.torque_wind_down += 1
