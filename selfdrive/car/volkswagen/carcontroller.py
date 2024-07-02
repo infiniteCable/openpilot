@@ -57,7 +57,7 @@ class CarController(CarControllerBase):
         
         if CC.latActive:
           hca_enabled = True
-          self.lat_active_prev = False
+          self.lat_active_prev = True
           
           apply_angle = actuators.steeringAngleDeg
           apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
@@ -65,8 +65,8 @@ class CarController(CarControllerBase):
 
           # torque wind down as lazy counter
           torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [0, 20], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
-          torque_wind_down_by_angle = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 5 # maximum angle change torque is reached with 5 degrees
-          torque_wind_down_target = clip(torque_wind_down_by_angle, torque_wind_down_min_by_speed, self.CCP.TORQUE_WIND_DOWN_MAX)
+          torque_wind_down_by_angle     = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 5 # maximum angle change torque is reached with 5 degrees
+          torque_wind_down_target       = clip(torque_wind_down_by_angle, torque_wind_down_min_by_speed, self.CCP.TORQUE_WIND_DOWN_MAX)
 
           if self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
             self.torque_wind_down += 1
@@ -80,13 +80,13 @@ class CarController(CarControllerBase):
         
         else:
           if self.lat_active_prev and self.torque_wind_down > 0: # decrement angle change torque to zero before disabling lane assist to prevent EPS fault
-            apply_angle = CS.out.steeringAngleDeg
+            apply_angle            = CS.out.steeringAngleDeg
             self.torque_wind_down -= 1
           else:
-            hca_enabled = False
-            self.lat_active_prev = False
+            hca_enabled           = False
+            self.lat_active_prev  = False
             self.torque_wind_down = 0
-            apply_angle = 0
+            apply_angle           = 0
 
         self.apply_angle_last = clip(apply_angle, -self.CCP.ANGLE_MAX, self.CCP.ANGLE_MAX)
         can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, self.torque_wind_down))
