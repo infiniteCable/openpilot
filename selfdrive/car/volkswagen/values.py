@@ -72,17 +72,16 @@ class CarControllerParams:
         "laneAssistDeactivTrailer": 5,  # "Lane Assist: no function with trailer"
       }
 
-    elif CP.flags & VolkswagenFlags.MEB: # TODO
-      self.LDW_STEP = 10                  # LDW_02 message frequency 10Hz
-      self.ACC_HUD_STEP = 6               # ACC_02 message frequency 16Hz
+    elif CP.flags & VolkswagenFlags.MEB:
+      self.LDW_STEP               = 10    # LDW_02 message frequency 10Hz
       self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
-      self.TORQUE_WIND_DOWN_MAX = 125     # 
-      self.TORQUE_WIND_DOWN_MIN = 60      # 
-      self.ANGLE_MAX = 360
-      self.ANGLE_RATE_LIMIT_UP = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[20., 7.0, .8])
-      self.ANGLE_RATE_LIMIT_DOWN = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[20., 7.0, .8])
+      self.TORQUE_WIND_DOWN_MAX   = 125      
+      self.TORQUE_WIND_DOWN_MIN   = 40       
+      self.ANGLE_MAX              = 360
+      self.ANGLE_RATE_LIMIT_UP    = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[20., 7.0, .8])
+      self.ANGLE_RATE_LIMIT_DOWN  = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[20., 7.0, .8])
 
-      self.shifter_values = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
+      self.shifter_values    = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
       self.hca_status_values = can_define.dv["MEB_EPS_01"]["LatCon_HCA_Status"]
       self.acc_status_values = can_define.dv["MEB_ACC_02"]["ACC_State"]
 
