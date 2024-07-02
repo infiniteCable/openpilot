@@ -56,12 +56,9 @@ class CarController(CarControllerBase):
         #   * keep it near maximum regarding speed to get full torque in shortest time
         
         if CC.latActive:
-          hca_enabled = True
+          hca_enabled          = True
           self.lat_active_prev = True
-          
-          apply_angle = actuators.steeringAngleDeg
-          apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
-          apply_angle = clip(apply_angle, CS.out.steeringAngleDeg - 20, CS.out.steeringAngleDeg + 20)
+          apply_angle          = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
 
           # torque wind down as lazy counter
           torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [0, 20], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
