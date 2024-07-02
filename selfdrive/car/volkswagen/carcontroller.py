@@ -60,8 +60,6 @@ class CarController(CarControllerBase):
           apply_angle = apply_std_steer_angle_limits(apply_angle, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
           apply_angle = clip(apply_angle, CS.out.steeringAngleDeg - 10, CS.out.steeringAngleDeg + 10)
 
-          eed_bp=[0., 5., 15.], angle_v=[10., 7.0, 0.8]
-
           # torque wind down as lazy counter
           torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [0, 80], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
           torque_wind_down_by_angle = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 10 # maximum angle change torque is reached with 10 degrees
