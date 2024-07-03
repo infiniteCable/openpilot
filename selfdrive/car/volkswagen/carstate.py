@@ -264,14 +264,7 @@ class CarState(CarStateBase):
       pt_cp.vl["MEB_ESP_01"]["VR_Radgeschw"],
       pt_cp.vl["MEB_ESP_01"]["HL_Radgeschw"],
       pt_cp.vl["MEB_ESP_01"]["HR_Radgeschw"],
-      1,
     )
-    #ret.wheelSpeeds = self.get_wheel_speeds(
-    #  pt_cp.vl["ESP_21"]["VESP_v_Signal"],
-    #  pt_cp.vl["ESP_21"]["VESP_v_Signal"],
-    #  pt_cp.vl["ESP_21"]["VESP_v_Signal"],
-    #  pt_cp.vl["ESP_21"]["VESP_v_Signal"],
-    #)
 
     ret.vEgoRaw = float(np.mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr]))
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
