@@ -73,6 +73,7 @@ class CarControllerParams:
       }
 
     elif CP.flags & VolkswagenFlags.MEB:
+      self.STEER_STEP             = 1
       self.LDW_STEP               = 10    # LDW_02 message frequency 10Hz
       self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
       self.TORQUE_WIND_DOWN_MAX   = 125      
