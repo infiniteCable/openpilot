@@ -83,7 +83,7 @@ class CarController(CarControllerBase):
             hca_enabled           = False
             self.lat_active_prev  = False
             self.torque_wind_down = 0
-            apply_angle           = 0
+            apply_angle           = 0.
 
         self.apply_angle_last = clip(apply_angle, -self.CCP.ANGLE_MAX, self.CCP.ANGLE_MAX)
         can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, self.torque_wind_down))
