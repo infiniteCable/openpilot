@@ -341,6 +341,8 @@ class CarState(CarStateBase):
       if ret.cruiseState.speed > 50: # settable maximum 180km/h
         ret.cruiseState.speed = 0
 
+    self.distance_stock_values = pt_cp.vl["MEB_Distance_01"]
+
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
     ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_links"])
     ret.rightBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_rechts"])
@@ -512,6 +514,7 @@ class CarState(CarStateBase):
       ("MEB_ACC_02", 50),          #
       ("MEB_Side_Assist_01", 200), #
       ("MEB_Drive_State_01", 20),  #
+      ("MEB_Distance_01", 25),     #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.cam)
 
