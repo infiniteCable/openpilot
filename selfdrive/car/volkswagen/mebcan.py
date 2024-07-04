@@ -58,6 +58,18 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
   })
   return packer.make_can_msg("GRA_ACC_01", bus, values)
 
+def acc_control_value(main_switch_on, acc_faulted, long_active):
+  if acc_faulted:
+    acc_control = 7
+  elif long_active:
+    acc_control = 3
+  elif main_switch_on:
+    acc_control = 2
+  else:
+    acc_control = 0
+
+  return acc_control
+
 def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold):
   values = {
     "ACC_State": acc_control,
