@@ -20,7 +20,6 @@ Button = namedtuple('Button', ['event_type', 'can_addr', 'can_msg', 'values'])
 
 class CarControllerParams:
   STEER_STEP = 2                           # HCA_01/HCA_1 message frequency 50Hz
-  STEER_STEP_STANDBY = 100                 # HCA_01/HCA_1 standby message frequency 1Hz
   ACC_CONTROL_STEP = 2                     # ACC_06/ACC_07/ACC_System frequency 50Hz
 
   # Documented lateral limits: 3.00 Nm max, rate of change 5.00 Nm/sec.
@@ -73,14 +72,13 @@ class CarControllerParams:
       }
 
     elif CP.flags & VolkswagenFlags.MEB:
-      self.STEER_STEP             = 1
       self.LDW_STEP               = 10    # LDW_02 message frequency 10Hz
       self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
       self.TORQUE_WIND_DOWN_MAX   = 125      
       self.TORQUE_WIND_DOWN_MIN   = 40       
       self.ANGLE_MAX              = 360
-      self.ANGLE_RATE_LIMIT_UP    = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[20., 7.0, .8])
-      self.ANGLE_RATE_LIMIT_DOWN  = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[20., 7.0, .8])
+      self.ANGLE_RATE_LIMIT_UP    = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 1.6, .3])
+      self.ANGLE_RATE_LIMIT_DOWN  = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 7.0, 0.8])
 
       self.shifter_values    = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
       self.hca_status_values = can_define.dv["MEB_EPS_01"]["LatCon_HCA_Status"]
