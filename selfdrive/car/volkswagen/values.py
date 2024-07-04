@@ -75,7 +75,7 @@ class CarControllerParams:
       self.LDW_STEP               = 10    # LDW_02 message frequency 10Hz
       self.STEER_DRIVER_ALLOWANCE = 80    # Driver intervention threshold 0.8 Nm
       self.TORQUE_WIND_DOWN_MAX   = 125      
-      self.TORQUE_WIND_DOWN_MIN   = 40       
+      self.TORQUE_WIND_DOWN_MIN   = 20       
       self.ANGLE_MAX              = 360
       self.ANGLE_RATE_LIMIT_UP    = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 1.6, .3])
       self.ANGLE_RATE_LIMIT_DOWN  = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 7.0, 0.8])
