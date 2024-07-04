@@ -21,8 +21,6 @@ Panda can 2 is intercepting sensors can bus directed to sensors. (camera + radar
 
 Panda can 1 is connected to engine can bus. (no function at the moment, because filtering + sending to J533 works)
 
-A second panda can be connected to control and view can bus. (hud command sender)
-
 
 
 Allow lateral on brake with panda disallowing long messages on brake, simple dark mode for onroad screen (minimum brightness), turn screen of for onroad screen when no status or alert changes, panda not working for any other brands than Volkswagen. Driver monitoring is more aggressive. Enabled lateral torque controller which works good for disabled steering wheel centering.
