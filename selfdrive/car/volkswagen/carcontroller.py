@@ -62,7 +62,7 @@ class CarController(CarControllerBase):
 
           # torque wind down as lazy counter
           torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [0, 20], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
-          torque_wind_down_by_angle     = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 5 # maximum angle change torque is reached with 5 degrees
+          torque_wind_down_by_angle     = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 10 # maximum angle change torque is reached with 10 degrees
           torque_wind_down_target       = clip(torque_wind_down_by_angle, torque_wind_down_min_by_speed, self.CCP.TORQUE_WIND_DOWN_MAX)
 
           if self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
