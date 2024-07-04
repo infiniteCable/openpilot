@@ -10,8 +10,6 @@ Part 3: Steering command tests with C3x (tuning in progress with new MEB signal 
 
 Part 4: ACC command tests with C3x (open)
 
-Part 5: HUD commands with second external panda (open)
-
 
 Adaption to Seat Cupra Born (MEB)
 
@@ -22,8 +20,6 @@ Panda can 0 is intercepting sensors can bus directed to J533. (camera + radar da
 Panda can 2 is intercepting sensors can bus directed to sensors. (camera + radar data filter + receiver) 
 
 Panda can 1 is connected to engine can bus. (no function at the moment, because filtering + sending to J533 works)
-
-A second panda can be connected to control and view can bus. (hud command sender)
 
 
 
