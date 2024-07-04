@@ -122,15 +122,15 @@ class CarController(CarControllerBase):
         self.apply_steer_last = apply_steer
         can_sends.append(self.CCS.create_steering_control(self.packer_pt, CANBUS.pt, apply_steer, hca_enabled))
 
-#      if self.CP.flags & VolkswagenFlags.STOCK_HCA_PRESENT:
-#        # Pacify VW Emergency Assist driver inactivity detection by changing its view of driver steering input torque
-#        # to the greatest of actual driver input or 2x openpilot's output (1x openpilot output is not enough to
-#        # consistently reset inactivity detection on straight level roads). See commaai/openpilot#23274 for background.
-#        ea_simulated_torque = clip(apply_steer * 2, -self.CCP.STEER_MAX, self.CCP.STEER_MAX)
-#        if abs(CS.out.steeringTorque) > abs(ea_simulated_torque):
-#          ea_simulated_torque = CS.out.steeringTorque
-#        can_sends.append(self.CCS.create_eps_update(self.packer_pt, CANBUS.cam, CS.eps_stock_values, ea_simulated_torque))
-#
+      if self.CP.flags & VolkswagenFlags.STOCK_HCA_PRESENT:
+        # Pacify VW Emergency Assist driver inactivity detection by changing its view of driver steering input torque
+        # to the greatest of actual driver input or 2x openpilot's output (1x openpilot output is not enough to
+        # consistently reset inactivity detection on straight level roads). See commaai/openpilot#23274 for background.
+        ea_simulated_torque = clip(apply_steer * 2, -self.CCP.STEER_MAX, self.CCP.STEER_MAX)
+        if abs(CS.out.steeringTorque) > abs(ea_simulated_torque):
+          ea_simulated_torque = CS.out.steeringTorque
+        can_sends.append(self.CCS.create_eps_update(self.packer_pt, CANBUS.cam, CS.eps_stock_values, ea_simulated_torque))
+
     # **** Acceleration Controls ******************************************** #
 
     if self.frame % self.CCP.ACC_CONTROL_STEP == 0 and self.CP.openpilotLongitudinalControl:
@@ -163,9 +163,9 @@ class CarController(CarControllerBase):
     # **** Stock ACC Button Controls **************************************** #
 
     gra_send_ready = self.CP.pcmCruise and CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
-    #if gra_send_ready and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
-    #  can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, self.ext_bus, CS.gra_stock_values,
-    #                                                       cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
+    if gra_send_ready and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
+      can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, self.ext_bus, CS.gra_stock_values,
+                                                           cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
 
     new_actuators = actuators.as_builder()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
