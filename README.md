@@ -10,8 +10,6 @@ Part 3: Steering command tests with C3x (tuning in progress with new MEB signal 
 
 Part 4: ACC command tests with C3x (open)
 
-Part 5: HUD commands with second external panda (open)
-
 
 Adaption to Seat Cupra Born (MEB)
 
