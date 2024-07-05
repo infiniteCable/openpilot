@@ -8,8 +8,11 @@ Part 2: can bus command sniffing (in progress) -> all signals are possible candi
 
 Part 3: Steering command tests with C3x (tuning in progress with new MEB signal (no counter, no checksum, seems to be angle controlled) -> works)
 
+Part 3.1: checksum calculation
+
 Part 4: ACC command tests with C3x (open)
 
+Part 4.1: checksum calculation
 
 Adaption to Seat Cupra Born (MEB)
 
