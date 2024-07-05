@@ -86,4 +86,5 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     #"Constant_1_5": 1,
     #"Constant_1_6": 1,
     #"Constant_FE": 0xFE,
+  }
   return packer.make_can_msg("MEB_ACC_02", bus, values)
