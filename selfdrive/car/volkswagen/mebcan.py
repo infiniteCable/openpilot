@@ -74,7 +74,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
   values = {
     "ACC_State": acc_control,
     "ACC_Active": acc_enabled,
-    "Regulating_State": 3 if acc_enabled else 0,
+    "Regulating_State": 4 if acc_enabled else 0,
     "Accel": accel * 100 if acc_enabled else 600,
     "Stopped": esp_hold,
     "Starting": starting,
@@ -86,4 +86,5 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     #"Constant_1_5": 1,
     #"Constant_1_6": 1,
     #"Constant_FE": 0xFE,
+  }
   return packer.make_can_msg("MEB_ACC_02", bus, values)
