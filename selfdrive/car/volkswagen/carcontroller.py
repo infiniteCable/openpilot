@@ -68,10 +68,10 @@ class CarController(CarControllerBase):
           if self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
             self.torque_wind_down += 1
           elif CS.out.steeringPressed and self.torque_wind_down > self.CCP.TORQUE_WIND_DOWN_MIN: # user action results in decreasing the angle change torque
-            self.torque_wind_down -= 4
+            self.torque_wind_down = max(self.torque_wind_down - 4, self.CCP.TORQUE_WIND_DOWN_MIN)
           elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MAX: # following angle change target
             if self.torque_wind_down < torque_wind_down_target:
-              self.torque_wind_down += 1
+              self.torque_wind_down = min(self.torque_wind_down + 4, torque_wind_down_target)
             elif self.torque_wind_down > torque_wind_down_target:
               self.torque_wind_down -= 1
         
