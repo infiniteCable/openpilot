@@ -82,7 +82,6 @@ class CarControllerParams:
 
       self.shifter_values    = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
       self.hca_status_values = can_define.dv["MEB_EPS_01"]["LatCon_HCA_Status"]
-      self.acc_status_values = can_define.dv["MEB_ACC_02"]["ACC_State"]
 
       self.BUTTONS = [
         Button(car.CarState.ButtonEvent.Type.setCruise, "GRA_ACC_01", "GRA_Tip_Setzen", [1]),
