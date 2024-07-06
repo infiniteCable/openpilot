@@ -287,7 +287,7 @@ class CarState(CarStateBase):
     ret.gas = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"]
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
     ret.brake = pt_cp.vl["MEB_ESP_01"]["VL_Brake_Pressure"]
-    brake_light = bool(pt_cp.vl["MEB_Light_01"]["Brake_Light"])
+    #brake_light = bool(pt_cp.vl["MEB_Light_01"]["Brake_Light"])
     #ret.regenBraking = brake_light and not ret.brakePressed and not ret.standstill
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
 
@@ -326,13 +326,11 @@ class CarState(CarStateBase):
     cruiseSpeed_tmp = (cruiseSpeed1 + cruiseSpeed5)
     cruiseSpeed = cruiseSpeed_tmp + (cruiseSpeed_tmp - 6) // 40
 
-    # Update ACC state
-    self.acc_type               = 2
-    self.acc_status             = self.CCP.acc_status_values.get(cam_cp.vl["MEB_ACC_02"]["ACC_State"])
-    ret.accFaulted              = self.acc_status in ("FAULT")
+    self.acc_type  = 2
+    ret.accFaulted = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (6, 7)
     
-    ret.cruiseState.available   = self.acc_status in ("READY", "PRE_INACTIVE", "ACTIVE", "PRE_ACTIVE")
-    ret.cruiseState.enabled     = self.acc_status in ("ACTIVE", "PRE_ACTIVE", "USER_OVERWRITE", "PRE_USER_OVERWRITE")
+    ret.cruiseState.available = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (2, 3, 4, 5)
+    ret.cruiseState.enabled = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (3, 4, 5)
     ret.cruiseState.nonAdaptive = bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
     ret.cruiseState.standstill  = self.esp_hold_confirmation
     
@@ -502,6 +500,7 @@ class CarState(CarStateBase):
       ("MEB_ESP_02", 100),        #
       ("MEB_ESP_03", 10),         #
       ("MEB_Light_01", 5),        #
+      ("MEB_TSK_01", 5),          #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
