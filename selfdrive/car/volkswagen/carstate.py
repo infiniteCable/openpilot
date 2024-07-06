@@ -314,8 +314,6 @@ class CarState(CarStateBase):
     # and capture it for forwarding to the blind spot radar controller
     self.ldw_stock_values = cam_cp.vl["LDW_02"]
 
-    # Stock FCW
-    # Stock AEB
     ret.stockFcw = bool(cam_cp.vl["MEB_ACC_01"]["FCW_Active"])
     ret.stockAeb = False
 
@@ -326,11 +324,10 @@ class CarState(CarStateBase):
     cruiseSpeed_tmp = (cruiseSpeed1 + cruiseSpeed5)
     cruiseSpeed = cruiseSpeed_tmp + (cruiseSpeed_tmp - 6) // 40
 
-    self.acc_type  = 2
     ret.accFaulted = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (6, 7)
     
-    ret.cruiseState.available = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (2, 3, 4, 5)
-    ret.cruiseState.enabled = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (3, 4, 5)
+    ret.cruiseState.available   = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (2, 3, 4, 5)
+    ret.cruiseState.enabled     = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (3, 4, 5)
     ret.cruiseState.nonAdaptive = bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
     ret.cruiseState.standstill  = self.esp_hold_confirmation
     
@@ -349,9 +346,6 @@ class CarState(CarStateBase):
 
     # Additional safety checks performed in CarInterface.
     ret.espDisabled = bool(pt_cp.vl["ESP_24"]["ESP_Off_Lampe"])
-
-    # Digital instrument clusters expect the ACC HUD lead car distance to be scaled differently
-    self.upscale_lead_car_signal = False
 
     self.frame += 1
     return ret
