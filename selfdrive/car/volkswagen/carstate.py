@@ -325,6 +325,7 @@ class CarState(CarStateBase):
     cruiseSpeed = cruiseSpeed_tmp + (cruiseSpeed_tmp - 6) // 40
 
     ret.accFaulted = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (6, 7)
+    self.acc_type = 0 # backwards compatibility with car controller command
     
     ret.cruiseState.available   = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (2, 3, 4, 5)
     ret.cruiseState.enabled     = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (3, 4, 5)
