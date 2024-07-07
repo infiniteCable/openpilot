@@ -71,20 +71,26 @@ def acc_control_value(main_switch_on, acc_faulted, long_active):
   return acc_control
 
 def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold):
+  commands = []
+  
   values = {
     "ACC_State": acc_control,
     "ACC_Active": acc_enabled,
-    "Regulating_State": 4 if acc_enabled else 0,
-    "Accel": accel * 100 if acc_enabled else 600,
-    "Stopped": esp_hold,
+    "Regulating_Strength": 12 if acc_enabled else 0,
+    "Accel": accel if acc_enabled else 6,
     "Starting": starting,
     "Stopping": stopping,
-    #"Constant_1_1": 1,
-    #"Constant_1_2": 1,
-    #"Constant_1_3": 1,
-    #"Constant_1_4": 1,
-    #"Constant_1_5": 1,
-    #"Constant_1_6": 1,
-    #"Constant_FE": 0xFE,
+    "Constant_1_1": 1,
+    "Constant_1_2": 1,
+    "Constant_1_3": 1,
+    "Constant_1_4": 1,
+    "Constant_1_5": 1,
+    "Constant_1_6": 1,
+    "Constant_FE": 0xFE,
+    "State_Change_01": 7,
+    "State_Change_02": 1,
+    "State_Change_03": 7,
   }
-  return packer.make_can_msg("MEB_ACC_02", bus, values)
+  commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
+  
+  return commands
