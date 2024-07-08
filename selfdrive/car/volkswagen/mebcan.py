@@ -58,9 +58,11 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
   })
   return packer.make_can_msg("GRA_ACC_01", bus, values)
 
-def acc_control_value(main_switch_on, acc_faulted, long_active):
+def acc_control_value(main_switch_on, acc_faulted, long_active, user_overriding):
   if acc_faulted:
     acc_control = 7
+  elif user_overriding:
+    acc_control = 12
   elif long_active:
     acc_control = 3
   elif main_switch_on:
@@ -70,7 +72,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active):
 
   return acc_control
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, disabling, speed, reversing, user_overriding):
   commands = []
   
   values = {
@@ -79,14 +81,14 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "Regulating_Strength": 5 if acc_enabled else 0,
     "Accel": accel if acc_enabled else 6,
     "Starting": starting,
-    "Disabling_Starting": starting,
+    "Disabling_Starting": starting or disabling,
     "Stopping": stopping,
     "Stopping_02": stopping,
     "Anti_Stopping": 0 if stopping else 1,
     "Anti_Stopping_02": 0 if stopping else 1,
     "Anti_Stopping_03": 0 if stopping else 1,
     "Anti_Stopping_04": 0 if stopping else 7,
-    "Disabling_or_Active_Hold": esp_hold and acc_enabled,
+    "Disabling_or_Active_Hold": esp_hold and acc_enabled or disabling,
     "Constant_1_1": 1,
     "Constant_1_2": 1,
     "Constant_1_3": 1,
@@ -96,13 +98,13 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "Constant_1_7": 1,
     "Constant_1_8": 1,
     "Constant_FE": 0xFE,
-    "Speed": 0,
-    "Disabling": 0,
+    "Speed": speed,
+    "Disabling": disabling,
     "Secondary_Accel_02": 0,
     "Secondary_Accel_02": 0,
     "Secondary_Accel_03": 0,
-    "Reversing": 0,
-    "User_Override_State": 0,
+    "Reversing": reversing,
+    "User_Override_State": 3 if user_overriding,
     "Stopping_Stronger": 0,    
   }
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
