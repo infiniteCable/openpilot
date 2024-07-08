@@ -140,7 +140,7 @@ class CarController(CarControllerBase):
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
       
       if self.CP.flags & VolkswagenFlags.MEB:
-        disabling = True if self.long_active_prev and not CC.longActive
+        disabling = self.long_active_prev and not CC.longActive
         self.long_active_prev = CC.longActive
         current_speed = CS.out.vEgoRaw * CV.MS_TO_KPH
         reversing = True if CS.out.gearShifter == self.CCP.GearShifter.reverse
