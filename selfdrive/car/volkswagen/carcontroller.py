@@ -36,6 +36,7 @@ class CarController(CarControllerBase):
     self.hca_frame_same_torque = 0
     self.lat_active_prev = False
     self.torque_wind_down = 0
+    self.long_active_prev = False
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -138,8 +139,20 @@ class CarController(CarControllerBase):
       accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX) if CC.longActive else 0
       stopping = actuators.longControlState == LongCtrlState.stopping
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
-      can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
-                                                         acc_control, stopping, starting, CS.esp_hold_confirmation))
+      
+      if self.CP.flags & VolkswagenFlags.MEB:
+        disabling = True if self.long_active_prev and not CC.longActive
+        self.long_active_prev = CC.longActive
+        current_speed = CS.out.vEgoRaw * CV.MS_TO_KPH
+        reversing = True if CS.out.gearShifter == self.CCP.GearShifter.reverse
+        user_overriding = CS.out.gasPressed or CS.out.brakePressed
+        can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
+                                                           acc_control, stopping, starting, CS.esp_hold_confirmation,
+                                                           disabling, current_speed, reversing, user_overriding))
+
+      else:
+        can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
+                                                           acc_control, stopping, starting, current_speed, reversing))
 
     # **** HUD Controls ***************************************************** #
 
