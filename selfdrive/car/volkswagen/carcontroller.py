@@ -75,6 +75,10 @@ class CarController(CarControllerBase):
               self.torque_wind_down = min(self.torque_wind_down + 4, torque_wind_down_target)
             elif self.torque_wind_down > torque_wind_down_target:
               self.torque_wind_down -= 1
+
+          #if abs(apply_angle) > 45:
+          #  new_steer = self.CCP.STEER_MAX - 
+          #  apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP) 
         
         else:
           if self.lat_active_prev and self.torque_wind_down > 0: # decrement angle change torque to zero before disabling lane assist to prevent EPS fault
