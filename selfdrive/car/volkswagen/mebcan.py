@@ -61,10 +61,11 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
 def acc_control_value(main_switch_on, acc_faulted, long_active, user_overriding):
   if acc_faulted:
     acc_control = 7
-  elif user_overriding:
-    acc_control = 12
   elif long_active:
-    acc_control = 3
+    if user_overriding:
+      acc_control = 12
+    else:
+      acc_control = 3
   elif main_switch_on:
     acc_control = 2
   else:
