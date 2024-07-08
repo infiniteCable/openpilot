@@ -79,6 +79,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "Regulating_Strength": 5 if acc_enabled else 0,
     "Accel": accel if acc_enabled else 6,
     "Starting": starting,
+    "Disabling_Starting": starting,
     "Stopping": stopping,
     "Stopping_02": stopping,
     "Anti_Stopping": 0 if stopping else 1,
