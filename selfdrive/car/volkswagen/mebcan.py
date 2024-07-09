@@ -73,7 +73,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, user_overriding)
 
   return acc_control
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, disabling, speed, reversing, user_overriding):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, disabling, enabling, speed, reversing, user_overriding):
   commands = []
   
   values = {
@@ -101,9 +101,9 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "Constant_FE": 0xFE,
     "Speed": speed,
     "Disabling": disabling,
-    "Secondary_Accel_02": 0,
-    "Secondary_Accel_02": 0,
-    "Secondary_Accel_03": 0,
+    "Secondary_Accel": 1 if acc_enabled else 0,
+    "Secondary_Accel_02": 20 if acc_enabled else 0,
+    "Secondary_Accel_03": 14 if acc_enabled else 0,
     "Reversing": reversing,
     "User_Override_State": 3 if user_overriding else 0,
     "Stopping_Stronger": 0,    
