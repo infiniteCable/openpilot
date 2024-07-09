@@ -145,14 +145,15 @@ class CarController(CarControllerBase):
       
       if self.CP.flags & VolkswagenFlags.MEB:
         disabling = self.long_active_prev and not CC.longActive
+        enabling = not self.long_active_prev and CC.longActive
         self.long_active_prev = CC.longActive
         current_speed = CS.out.vEgo * CV.MS_TO_KPH
         reversing = True if CS.out.gearShifter in [car.CarState.GearShifter.reverse] else False
         user_overriding = CS.out.gasPressed or CS.out.brakePressed
-        acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, user_overriding)
+        acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, user_overriding, disabling, enabling)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
                                                            acc_control, stopping, starting, CS.esp_hold_confirmation,
-                                                           disabling, current_speed, reversing, user_overriding))
+                                                           disabling, enabling, current_speed, reversing, user_overriding))
 
       else:
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
