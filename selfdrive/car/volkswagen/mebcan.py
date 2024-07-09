@@ -103,7 +103,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_Anforderung_HMS": acc_hold_type,
     "Unknown_01": 3 if stopping else 31,
     "Unknown_02": 0 if stopping else 15,
-    "ACC_Active": acc_enabled,
+    "ACC_Active": acc_enabled and not user_overriding,
     "Constant_1_1": 1,
     "Constant_1_2": 1,
     "Constant_1_3": 1,
