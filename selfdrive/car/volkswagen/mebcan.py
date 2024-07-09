@@ -58,11 +58,15 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
   })
   return packer.make_can_msg("GRA_ACC_01", bus, values)
 
-def acc_control_value(main_switch_on, acc_faulted, long_active, user_overriding):
+def acc_control_value(main_switch_on, acc_faulted, long_active, user_overriding, disabling, enabling):
   if acc_faulted:
     acc_control = 7
   elif long_active:
-    if user_overriding:
+    if enabling:
+      acc_control = 4
+    elif disabling:
+      acc_control = 5
+    elif user_overriding:
       acc_control = 12
     else:
       acc_control = 3
