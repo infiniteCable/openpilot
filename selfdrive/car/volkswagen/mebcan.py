@@ -94,7 +94,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_Anhalteweg": 0, #1 if stopping else 20,  # Distance to stop (stopping coordinator handles terminal roll-out)
     "ACC_Anforderung_HMS": acc_hold_type,
     "Unknown_01": 31,
-    "Unknown_02": 15,
+    "Unknown_02": 0 if stopping else 15,
     "ACC_Active": acc_enabled,
     "Constant_1_1": 1,
     "Constant_1_2": 1,
