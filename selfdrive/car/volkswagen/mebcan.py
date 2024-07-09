@@ -60,16 +60,9 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
 
 def acc_control_value(main_switch_on, acc_faulted, long_active, user_overriding, disabling, enabling):
   if acc_faulted:
-    acc_control = 7
+    acc_control = 6
   elif long_active:
-    if enabling:
-      acc_control = 4
-    elif disabling:
-      acc_control = 5
-    elif user_overriding:
-      acc_control = 12
-    else:
-      acc_control = 3
+    acc_control = 3
   elif main_switch_on:
     acc_control = 2
   else:
@@ -79,37 +72,39 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, user_overriding,
 
 def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, disabling, enabling, speed, reversing, user_overriding):
   commands = []
+
+  if starting:
+    acc_hold_type = 4  # hold release / startup
+  elif esp_hold:
+    acc_hold_type = 3  # hold standby
+  elif stopping:
+    acc_hold_type = 1  # hold request
+  else:
+    acc_hold_type = 0
   
   values = {
-    "ACC_State": acc_control,
+    "ACC_Typ": acc_type,
+    "ACC_Status_ACC": acc_control,
+    "ACC_StartStopp_Info": acc_enabled,
+    "ACC_Sollbeschleunigung_02": accel if acc_enabled else 3.01,
+    "ACC_zul_Regelabw_unten": 0.2,  # TODO: dynamic adjustment of comfort-band
+    "ACC_zul_Regelabw_oben": 0.2,  # TODO: dynamic adjustment of comfort-band
+    "ACC_neg_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
+    "ACC_pos_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
+    "ACC_Anfahren": starting,
+    "ACC_Anhalten": stopping,
+    "ACC_Anhalteweg": 1 if stopping else 20,  # Distance to stop (stopping coordinator handles terminal roll-out)
+    "ACC_Anforderung_HMS": acc_hold_type,
+    "Unknown_01": 31,
+    "Unknown_02": 15,
     "ACC_Active": acc_enabled,
-    "Regulating_Strength": 5 if acc_enabled and not esp_hold else 0,
-    "Accel": accel if acc_enabled else 3.01,
-    "Starting": starting,
-    "Disabling_Starting": starting or disabling,
-    "Stopping": stopping,
-    "Stopping_02": stopping,
-    "Anti_Stopping": 0 if stopping else 1,
-    "Anti_Stopping_02": 0 if stopping else 1,
-    "Anti_Stopping_03": 0 if stopping else 1,
-    "Anti_Stopping_04": 0 if stopping else 7,
-    "Anti_Stopping_05": 0 if stopping else 1,
-    "Anti_Stopping_06": 0 if stopping else 1,
-    "Anti_Stopping_07": 0 if stopping else 1,
-    "Disabling_or_Active_Hold": esp_hold and acc_enabled or disabling,
     "Constant_1_1": 1,
     "Constant_1_2": 1,
     "Constant_1_3": 1,
-    "Constant_1_5": 1,
-    "Constant_1_6": 1,
+    "Constant_1_4": 1,
     "Constant_FE": 0xFE,
     "Speed": speed,
-    "Secondary_Accel": 0, #if esp_hold else 1,
-    "Secondary_Accel_02": 20 if acc_enabled and not esp_hold else 0,
-    "Secondary_Accel_03": 10 if acc_enabled and not esp_hold else 0,
     "Reversing": reversing,
-    "User_Override_State": 0, #3 if user_overriding else 0,
-    "Stopping_Stronger": 0,    
   }
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
   
