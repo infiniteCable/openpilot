@@ -76,9 +76,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
   if starting:
     acc_hold_type = 4  # hold release / startup
   elif esp_hold:
-    acc_hold_type = 3  # hold standby
-  elif stopping:
-    acc_hold_type = 1  # hold request
+    acc_hold_type = 1  # hold standby
   else:
     acc_hold_type = 0
   
@@ -93,7 +91,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_pos_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
     "ACC_Anfahren": starting,
     "ACC_Anhalten": stopping,
-    "ACC_Anhalteweg": 1 if stopping else 20,  # Distance to stop (stopping coordinator handles terminal roll-out)
+    "ACC_Anhalteweg": 0, #1 if stopping else 20,  # Distance to stop (stopping coordinator handles terminal roll-out)
     "ACC_Anforderung_HMS": acc_hold_type,
     "Unknown_01": 31,
     "Unknown_02": 15,
