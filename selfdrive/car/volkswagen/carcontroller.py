@@ -147,7 +147,7 @@ class CarController(CarControllerBase):
         disabling = self.long_active_prev and not CC.longActive
         self.long_active_prev = CC.longActive
         current_speed = CS.out.vEgo * CV.MS_TO_KPH
-        reversing = True if CS.out.gearShifter == self.CCP.GearShifter.reverse else False
+        reversing = True if CS.out.gearShifter in [car.CarState.GearShifter.reverse] else False
         user_overriding = CS.out.gasPressed or CS.out.brakePressed
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, user_overriding)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
