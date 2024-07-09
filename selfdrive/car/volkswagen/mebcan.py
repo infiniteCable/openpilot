@@ -104,12 +104,11 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "Constant_1_6": 1,
     "Constant_FE": 0xFE,
     "Speed": speed,
-    "Disabling": disabling,
-    #"Secondary_Accel": 0 if esp_hold else 1,
-    #"Secondary_Accel_02": 20 if acc_enabled and not esp_hold else 20,
-    #"Secondary_Accel_03": 14 if acc_enabled and not esp_hold else 14,
+    "Secondary_Accel": 0, #if esp_hold else 1,
+    "Secondary_Accel_02": 20 if acc_enabled and not esp_hold else 0,
+    "Secondary_Accel_03": 10 if acc_enabled and not esp_hold else 0,
     "Reversing": reversing,
-    #"User_Override_State": 3 if user_overriding else 0,
+    "User_Override_State": 3, # if user_overriding else 0,
     "Stopping_Stronger": 0,    
   }
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
