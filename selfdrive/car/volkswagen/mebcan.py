@@ -81,13 +81,6 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     acc_hold_type = 1  # hold standby
   else:
     acc_hold_type = 0
-
-  if stopping:
-    acc_signal_01 = 20
-  elif esp_hold:
-    acc_signal_01 = 0
-  else:
-    acc_signal_01 = 1
   
   values = {
     "ACC_Typ": acc_type,
@@ -101,7 +94,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_Anfahren": starting,
     "ACC_Anhalten": stopping,
     
-    "ACC_Anhalteweg": acc_signal_01,
+    "ACC_Anhalteweg": 1 if stopping else 20,
     "ACC_Anforderung_HMS": acc_hold_type,
     "Unknown_01": 25 if stopping else 31,
     "Unknown_02": 0 if stopping else 15,
