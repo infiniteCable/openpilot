@@ -119,13 +119,52 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
   
   return commands
 
-#def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance, distance):
-#  values = {
-#    "ACC_Status_Anzeige": acc_hud_status,
-#    "ACC_Wunschgeschw_02": set_speed if set_speed < 250 else 327.36,
-#    "ACC_Gesetzte_Zeitluecke": distance + 2,
-#    "ACC_Display_Prio": 3,
-#    "ACC_Abstandsindex": lead_distance,
-#  }
-#
-#  return packer.make_can_msg("MEB_ACC_01", bus, values)
+def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance, distance, meb_acc_01_values):
+  values = {s: meb_acc_01_values[s] for s in [
+    "NEW_SIGNAL_5",
+    "ACC_Set_Speed",
+    "NEW_SIGNAL_1",
+    "NEW_SIGNAL_6",
+    "NEW_SIGNAL_19",
+    "NEW_SIGNAL_8",
+    "NEW_SIGNAL_14",
+    "NEW_SIGNAL_7",
+    "NEW_SIGNAL_9",
+    "NEW_SIGNAL_10",
+    "FCW_Active",
+    "NEW_SIGNAL_11",
+    "NEW_SIGNAL_13",
+    "NEW_SIGNAL_12",
+    "NEW_SIGNAL_16",
+    "NEW_SIGNAL_17",
+    "NEW_SIGNAL_18",
+    "NEW_SIGNAL_15",
+    "NEW_SIGNAL_29",
+    "NEW_SIGNAL_20",
+    "ACC_Limiter_Mode",
+    "NEW_SIGNAL_21",
+    "NEW_SIGNAL_24",
+    "NEW_SIGNAL_22",
+    "NEW_SIGNAL_23",
+    "NEW_SIGNAL_25",
+    "NEW_SIGNAL_27",
+    "NEW_SIGNAL_26",
+    "NEW_SIGNAL_4",
+    "NEW_SIGNAL_28",
+    "NEW_SIGNAL_2",
+    "NEW_SIGNAL_3",
+  ]}
+
+  values.update({
+    "ACC_Status_ACC": acc_hud_status,
+  })
+  
+  #values = {
+  #  "ACC_Status_Anzeige": acc_hud_status,
+  #  "ACC_Wunschgeschw_02": set_speed if set_speed < 250 else 327.36,
+  #  "ACC_Gesetzte_Zeitluecke": distance + 2,
+  #  "ACC_Display_Prio": 3,
+  #  "ACC_Abstandsindex": lead_distance,
+  #}
+
+  return packer.make_can_msg("MEB_ACC_01", bus, values)
