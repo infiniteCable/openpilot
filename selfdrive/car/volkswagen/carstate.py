@@ -319,11 +319,6 @@ class CarState(CarStateBase):
 
     self.esp_hold_confirmation = bool(cam_cp.vl["MEB_Drive_State_01"]["Standstill"])
 
-    cruiseSpeed5 = cam_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_2"]
-    cruiseSpeed1 = cam_cp.vl["MEB_ACC_01"]["ACC_Set_Speed_1"] // 3
-    cruiseSpeed_tmp = (cruiseSpeed1 + cruiseSpeed5)
-    cruiseSpeed = cruiseSpeed_tmp + (cruiseSpeed_tmp - 6) // 40
-
     ret.accFaulted = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (6, 7)
     self.acc_type = cam_cp.vl["MEB_ACC_02"]["ACC_Typ"]
     
@@ -331,9 +326,9 @@ class CarState(CarStateBase):
     ret.cruiseState.enabled     = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (3, 4, 5)
     ret.cruiseState.nonAdaptive = bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
     ret.cruiseState.standstill  = self.esp_hold_confirmation
-    
+
     if self.CP.pcmCruise:
-      ret.cruiseState.speed = cruiseSpeed * CV.KPH_TO_MS
+      ret.cruiseState.speed = int(round(cam_cp.vl["MEB_ACC_01"]["ACC_Set_Speed"])) * CV.KPH_TO_MS
       if ret.cruiseState.speed > 50: # settable maximum 180km/h
         ret.cruiseState.speed = 0
 
