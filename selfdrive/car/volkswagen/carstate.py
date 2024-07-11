@@ -318,7 +318,7 @@ class CarState(CarStateBase):
     ret.stockFcw = bool(cam_cp.vl["MEB_ACC_01"]["FCW_Active"])
     ret.stockAeb = False
 
-    self.esp_hold_confirmation = bool(cam_cp.vl["MEB_Drive_State_01"]["Standstill"])
+    self.esp_hold_confirmation = bool(pt_cp.vl["MEB_ESP_04"]["ESP_Hold"])
 
     ret.accFaulted = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (6, 7)
     self.acc_type = cam_cp.vl["MEB_ACC_02"]["ACC_Typ"]
@@ -485,6 +485,7 @@ class CarState(CarStateBase):
       ("Getriebe_11", 100),       # From J743 Auto transmission control module
       ("ZV_02", 5),               # From ZV
       ("MEB_EPS_01", 100),        #
+      ("MEB_ESP_04", 50),         #
       ("ESP_21", 50),             #
       ("ESP_24", 20),             #
       ("MEB_ABS_01", 50),         #
