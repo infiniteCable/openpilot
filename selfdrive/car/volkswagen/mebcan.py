@@ -58,7 +58,7 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
   })
   return packer.make_can_msg("GRA_ACC_01", bus, values)
 
-def acc_control_value(main_switch_on, acc_faulted, long_active, user_overriding, disabling, enabling):
+def acc_control_value(main_switch_on, acc_faulted, long_active):
   if acc_faulted:
     acc_control = 6
   elif long_active:
@@ -70,7 +70,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, user_overriding,
 
   return acc_control
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, disabling, enabling, speed, reversing, user_overriding):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, just_started, speed, reversing, user_overriding):
   commands = []
 
   if starting:
