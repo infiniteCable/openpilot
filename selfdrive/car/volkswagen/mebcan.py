@@ -77,7 +77,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     acc_hold_type = 4  # hold release / startup
   elif just_started:
     acc_hold_type = 5  # hold release quit
-  elif esp_hold:
+  elif esp_hold or stopping:
     acc_hold_type = 1  # hold standby
   else:
     acc_hold_type = 0
