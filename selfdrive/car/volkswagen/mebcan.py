@@ -101,8 +101,8 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     
     "ACC_Anhalteweg": anhalteweg if acc_enabled else 0,
     "ACC_Anforderung_HMS": acc_hold_type if acc_enabled else 0,
-    "Unknown_01": 0, #25 if stopping else 31,
-    "Unknown_02": 0, #if stopping else 15,
+    "Unknown_01": 25 if stopping else 31,
+    "Unknown_02": 0 if stopping else 15,
     "ACC_Active": 0,
     "Constant_1_1": 1,
     "Constant_1_2": 1,
