@@ -70,7 +70,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active):
 
   return acc_control
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, just_started, speed, reversing, user_overriding):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, just_started, speed, reversing):
   commands = []
 
   if starting:
