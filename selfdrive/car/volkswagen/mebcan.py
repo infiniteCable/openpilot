@@ -138,6 +138,7 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
     "NEW_SIGNAL_19",
     "NEW_SIGNAL_11",
     "NEW_SIGNAL_12",
+    "ACC_Limiter_Mode",
     "NEW_SIGNAL_13",
     "NEW_SIGNAL_14",
     "NEW_SIGNAL_16",
