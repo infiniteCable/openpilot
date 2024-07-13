@@ -58,11 +58,14 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
   })
   return packer.make_can_msg("GRA_ACC_01", bus, values)
 
-def acc_control_value(main_switch_on, acc_faulted, long_active):
+def acc_control_value(main_switch_on, acc_faulted, long_active, gas_pressed):
   if acc_faulted:
     acc_control = 6
   elif long_active:
-    acc_control = 3
+    if gas_pressed:
+      acc_control = 4
+    else:
+      acc_control = 3
   elif main_switch_on:
     acc_control = 2
   else:
@@ -70,10 +73,12 @@ def acc_control_value(main_switch_on, acc_faulted, long_active):
 
   return acc_control
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, meb_acc_02_values):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, gas_pressed, meb_acc_02_values):
   commands = []
 
-  if starting:
+  if gas_pressed:
+    acc_hold_type = 0 
+  elif starting:
     acc_hold_type = 4  # hold release / startup
   elif esp_hold or stopping:
     acc_hold_type = 1  # hold standby
@@ -98,7 +103,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_pos_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
     "ACC_Anfahren": starting,
     "ACC_Anhalten": stopping,
-    "ACC_Anforderung_HMS": acc_hold_type if acc_enabled and acc_control != 4 else 0,
+    "ACC_Anforderung_HMS": acc_hold_type if acc_enabled else 0,
   })
   
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
