@@ -70,13 +70,11 @@ def acc_control_value(main_switch_on, acc_faulted, long_active):
 
   return acc_control
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, just_started, meb_acc_02_values):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, meb_acc_02_values):
   commands = []
 
   if starting:
     acc_hold_type = 4  # hold release / startup
-  elif just_started:
-    acc_hold_type = 5  # hold release quit
   elif esp_hold or stopping:
     acc_hold_type = 1  # hold standby
   else:
