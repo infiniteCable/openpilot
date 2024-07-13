@@ -107,6 +107,10 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
   
   return commands
 
+def acc_hud_status_value(main_switch_on, acc_faulted, long_active):
+  # TODO: happens to resemble the ACC control value for now, but extend this for init/gas override later
+  return acc_control_value(main_switch_on, acc_faulted, long_active)
+
 def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, meb_acc_01_values):
   values = {s: meb_acc_01_values[s] for s in [
     "Signal_2",
