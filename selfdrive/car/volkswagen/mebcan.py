@@ -122,6 +122,7 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
 
   values.update({
     "STA_Primaeranz": acc_hud_status,
+    "ACC_Status_ACC": acc_control,
     "ACC_Wunschgeschw_02": set_speed if set_speed < 250 else 327.36,
     "ACC_Gesetzte_Zeitluecke": distance + 2,
     "ACC_Display_Prio": 3,
