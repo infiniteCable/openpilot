@@ -144,6 +144,7 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
     "NEW_SIGNAL_16",
     "NEW_SIGNAL_15",
     "NEW_SIGNAL_1",
+    "NEW_SIGNAL_2",
   ]}
 
   values.update({
