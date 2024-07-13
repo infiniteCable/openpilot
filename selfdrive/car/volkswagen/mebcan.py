@@ -149,6 +149,7 @@ def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance
   values.update({
     "ACC_Status_ACC": acc_hud_status,
     "Lead_Distance": lead_distance,
+    "ACC_Set_Speed": set_speed if set_speed < 250 else 327.36,
   })
   
   #values = {
