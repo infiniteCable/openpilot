@@ -70,7 +70,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active):
 
   return acc_control
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, just_started, speed, reversing):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, just_started, meb_acc_02_values):
   commands = []
 
   if starting:
@@ -82,12 +82,14 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
   else:
     acc_hold_type = 0
 
-  if stopping:
-    anhalteweg = 1
-  else:
-    anhalteweg = 20
-  
-  values = {
+  values = {s: meb_acc_02_values[s] for s in [
+    "Signal_2_1",
+    "Signal_2_2",
+    "Signal_3",
+    "Signal_4",
+  ]}
+
+  values.update({
     "ACC_Typ": acc_type,
     "ACC_Status_ACC": acc_control,
     "ACC_StartStopp_Info": acc_enabled,
@@ -98,67 +100,30 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_pos_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
     "ACC_Anfahren": starting,
     "ACC_Anhalten": stopping,
-    
-    "ACC_Anhalteweg": anhalteweg if acc_enabled else 0,
     "ACC_Anforderung_HMS": acc_hold_type if acc_enabled and acc_control != 4 else 0,
-    "Unknown_01": 25 if stopping else 31,
-    "Unknown_02": 0 if stopping else 15,
-    "ACC_Active": 0,
-    "Constant_1_1": 1,
-    "Constant_1_2": 1,
-    "Constant_1_3": 1,
-    "Constant_1_4": 1,
-    "Constant_FE": 0xFE,
-    "Speed": speed,
-    "Reversing": reversing,
-  }
+  })
+  
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
   
   return commands
 
-def create_acc_hud_control(packer, bus, acc_hud_status, set_speed, lead_distance, distance, meb_acc_01_values):
+def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, meb_acc_01_values):
   values = {s: meb_acc_01_values[s] for s in [
-    "NEW_SIGNAL_22",
-    "NEW_SIGNAL_9",
-    "NEW_SIGNAL_6",
-    "NEW_SIGNAL_7",
-    "NEW_SIGNAL_5",
-    "NEW_SIGNAL_4",
-    "NEW_SIGNAL_3",
-    "FCW_Active",
-    "Constant_F",
-    "Constant_63",
-    "Heartbeat",
-    "Constant_FFFF",
-    "NEW_SIGNAL_20",
-    "NEW_SIGNAL_21",
-    "NEW_SIGNAL_17",
-    "ACC_Status_ACC",
-    "NEW_SIGNAL_18",
-    "NEW_SIGNAL_19",
-    "NEW_SIGNAL_11",
-    "NEW_SIGNAL_12",
+    "Signal_2",
+    "Signal_3_1",
+    "Signal_3_2",
+    "Signal_4_1",
     "ACC_Limiter_Mode",
-    "NEW_SIGNAL_13",
-    "NEW_SIGNAL_14",
-    "NEW_SIGNAL_16",
-    "NEW_SIGNAL_15",
-    "NEW_SIGNAL_1",
-    "NEW_SIGNAL_2",
+    "Signal_4_2",
+    "Signal_5",
   ]}
 
   values.update({
-    "ACC_Status_ACC": acc_hud_status,
-    "Lead_Distance": lead_distance,
-    "ACC_Set_Speed": set_speed if set_speed < 250 else 327.36,
+    "STA_Primaeranz": acc_hud_status,
+    "ACC_Wunschgeschw_02": set_speed if set_speed < 250 else 327.36,
+    "ACC_Gesetzte_Zeitluecke": distance + 2,
+    "ACC_Display_Prio": 3,
+    "ACC_Abstandsindex_02": lead_distance,
   })
-  
-  #values = {
-  #  "ACC_Status_Anzeige": acc_hud_status,
-  #  "ACC_Wunschgeschw_02": set_speed if set_speed < 250 else 327.36,
-  #  "ACC_Gesetzte_Zeitluecke": distance + 2,
-  #  "ACC_Display_Prio": 3,
-  #  "ACC_Abstandsindex": lead_distance,
-  #}
 
   return packer.make_can_msg("MEB_ACC_01", bus, values)
