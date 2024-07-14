@@ -36,6 +36,9 @@ class CarController(CarControllerBase):
     self.hca_frame_same_torque = 0
     self.lat_active_prev = False
     self.torque_wind_down = 0
+    self.long_active_prev = False
+    self.long_cancel = False
+    self.long_resume = False
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -143,6 +146,14 @@ class CarController(CarControllerBase):
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
      
       if self.CP.flags & VolkswagenFlags.MEB:
+        if CC.longActive and not self.long_active_prev:
+          self.long_active_prev = True
+          self.long_resume = True
+          
+        elif not CC.longActive and self.long_active_prev:
+          self.long_active_prev = False
+          #self.long_cancel = True
+        
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
                                                            acc_control, stopping, starting, CS.esp_hold_confirmation,
@@ -192,9 +203,10 @@ class CarController(CarControllerBase):
                                                              cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
         
     elif self.CP.openpilotLongitudinalControl and self.CP.flags & VolkswagenFlags.MEB:
-      if gra_send_ready and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
+      # prevent radar from faulting
+      if gra_send_ready and (self.long_cancel or self.long_resume):
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.cam, CS.gra_stock_values,
-                                                             cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
+                                                             cancel=self.long_cancel, resume=self.long_resume))
       
 
     new_actuators = actuators.as_builder()
