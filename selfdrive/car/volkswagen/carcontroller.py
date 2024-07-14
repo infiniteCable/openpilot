@@ -205,8 +205,10 @@ class CarController(CarControllerBase):
     elif self.CP.openpilotLongitudinalControl and self.CP.flags & VolkswagenFlags.MEB:
       # prevent radar from faulting
       if gra_send_ready and (self.long_cancel or self.long_resume):
-        can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.cam, CS.gra_stock_values,
+        can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
                                                              cancel=self.long_cancel, resume=self.long_resume))
+        self.long_resume = False
+        self.long_cancel = False
       
 
     new_actuators = actuators.as_builder()
