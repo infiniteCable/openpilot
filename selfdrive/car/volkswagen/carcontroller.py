@@ -37,7 +37,6 @@ class CarController(CarControllerBase):
     self.lat_active_prev = False
     self.torque_wind_down = 0
     self.long_active = False
-    self.long_active_prev = False
     self.acc_control = 0
 
   def update(self, CC, CS, now_nanos):
@@ -147,8 +146,7 @@ class CarController(CarControllerBase):
      
       if self.CP.flags & VolkswagenFlags.MEB:
         self.long_active = CC.longActive and not CS.out.gasPressed
-        acc_control_disable = not self.long_active and self.long_active_prev
-        self.long_active_prev = self.long_active
+        acc_control_disable = not self.long_active and CC.longActive
         self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, self.long_active, acc_control_disable)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, long_active, accel,
                                                            self.acc_control, stopping, starting, CS.esp_hold_confirmation,
