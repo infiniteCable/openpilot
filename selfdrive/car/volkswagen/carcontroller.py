@@ -36,6 +36,9 @@ class CarController(CarControllerBase):
     self.hca_frame_same_torque = 0
     self.lat_active_prev = False
     self.torque_wind_down = 0
+    self.long_active = False
+    self.long_active_prev = False
+    self.acc_control = 0
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -143,10 +146,12 @@ class CarController(CarControllerBase):
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
      
       if self.CP.flags & VolkswagenFlags.MEB:
-        long_active = CC.longActive and not CS.out.gasPressed
-        acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, long_active)
+        self.long_active = CC.longActive and not CS.out.gasPressed
+        acc_control_disable = not self.long_active and self.long_active_prev
+        self.long_active_prev = self.long_active
+        self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, self.long_active, acc_control_disable)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, long_active, accel,
-                                                           acc_control, stopping, starting, CS.esp_hold_confirmation,
+                                                           self.acc_control, stopping, starting, CS.esp_hold_confirmation,
                                                            CS.meb_acc_02_values))
 
       else:
@@ -168,12 +173,9 @@ class CarController(CarControllerBase):
         lead_distance = 0
         if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
           lead_distance = 512
-        long_active = CC.longActive and not CS.out.gasPressed
-        acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, long_active)
-        acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, long_active)
-        # FIXME: follow the recent displayed-speed updates, also use mph_kmh toggle to fix display rounding problem?
+        acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, self.long_active)
         set_speed = hud_control.setSpeed * CV.MS_TO_KPH
-        can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, acc_control, set_speed,
+        can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, self.acc_control, set_speed,
                                                          lead_distance, hud_control.leadDistanceBars, CS.meb_acc_01_values))
         
       else:
