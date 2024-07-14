@@ -145,8 +145,8 @@ class CarController(CarControllerBase):
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
      
       if self.CP.flags & VolkswagenFlags.MEB:
-        self.long_active = CC.longActive and not CS.out.gasPressed
-        acc_control_disable = not self.long_active and CC.longActive
+        self.long_active = CC.longActive #and not CS.out.gasPressed
+        acc_control_disable = CS.out.gasPressed and self.long_active
         self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, self.long_active, acc_control_disable)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, self.long_active, accel,
                                                            self.acc_control, stopping, starting, CS.esp_hold_confirmation,
