@@ -192,11 +192,9 @@ class CarController(CarControllerBase):
                                                              cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
         
     elif self.CP.openpilotLongitudinalControl and self.CP.flags & VolkswagenFlags.MEB:
-      # prevent radar from faulting with active OP long control when user overriding with accel pedal
-      # this simulates a user acc startup request
-      if gra_send_ready and CC.longActive and CS.out.gasPressed:
+      if gra_send_ready and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.cam, CS.gra_stock_values,
-                                                             cancel=False, resume=True))
+                                                             cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
       
 
     new_actuators = actuators.as_builder()
