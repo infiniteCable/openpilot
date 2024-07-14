@@ -131,6 +131,7 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     "Signal_4_1",
     "ACC_Limiter_Mode",
     "Signal_4_2",
+    "Signal_4_3",
     "Signal_5",
   ]}
 
@@ -141,6 +142,8 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     "ACC_Gesetzte_Zeitluecke": distance + 2,
     "ACC_Display_Prio": 3,
     "ACC_Abstandsindex_02": lead_distance,
+    "ACC_Temp_Inactive": 1 if acc_control != 3 else 0,
+    "ACC_Cruise_Type": 2 if acc_control != 3 else 0,
   })
 
   return packer.make_can_msg("MEB_ACC_01", bus, values)
