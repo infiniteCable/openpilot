@@ -148,7 +148,7 @@ class CarController(CarControllerBase):
         self.long_active = CC.longActive and not CS.out.gasPressed
         acc_control_disable = not self.long_active and CC.longActive
         self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, self.long_active, acc_control_disable)
-        can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, long_active, accel,
+        can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, self.long_active, accel,
                                                            self.acc_control, stopping, starting, CS.esp_hold_confirmation,
                                                            CS.meb_acc_02_values))
 
