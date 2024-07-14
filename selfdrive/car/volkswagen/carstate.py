@@ -314,14 +314,13 @@ class CarState(CarStateBase):
     # and capture it for forwarding to the blind spot radar controller
     self.ldw_stock_values = cam_cp.vl["LDW_02"]
     self.meb_acc_01_values = cam_cp.vl["MEB_ACC_01"]
-    self.meb_acc_02_values = cam_cp.vl["MEB_ACC_02"]
 
     ret.stockFcw = False
     ret.stockAeb = False
 
     self.esp_hold_confirmation = bool(pt_cp.vl["MEB_ESP_04"]["ESP_Hold"])
 
-    ret.accFaulted = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (6, 7) or cam_cp.vl["MEB_ACC_02"]["ACC_Status_ACC"] in (6, 7) 
+    ret.accFaulted = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (6, 7)
     self.acc_type = cam_cp.vl["MEB_ACC_02"]["ACC_Typ"]
     
     ret.cruiseState.available   = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (2, 3, 4, 5)
