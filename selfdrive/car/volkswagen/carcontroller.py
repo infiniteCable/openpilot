@@ -143,10 +143,12 @@ class CarController(CarControllerBase):
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
      
       if self.CP.flags & VolkswagenFlags.MEB:
+        current_speed = CS.out.vEgo * CV.MS_TO_KPH
+        reversing = CS.out.gearShifter in [car.CarState.GearShifter.reverse]
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
                                                            acc_control, stopping, starting, CS.esp_hold_confirmation,
-                                                           CS.meb_acc_02_values))
+                                                           current_speed, reversing))
 
       else:
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
