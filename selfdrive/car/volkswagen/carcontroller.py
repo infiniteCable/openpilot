@@ -152,7 +152,7 @@ class CarController(CarControllerBase):
           
         elif not CC.longActive and self.long_active_prev:
           self.long_active_prev = False
-          #self.long_cancel = True
+          self.long_cancel = True
         
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
@@ -203,7 +203,8 @@ class CarController(CarControllerBase):
                                                              cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
         
     elif self.CP.openpilotLongitudinalControl and self.CP.flags & VolkswagenFlags.MEB:
-      # prevent radar from faulting
+      # prevent car from faulting
+      # keep car cruise control snychron with OP control
       if gra_send_ready and (self.long_cancel or self.long_resume):
         can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.pt, CS.gra_stock_values,
                                                              cancel=self.long_cancel, resume=self.long_resume))
