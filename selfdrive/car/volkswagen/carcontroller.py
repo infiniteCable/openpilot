@@ -36,8 +36,6 @@ class CarController(CarControllerBase):
     self.hca_frame_same_torque = 0
     self.lat_active_prev = False
     self.torque_wind_down = 0
-    self.long_active = False
-    self.acc_control = 0
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -145,11 +143,9 @@ class CarController(CarControllerBase):
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
      
       if self.CP.flags & VolkswagenFlags.MEB:
-        self.long_active = CC.longActive #and not CS.out.gasPressed
-        acc_control_disable = CS.out.gasPressed and self.long_active
-        self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, self.long_active, acc_control_disable)
-        can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, self.long_active, accel,
-                                                           self.acc_control, stopping, starting, CS.esp_hold_confirmation,
+        acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
+        can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
+                                                           acc_control, stopping, starting, CS.esp_hold_confirmation,
                                                            CS.meb_acc_02_values))
 
       else:
@@ -171,9 +167,10 @@ class CarController(CarControllerBase):
         lead_distance = 0
         if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
           lead_distance = 512
-        acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, self.long_active)
+        acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
+        acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
         set_speed = hud_control.setSpeed * CV.MS_TO_KPH
-        can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, self.acc_control, set_speed,
+        can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, acc_control, set_speed,
                                                          lead_distance, hud_control.leadDistanceBars, CS.meb_acc_01_values))
         
       else:
@@ -188,10 +185,19 @@ class CarController(CarControllerBase):
 
     # **** Stock ACC Button Controls **************************************** #
 
-    gra_send_ready = self.CP.pcmCruise and CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
-    if gra_send_ready and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
-      can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, self.ext_bus, CS.gra_stock_values,
-                                                           cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
+    gra_send_ready = CS.gra_stock_values["COUNTER"] != self.gra_acc_counter_last
+    if self.CP.pcmCruise:
+      if gra_send_ready and (CC.cruiseControl.cancel or CC.cruiseControl.resume):
+        can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, self.ext_bus, CS.gra_stock_values,
+                                                             cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
+        
+    elif self.CP.openpilotLongitudinalControl and self.CP.flags & VolkswagenFlags.MEB:
+      # prevent radar from faulting with active OP long control when user overriding with accel pedal
+      # this simulates a user acc startup request
+      if gra_send_ready and CC.longActive and CS.out.gasPressed:
+        can_sends.append(self.CCS.create_acc_buttons_control(self.packer_pt, CANBUS.cam, CS.gra_stock_values,
+                                                             cancel=False, resume=True))
+      
 
     new_actuators = actuators.as_builder()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
