@@ -71,7 +71,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active):
   return acc_control
   
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, meb_acc_02_values):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, speed, reversing):
   commands = []
 
   if starting:
@@ -81,16 +81,10 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
   else:
     acc_hold_type = 0
 
-  values = {s: meb_acc_02_values[s] for s in [
-    "Signal_2_1",
-    "Signal_2_2",
-    "Signal_3",
-    "Signal_4",
-  ]}
-
-  values.update({
+  values = {
     "ACC_Typ": acc_type,
     "ACC_Status_ACC": acc_control,
+    "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     "ACC_StartStopp_Info": acc_enabled,
     "ACC_Sollbeschleunigung_02": accel if acc_enabled else 3.01,
     "ACC_zul_Regelabw_unten": 0.2,  # TODO: dynamic adjustment of comfort-band
@@ -99,8 +93,14 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_pos_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
     "ACC_Anfahren": starting,
     "ACC_Anhalten": stopping,
+    "ACC_Anhalten_Bremse": 0.5 if stopping else 10,
     "ACC_Anforderung_HMS": acc_hold_type if acc_enabled else 0,
-  })
+    "SET_ME_0XFE": 0xFE,
+    "SET_ME_0X1": 0x1,
+    "SET_ME_0X9": 0x9,
+    "Speed": speed,
+    "Reversing": reversing,
+  }
   
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
   
