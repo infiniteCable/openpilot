@@ -104,7 +104,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     "SET_ME_0X1": 0x1,
     "SET_ME_0X9": 0x9,
-    "Accel_Boost": 1 if speed != 0 else 0, 
+    #"Accel_Boost": 1 if speed != 0 else 0, 
   }
   
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
