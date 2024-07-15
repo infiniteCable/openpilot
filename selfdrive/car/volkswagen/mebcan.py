@@ -93,7 +93,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_pos_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
     "ACC_Anfahren": starting,
     "ACC_Anhalten": stopping,
-    "ACC_Anhalten_Bremse": 0.5 if stopping else 10,
+    "ACC_Anhalten_Bremse": 0.5 if stopping else 0,
     "ACC_Anforderung_HMS": acc_hold_type if acc_enabled else 0,
     "SET_ME_0XFE": 0xFE,
     "SET_ME_0X1": 0x1,
@@ -140,17 +140,24 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     "SET_ME_0X1": 1,
     "SET_ME_0X7FFF": 0x7FFF,
     "Lead_Type_Detected": 1 if lead_distance > 0 else 0,
+    "Lead_Type": 3 if lead_distance > 0 else 0,
     "Not_ACC_AKTIV_regelt": 1 if acc_control == 3 and acc_control != 0 else 0,
     "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     "ACC_Driving_Type": 3 if lead_distance > 0 else 0,
     "Unknown_03": 106 if acc_hud_status > 0 else 0,
-    "Lead_Type": 3 if lead_distance > 0 else 0,
     "ACC_Special_Events": 3 if esp_hold and acc_hud_status > 0 else 0,
     "Zeitluecke_3_Signal": 50 if lead_distance > 0 else 0,
   }
 
   values.update({
     "Heartbeat": meb_acc_01_values["Heartbeat"],
+    "Hold_First_Active": meb_acc_01_values["Hold_First_Active"],
+    "SET_ME_0X1_2": meb_acc_01_values["SET_ME_0X1_2"],
+    "Not_ACC_AKTIV_regelt": meb_acc_01_values["Not_ACC_AKTIV_regelt"],
+    "ACC_AKTIV_regelt": meb_acc_01_values["ACC_AKTIV_regelt"],
+    "Unknown_03": meb_acc_01_values["Unknown_03"],
+    "ACC_Driving_Type": meb_acc_01_values["ACC_Driving_Type"],
+    "ACC_Special_Events": meb_acc_01_values["ACC_Special_Events"],
   })
 
   return packer.make_can_msg("MEB_ACC_01", bus, values)
