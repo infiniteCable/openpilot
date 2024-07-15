@@ -123,7 +123,7 @@ def acc_hud_status_value(main_switch_on, acc_faulted, long_active):
   return acc_hud_status
 
 
-def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values):
+def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values):  
   values = {
     "STA_Primaeranz": acc_hud_status,
     "ACC_Status_ACC": acc_control,
@@ -146,7 +146,7 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     "Unknown_03": 106 if acc_hud_status > 0 else 0,
     "Lead_Type": 3 if lead_distance > 0 else 0,
     "ACC_Special_Events": 3 if esp_hold and acc_hud_status > 0 else 0,
-    # Zeitluecke_x_Signal
+    "Zeitluecke_3_Signal": 50 if lead_distance > 0 else 0,
   }
 
   values.update({
