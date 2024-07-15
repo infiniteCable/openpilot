@@ -100,6 +100,11 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "SET_ME_0X9": 0x9,
     "Speed": speed,
     "Reversing": reversing,
+    "SET_ME_0XFE": 0xFE,
+    "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
+    "SET_ME_0X1": 0x1,
+    "SET_ME_0X9": 0x9,
+    #Accel_Boost
   }
   
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
@@ -118,27 +123,30 @@ def acc_hud_status_value(main_switch_on, acc_faulted, long_active):
   return acc_hud_status
 
 
-def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, meb_acc_01_values):
-  values = {s: meb_acc_01_values[s] for s in [
-    "Signal_2",
-    "Signal_3_1",
-    "Signal_3_2",
-    "Signal_4_1",
-    "ACC_Temp_Inactive",
-    "ACC_Limiter_Mode",
-    "ACC_Cruise_Type",
-    "Signal_4_2",
-    "Signal_4_3",
-    "Signal_5",
-  ]}
-
-  values.update({
+def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold):
+  values = {
     "STA_Primaeranz": acc_hud_status,
     "ACC_Status_ACC": acc_control,
     "ACC_Wunschgeschw_02": set_speed if set_speed < 250 else 327.36,
     "ACC_Gesetzte_Zeitluecke": distance + 2,
     "ACC_Display_Prio": 3,
     "ACC_Abstandsindex_02": lead_distance,
-  })
+    "SET_ME_0X1_2": 1,
+    "SET_ME_0X3FF": 0x3FF,
+    "Heartbeat": heartbeat,
+    "SET_ME_0XFFFF": 0xFFFF,
+    "ACC_Enabled": 1 if acc_hud_status > 0 else 0,
+    "Hold_First_Active": 1,
+    "SET_ME_0X1": 1,
+    "SET_ME_0X7FFF": 0x7FFF,
+    "Lead_Type_Detected": 1 if lead_distance > 0 else 0,
+    "Not_ACC_AKTIV_regelt": 1 if acc_hud_status != 2 else 0,
+    "ACC_AKTIV_regelt": 1 if acc_hud_status == 2 else 0,
+    "ACC_Driving_Type": 3 if lead_distance > 0 else 0,
+    "Unknown_03": 106 if acc_hud_status > 0 else 0,
+    "Lead_Type": 3 if lead_distance > 0 else 0,
+    "ACC_Special_Events": 3 if esp_hold and acc_hud_status > 0 else 0,
+    # Zeitluecke_x_Signal
+  }
 
   return packer.make_can_msg("MEB_ACC_01", bus, values)
