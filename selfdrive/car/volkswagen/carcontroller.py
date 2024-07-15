@@ -180,7 +180,7 @@ class CarController(CarControllerBase):
         set_speed = hud_control.setSpeed * CV.MS_TO_KPH
         can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, acc_control, set_speed,
                                                          lead_distance, hud_control.leadDistanceBars, self.long_heartbeat,
-                                                         CS.esp_hold_confirmation))
+                                                         CS.esp_hold_confirmation, CS.meb_acc_01_values))
         
       else:
         lead_distance = 0
