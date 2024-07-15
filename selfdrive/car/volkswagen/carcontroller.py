@@ -36,6 +36,7 @@ class CarController(CarControllerBase):
     self.hca_frame_same_torque = 0
     self.lat_active_prev = False
     self.torque_wind_down = 0
+    self.long_heartbeat = 0
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -166,6 +167,11 @@ class CarController(CarControllerBase):
 
     if self.frame % self.CCP.ACC_HUD_STEP == 0 and self.CP.openpilotLongitudinalControl:
       if self.CP.flags & VolkswagenFlags.MEB:
+        if self.long_heartbeat != 221:
+          self.long_heartbeat = 221
+        elif self.long_heartbeat == 221:
+          self.long_heartbeat = 360
+        
         lead_distance = 0
         if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
           lead_distance = 512
@@ -173,7 +179,8 @@ class CarController(CarControllerBase):
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
         set_speed = hud_control.setSpeed * CV.MS_TO_KPH
         can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, acc_control, set_speed,
-                                                         lead_distance, hud_control.leadDistanceBars, CS.meb_acc_01_values))
+                                                         lead_distance, hud_control.leadDistanceBars, self.long_heartbeat,
+                                                         CS.esp_hold_confirmation))
         
       else:
         lead_distance = 0
