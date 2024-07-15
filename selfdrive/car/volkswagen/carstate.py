@@ -318,7 +318,7 @@ class CarState(CarStateBase):
     ret.stockFcw = False
     ret.stockAeb = False
 
-    self.esp_hold_confirmation = bool(pt_cp.vl["MEB_ESP_04"]["ESP_Hold"])
+    self.esp_hold_confirmation = bool(pt_cp.vl["MEB_ESP_05"]["ESP_Hold"])
 
     ret.accFaulted = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (6, 7)
     self.acc_type = cam_cp.vl["MEB_ACC_02"]["ACC_Typ"]
@@ -492,6 +492,7 @@ class CarState(CarStateBase):
       ("MEB_ESP_01", 100),        #
       ("MEB_ESP_02", 100),        #
       ("MEB_ESP_03", 10),         #
+      ("MEB_ESP_05", 50),         #
       ("MEB_Light_01", 5),        #
       ("MEB_TSK_01", 5),          #
       ("MEB_Motor_01", 50),       #
