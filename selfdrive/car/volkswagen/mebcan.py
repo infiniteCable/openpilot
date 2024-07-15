@@ -125,7 +125,7 @@ def acc_hud_status_value(main_switch_on, acc_faulted, long_active):
 
 def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values):  
   values = {
-    "STA_Primaeranz": acc_hud_status,
+    #"STA_Primaeranz": acc_hud_status,
     "ACC_Status_ACC": acc_control,
     "ACC_Wunschgeschw_02": set_speed if set_speed < 250 else 327.36,
     "ACC_Gesetzte_Zeitluecke": distance + 2,
