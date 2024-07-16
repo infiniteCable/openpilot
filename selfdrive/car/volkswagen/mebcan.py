@@ -71,7 +71,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active):
   return acc_control
   
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, speed, reversing):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, speed, reversing, meb_acc_02_values):
   commands = []
 
   if starting:
@@ -106,6 +106,20 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     #"SET_ME_0X9": 0x9,
     #"Accel_Boost": 1 if speed != 0 else 0, 
   }
+
+  values.update({
+    "SET_ME_0XFE": meb_acc_02_values["SET_ME_0XFE"],
+    "SET_ME_0X1": meb_acc_02_values["SET_ME_0X1"],
+    "SET_ME_0X9": meb_acc_02_values["SET_ME_0X9"],
+    "Speed": meb_acc_02_values["Speed"],
+    "Reversing": meb_acc_02_values["Reversing"],
+    "SET_ME_0XFE": meb_acc_02_values["SET_ME_0XFE"],
+    "ACC_AKTIV_regelt": meb_acc_02_values["ACC_AKTIV_regelt"],
+    "SET_ME_0X1": meb_acc_02_values["SET_ME_0X1"],
+    "SET_ME_0X9": meb_acc_02_values["SET_ME_0X9"],
+    "Accel_Boost": meb_acc_02_values["Accel_Boost"],
+    "ACC_AKTIV_regelt": meb_acc_02_values["ACC_AKTIV_regelt"],
+  })
   
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
   
@@ -131,6 +145,22 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     "ACC_Gesetzte_Zeitluecke": distance + 2,
     "ACC_Display_Prio": 3,
     "ACC_Abstandsindex_02": lead_distance,
+    #"SET_ME_0X1_2": 1,
+    #"SET_ME_0X3FF": 0x3FF,
+    #"Heartbeat": heartbeat,
+    #"SET_ME_0XFFFF": 0xFFFF,
+    #"ACC_Enabled": 1 if acc_hud_status > 0 else 0,
+    #"Hold_First_Active": 1,
+    #"SET_ME_0X1": 1,
+    #"SET_ME_0X7FFF": 0x7FFF,
+    #"Lead_Type_Detected": 1 if lead_distance > 0 else 0,
+    #"Lead_Type": 3 if lead_distance > 0 else 0,
+    #"Not_ACC_AKTIV_regelt": 1 if acc_control == 3 and acc_control != 0 else 0,
+    #"ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
+    #"ACC_Driving_Type": 3 if lead_distance > 0 else 0,
+    #"Unknown_03": 106 if acc_hud_status > 0 else 0,
+    #"ACC_Special_Events": 3 if esp_hold and acc_hud_status > 0 else 0,
+    #"Zeitluecke_3_Signal": 50 if lead_distance > 0 else 0,
   }
 
   values.update({
