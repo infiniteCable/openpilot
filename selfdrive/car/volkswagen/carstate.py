@@ -314,6 +314,7 @@ class CarState(CarStateBase):
     # and capture it for forwarding to the blind spot radar controller
     self.ldw_stock_values = cam_cp.vl["LDW_02"]
     self.meb_acc_01_values = cam_cp.vl["MEB_ACC_01"]
+    self.meb_acc_02_values = cam_cp.vl["MEB_ACC_02"]
 
     ret.stockFcw = False
     ret.stockAeb = False
