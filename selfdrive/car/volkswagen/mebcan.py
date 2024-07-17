@@ -94,7 +94,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_pos_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
     "ACC_Anfahren": starting,
     "ACC_Anhalten": stopping,
-    "ACC_Anhalteweg": 0.3 if stopping else 20.46,  # Distance to stop (stopping coordinator handles terminal roll-out)
+    #"ACC_Anhalteweg": 0.3 if stopping else 20.46,  # Distance to stop (stopping coordinator handles terminal roll-out)
     "ACC_Anforderung_HMS": acc_hold_type if acc_enabled else 0,
     "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     #"SET_ME_0XFE": 0xFE,
@@ -112,7 +112,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "SET_ME_0XFE": meb_acc_02_values["SET_ME_0XFE"],
     "SET_ME_0X1": meb_acc_02_values["SET_ME_0X1"],
     "SET_ME_0X9": meb_acc_02_values["SET_ME_0X9"],
-    #"Accel_Boost": meb_acc_02_values["Accel_Boost"],
+    "Accel_Boost": meb_acc_02_values["Accel_Boost"],
   })
   
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
