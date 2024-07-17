@@ -82,9 +82,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     acc_hold_type = 0
 
   values = {
-    "ACC_Typ": acc_type,
     "ACC_Status_ACC": acc_control,
-    #"ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     "ACC_StartStopp_Info": acc_enabled,
     "ACC_Sollbeschleunigung_02": accel if acc_enabled else 3.01,
     "ACC_zul_Regelabw_unten": 0.2,  # TODO: dynamic adjustment of comfort-band
@@ -93,21 +91,22 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_pos_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
     "ACC_Anfahren": starting,
     "ACC_Anhalten": stopping,
-    "ACC_Anhalten_Bremse": 0.5 if stopping else 10.32,
+    #"ACC_Anhalten_Bremse": 0.5 if stopping else 10.32,
     "ACC_Anforderung_HMS": acc_hold_type if acc_enabled else 0,
+    #"ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     #"SET_ME_0XFE": 0xFE,
     #"SET_ME_0X1": 0x1,
     #"SET_ME_0X9": 0x9,
     #"Speed": speed,
     #"Reversing": reversing,
     #"SET_ME_0XFE": 0xFE,
-    #"ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     #"SET_ME_0X1": 0x1,
     #"SET_ME_0X9": 0x9,
     #"Accel_Boost": 1 if speed != 0 else 0, 
   }
 
   values.update({
+    "ACC_Typ": meb_acc_02_values["ACC_Typ"],
     "SET_ME_0XFE": meb_acc_02_values["SET_ME_0XFE"],
     "SET_ME_0X1": meb_acc_02_values["SET_ME_0X1"],
     "SET_ME_0X9": meb_acc_02_values["SET_ME_0X9"],
@@ -119,6 +118,12 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "SET_ME_0X9": meb_acc_02_values["SET_ME_0X9"],
     "Accel_Boost": meb_acc_02_values["Accel_Boost"],
     "ACC_AKTIV_regelt": meb_acc_02_values["ACC_AKTIV_regelt"],
+    "ACC_limitierte_Anfahrdyn": meb_acc_02_values["ACC_limitierte_Anfahrdyn"],
+    "ACC_nachtr_Stopp_Anf": meb_acc_02_values["ACC_nachtr_Stopp_Anf"],
+    "ACC_DynErhoehung ": meb_acc_02_values["ACC_DynErhoehung "],
+    "ACC_Freilaufstrategie_TSK": meb_acc_02_values["ACC_Freilaufstrategie_TSK"],
+    "ACC_Minimale_Bremsung": meb_acc_02_values["ACC_Minimale_Bremsung"],
+    "ACC_Anhalten_Bremse": meb_acc_02_values["ACC_Anhalten_Bremse"],
   })
   
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
