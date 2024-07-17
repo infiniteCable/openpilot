@@ -73,16 +73,16 @@ class CarControllerParams:
 
     elif CP.flags & VolkswagenFlags.MEB:
       self.LDW_STEP                        = 10    # LDW_02 message frequency 10Hz
-      self.ACC_HUD_STEP                    = 6     # ACC_02 message frequency 16Hz
+      self.ACC_HUD_STEP                    = 6     # MEB_ACC_01 message frequency 16Hz
       self.STEER_DRIVER_ALLOWANCE          = 80    # Driver intervention threshold 0.8 Nm
-      self.TORQUE_WIND_DOWN_MAX            = 125
-      self.TORQUE_WIND_DOWN_MIN            = 20
-      self.TORQUE_WIND_DOWN_USER           = 60
-      self.TORQUE_WIND_DOWN_CRITICAL_STEPS = 4
-      self.TORQUE_WIND_DOWN_NORMAL_STEPS   = 4
-      self.TORQUE_WIND_DOWN_MAX_BY_SPEED   = 20
-      self.TORQUE_WIND_DOWN_MAX_BY_ANGLE   = 20
-      self.ANGLE_MAX                       = 360
+      self.TORQUE_WIND_DOWN_MAX            = 125   # HCA_03 maximum angle change torque
+      self.TORQUE_WIND_DOWN_MIN            = 20    # HCA_03 minimum angle change torque
+      self.TORQUE_WIND_DOWN_USER           = 60    # HCA_03 desired angle change torque for user intervention
+      self.TORQUE_WIND_DOWN_CRITICAL_STEPS = 4     # HCA_03 angle change torque counter steps for critical change events
+      self.TORQUE_WIND_DOWN_NORMAL_STEPS   = 1     # HCA_03 angle change torque counter steps for default change events
+      self.TORQUE_WIND_DOWN_MAX_BY_SPEED   = 20    # HCA_03 speed in m/s^2 where maximum angle change torque is reached
+      self.TORQUE_WIND_DOWN_MAX_BY_ANGLE   = 20    # HCA_03 angle from zero position where maximum angle change torque is reached
+      self.ANGLE_MAX                       = 360   # HCA_03 maximum angle
       self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 1.6, .3])
       self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 7.0, 0.8])
 
