@@ -321,11 +321,11 @@ class CarState(CarStateBase):
 
     self.esp_hold_confirmation = bool(pt_cp.vl["MEB_ESP_05"]["ESP_Hold"])
 
-    ret.accFaulted = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (6, 7)
+    ret.accFaulted = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (6, 7)
     self.acc_type = cam_cp.vl["MEB_ACC_02"]["ACC_Typ"]
     
-    ret.cruiseState.available   = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (2, 3, 4, 5)
-    ret.cruiseState.enabled     = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (3, 4, 5)
+    ret.cruiseState.available   = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (2, 3, 4, 5)
+    ret.cruiseState.enabled     = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (3, 4, 5)
     ret.cruiseState.nonAdaptive = False #bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
     ret.cruiseState.standstill  = self.esp_hold_confirmation
 
