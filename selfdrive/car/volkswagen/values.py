@@ -80,6 +80,8 @@ class CarControllerParams:
       self.TORQUE_WIND_DOWN_USER           = 60
       self.TORQUE_WIND_DOWN_CRITICAL_STEPS = 4
       self.TORQUE_WIND_DOWN_NORMAL_STEPS   = 4
+      self.TORQUE_WIND_DOWN_MAX_BY_SPEED   = 20
+      self.TORQUE_WIND_DOWN_MAX_BY_ANGLE   = 20
       self.ANGLE_MAX                       = 360
       self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 1.6, .3])
       self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 7.0, 0.8])
