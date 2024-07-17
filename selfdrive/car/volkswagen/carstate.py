@@ -326,7 +326,7 @@ class CarState(CarStateBase):
     
     ret.cruiseState.available   = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (2, 3, 4, 5)
     ret.cruiseState.enabled     = pt_cp.vl["MEB_TSK_01"]["TSK_State"] in (3, 4, 5)
-    ret.cruiseState.nonAdaptive = bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
+    ret.cruiseState.nonAdaptive = False #bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
     ret.cruiseState.standstill  = self.esp_hold_confirmation
 
     if self.CP.pcmCruise:
