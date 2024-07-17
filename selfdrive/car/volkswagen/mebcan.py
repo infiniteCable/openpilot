@@ -115,7 +115,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "SET_ME_0XFE": meb_acc_02_values["SET_ME_0XFE"],
     "SET_ME_0X1": meb_acc_02_values["SET_ME_0X1"],
     "SET_ME_0X9": meb_acc_02_values["SET_ME_0X9"],
-    #"Accel_Boost": meb_acc_02_values["Accel_Boost"],
+    "Accel_Boost": meb_acc_02_values["Accel_Boost"],
   })
   
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
@@ -135,6 +135,17 @@ def acc_hud_status_value(main_switch_on, acc_faulted, long_active):
 
 
 def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values):  
+  zeitluecke_3 = 0
+  zeitluecke_4 = 0
+  zeitluecke_5 = 0
+
+  if distance == 3:
+    zeitluecke_3 = 50
+  elif distance == 4:
+    zeitluecke_4 = 50
+  elif distance == 5:
+    zeitluecke_5 = 50
+  
   values = {
     #"STA_Primaeranz": acc_hud_status,
     "ACC_Status_ACC": acc_control,
@@ -149,44 +160,47 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     #"ACC_Enabled": 1 if acc_hud_status > 0 else 0,
     #"SET_ME_0X1": 1,
     #"SET_ME_0X7FFF": 0x7FFF,
-    #"Lead_Type_Detected": 1 if lead_distance > 0 else 0,
-    #"Lead_Type": 3 if lead_distance > 0 else 0,
+    "Lead_Type_Detected": 1 if lead_distance > 0 else 0,
+    "Lead_Type": 3 if lead_distance > 0 else 0,
+    "Lead_Distance": 100,
     "ACC_Enabled": 1 if acc_control == 3 else 0,
     "ACC_Standby_Override": 1 if acc_control != 3 else 0,
     "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
+    "ACC_Limiter_Mode": 0,
     #"ACC_Driving_Type": 3 if lead_distance > 0 else 0,
     #"Unknown_03": 106 if acc_hud_status > 0 else 0,
     #"ACC_Special_Events": 3 if esp_hold and acc_hud_status > 0 else 0,
-    #"Zeitluecke_3_Signal": 50 if lead_distance > 0 else 0,
+    "Zeitluecke_3_Signal": zeitluecke_3,
+    "Zeitluecke_4_Signal": zeitluecke_4,
+    "Zeitluecke_5_Signal": zeitluecke_5,
   }
 
   values.update({
     #"STA_Primaeranz": meb_acc_01_values["STA_Primaeranz"],
     "Unknown_Area_01": meb_acc_01_values["Unknown_Area_01"],
+    "SET_ME_0X1": meb_acc_01_values["SET_ME_0X1"],
     "SET_ME_0X3FF": meb_acc_01_values["SET_ME_0X3FF"],
     "Heartbeat": meb_acc_01_values["Heartbeat"],
     "SET_ME_0XFFFF": meb_acc_01_values["SET_ME_0XFFFF"],
     #"ACC_Enabled": meb_acc_01_values["ACC_Enabled"],
-    "Unknown_05": meb_acc_01_values["Unknown_05"],
-    "SET_ME_0X1": meb_acc_01_values["SET_ME_0X1"],
+    "Unknown_03": meb_acc_01_values["Unknown_03"],
     "Unknown_04": meb_acc_01_values["Unknown_04"],
+    "Unknown_05": meb_acc_01_values["Unknown_05"],
     "Unknown_06": meb_acc_01_values["Unknown_06"],
     "Unknown_07": meb_acc_01_values["Unknown_07"],
-    "SET_ME_0X7FFF": meb_acc_01_values["SET_ME_0X7FFF"],
-    "Lead_Type_Detected": meb_acc_01_values["Lead_Type_Detected"],
+    #"Lead_Type_Detected": meb_acc_01_values["Lead_Type_Detected"],
     #"ACC_Standby_Override": meb_acc_01_values["ACC_Standby_Override"],
     #"ACC_AKTIV_regelt": meb_acc_01_values["ACC_AKTIV_regelt"],
-    "ACC_Limiter_Mode": meb_acc_01_values["ACC_Limiter_Mode"],
+    #"ACC_Limiter_Mode": meb_acc_01_values["ACC_Limiter_Mode"],
     "ACC_Driving_Type": meb_acc_01_values["ACC_Driving_Type"],
-    "Unknown_03": meb_acc_01_values["Unknown_03"],
-    "Lead_Type": meb_acc_01_values["Lead_Type"],
-    "Lead_Distance": meb_acc_01_values["Lead_Distance"],
+    #"Lead_Type": meb_acc_01_values["Lead_Type"],
+    #"Lead_Distance": meb_acc_01_values["Lead_Distance"],
     "ACC_Special_Events": meb_acc_01_values["ACC_Special_Events"],
-    "Zeitluecke_1_Signal": meb_acc_01_values["Zeitluecke_1_Signal"],
-    "Zeitluecke_2_Signal": meb_acc_01_values["Zeitluecke_2_Signal"],
-    "Zeitluecke_3_Signal": meb_acc_01_values["Zeitluecke_3_Signal"],
-    "Zeitluecke_4_Signal": meb_acc_01_values["Zeitluecke_4_Signal"],
-    "Zeitluecke_5_Signal": meb_acc_01_values["Zeitluecke_5_Signal"],
+    #"Zeitluecke_1_Signal": meb_acc_01_values["Zeitluecke_1_Signal"],
+    #"Zeitluecke_2_Signal": meb_acc_01_values["Zeitluecke_2_Signal"],
+    #"Zeitluecke_3_Signal": meb_acc_01_values["Zeitluecke_3_Signal"],
+    #"Zeitluecke_4_Signal": meb_acc_01_values["Zeitluecke_4_Signal"],
+    #"Zeitluecke_5_Signal": meb_acc_01_values["Zeitluecke_5_Signal"],
   })
 
   return packer.make_can_msg("MEB_ACC_01", bus, values)
