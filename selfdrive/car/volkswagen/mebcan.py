@@ -120,7 +120,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_AKTIV_regelt": meb_acc_02_values["ACC_AKTIV_regelt"],
     "ACC_limitierte_Anfahrdyn": meb_acc_02_values["ACC_limitierte_Anfahrdyn"],
     "ACC_nachtr_Stopp_Anf": meb_acc_02_values["ACC_nachtr_Stopp_Anf"],
-    "ACC_DynErhoehung ": meb_acc_02_values["ACC_DynErhoehung "],
+    "ACC_DynErhoehung": meb_acc_02_values["ACC_DynErhoehung"],
     "ACC_Freilaufstrategie_TSK": meb_acc_02_values["ACC_Freilaufstrategie_TSK"],
     "ACC_Minimale_Bremsung": meb_acc_02_values["ACC_Minimale_Bremsung"],
     "ACC_Anhalten_Bremse": meb_acc_02_values["ACC_Anhalten_Bremse"],
