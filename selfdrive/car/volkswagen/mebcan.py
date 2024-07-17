@@ -82,6 +82,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     acc_hold_type = 0
 
   values = {
+    "ACC_Typ": acc_type,
     "ACC_Status_ACC": acc_control,
     "ACC_StartStopp_Info": acc_enabled,
     "ACC_Sollbeschleunigung_02": accel if acc_enabled else 3.01,
@@ -106,7 +107,6 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
   }
 
   values.update({
-    "ACC_Typ": meb_acc_02_values["ACC_Typ"],
     "SET_ME_0XFE": meb_acc_02_values["SET_ME_0XFE"],
     "SET_ME_0X1": meb_acc_02_values["SET_ME_0X1"],
     "SET_ME_0X9": meb_acc_02_values["SET_ME_0X9"],
