@@ -169,6 +169,7 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
   }
 
   values.update({
+    "STA_Primaeranz": meb_acc_01_values["STA_Primaeranz"],
     "Unknown_Area_01": meb_acc_01_values["Unknown_Area_01"],
     "SET_ME_0X3FF": meb_acc_01_values["SET_ME_0X3FF"],
     "Heartbeat": meb_acc_01_values["Heartbeat"],
