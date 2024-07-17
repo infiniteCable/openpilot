@@ -64,19 +64,19 @@ class CarController(CarControllerBase):
           apply_angle          = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
 
           # torque wind down as lazy counter
-          torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [0, 20], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
-          torque_wind_down_by_angle     = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / 20 # maximum angle change torque is reached with 10 degrees
+          torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [0, self.TORQUE_WIND_DOWN_MAX_BY_SPEED], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
+          torque_wind_down_by_angle     = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / self.TORQUE_WIND_DOWN_MAX_BY_ANGLE # maximum angle change torque is reached with 10 degrees
           torque_wind_down_target       = clip(torque_wind_down_by_angle, torque_wind_down_min_by_speed, self.CCP.TORQUE_WIND_DOWN_MAX)
 
           if self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
-            self.torque_wind_down += 1
+            self.torque_wind_down += self.TORQUE_WIND_DOWN_NORMAL_STEPS
           elif CS.out.steeringPressed and self.torque_wind_down > self.CCP.TORQUE_WIND_DOWN_USER: # user action results in decreasing the angle change torque
-            self.torque_wind_down = max(self.torque_wind_down - 4, self.CCP.TORQUE_WIND_DOWN_USER)
+            self.torque_wind_down = max(self.torque_wind_down - self.TORQUE_WIND_DOWN_CRITICAL_STEPS, self.CCP.TORQUE_WIND_DOWN_USER)
           elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MAX: # following desired target
             if self.torque_wind_down < torque_wind_down_target:
-              self.torque_wind_down = min(self.torque_wind_down + 4, torque_wind_down_target)
+              self.torque_wind_down = min(self.torque_wind_down + self.TORQUE_WIND_DOWN_CRITICAL_STEPS, torque_wind_down_target)
             elif self.torque_wind_down > torque_wind_down_target:
-              self.torque_wind_down -= 1
+              self.torque_wind_down -= self.TORQUE_WIND_DOWN_NORMAL_STEPS
 
           #if abs(apply_angle) > 45:
           #  new_steer = self.CCP.STEER_MAX - 
