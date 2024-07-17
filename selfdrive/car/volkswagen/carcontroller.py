@@ -88,7 +88,7 @@ class CarController(CarControllerBase):
           if self.lat_active_prev and self.torque_wind_down > 0: # decrement angle change torque to zero before disabling lane assist to prevent EPS fault
             hca_enabled            = True
             apply_angle            = CS.out.steeringAngleDeg
-            self.torque_wind_down -= 1
+            self.torque_wind_down -= self.CCP.TORQUE_WIND_DOWN_NORMAL_STEPS
           else:
             hca_enabled           = False
             self.lat_active_prev  = False
