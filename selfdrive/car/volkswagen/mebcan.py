@@ -131,7 +131,7 @@ def acc_hud_status_value(main_switch_on, acc_faulted, long_active):
   return acc_hud_status
 
 
-def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values):  
+def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values, distance_stock_values):  
   zeitluecke_3 = 0
   zeitluecke_4 = 0
   zeitluecke_5 = 0
@@ -195,7 +195,7 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     #"ACC_Limiter_Mode": meb_acc_01_values["ACC_Limiter_Mode"],
     "ACC_Driving_Type": meb_acc_01_values["ACC_Driving_Type"],
     #"Lead_Type": meb_acc_01_values["Lead_Type"],
-    #"Lead_Distance": meb_acc_01_values["Lead_Distance"],
+    "Lead_Distance": distance_stock_values["Same_Lane_01_Distance"],
     "ACC_Special_Events": meb_acc_01_values["ACC_Special_Events"],
     #"Zeitluecke_1_Signal": meb_acc_01_values["Zeitluecke_1_Signal"],
     #"Zeitluecke_2_Signal": meb_acc_01_values["Zeitluecke_2_Signal"],
