@@ -330,7 +330,7 @@ class CarState(CarStateBase):
     ret.cruiseState.standstill  = self.esp_hold_confirmation
 
     if self.CP.pcmCruise:
-      ret.cruiseState.speed = int(round(cam_cp.vl["MEB_ACC_01"]["ACC_Set_Speed"])) * CV.KPH_TO_MS
+      ret.cruiseState.speed = int(round(cam_cp.vl["MEB_ACC_01"]["ACC_Wunschgeschw_02"])) * CV.KPH_TO_MS
       if ret.cruiseState.speed > 50: # settable maximum 180km/h
         ret.cruiseState.speed = 0
 
