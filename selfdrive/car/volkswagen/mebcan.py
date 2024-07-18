@@ -142,6 +142,8 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     zeitluecke_4 = 50
   elif distance == 5:
     zeitluecke_5 = 50
+
+  lead_distance = distance_stock_values["Same_Lane_01_Long_Distance"]
   
   values = {
     #"STA_Primaeranz": acc_hud_status,
@@ -158,7 +160,7 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     #"SET_ME_0X1": 1,
     "Lead_Type_Detected": 1 if lead_distance > 0 else 0,
     "Lead_Type": 3 if lead_distance > 0 else 0,
-    "Lead_Distance": 40,
+    "Lead_Distance": lead_distance if lead_distance > 0 else 0,
     "ACC_Enabled": 1 if acc_control == 3 else 0,
     "ACC_Standby_Override": 1 if acc_control != 3 else 0,
     "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
@@ -195,7 +197,6 @@ def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, 
     #"ACC_Limiter_Mode": meb_acc_01_values["ACC_Limiter_Mode"],
     "ACC_Driving_Type": meb_acc_01_values["ACC_Driving_Type"],
     #"Lead_Type": meb_acc_01_values["Lead_Type"],
-    "Lead_Distance": distance_stock_values["Same_Lane_01_Distance"],
     "ACC_Special_Events": meb_acc_01_values["ACC_Special_Events"],
     #"Zeitluecke_1_Signal": meb_acc_01_values["Zeitluecke_1_Signal"],
     #"Zeitluecke_2_Signal": meb_acc_01_values["Zeitluecke_2_Signal"],
