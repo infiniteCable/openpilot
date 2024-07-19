@@ -58,13 +58,13 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
   })
   return packer.make_can_msg("GRA_ACC_01", bus, values)
 
-def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled):
+def acc_control_value(main_switch_on, acc_faulted, long_active, override, just_disabled):
   if acc_faulted:
     acc_control = 6
   elif just_disabled:
     acc_control = 5
   elif long_active:
-    acc_control = 3
+    acc_control = 4 if override else 3
   elif main_switch_on:
     acc_control = 2
   else:
@@ -73,7 +73,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled):
   return acc_control
   
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, speed, reversing, meb_acc_02_values):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, override, accel, acc_control, stopping, starting, esp_hold, speed, reversing, meb_acc_02_values):
   commands = []
 
   if starting:
@@ -118,20 +118,9 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
   
   return commands
+  
 
-
-def acc_hud_status_value(main_switch_on, acc_faulted, long_active):
-  if long_active:
-    acc_hud_status = 2
-  elif main_switch_on:
-    acc_hud_status = 1
-  else:
-    acc_hud_status = 0
-    
-  return acc_hud_status
-
-
-def create_acc_hud_control(packer, bus, acc_hud_status, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values, distance_stock_values):  
+def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values, distance_stock_values):  
   zeitluecke_3 = 0
   zeitluecke_4 = 0
   zeitluecke_5 = 0
