@@ -329,6 +329,7 @@ class CarState(CarStateBase):
 
     if self.CP.openpilotLongitudinalControl:
       ret.cruiseState.standstill = False
+      ret.cruiseState.nonAdaptive = False
       
     else:
       ret.cruiseState.standstill  = self.esp_hold_confirmation
