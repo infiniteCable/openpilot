@@ -338,10 +338,10 @@ void Device::updateBrightness(const UIState &s) {
 
     // Scale back to 10% to 100%
     clipped_brightness = std::clamp(100.0f * clipped_brightness, 10.0f, 100.0f);
+  }
 
-    if (dark_mode) {
-      clipped_brightness = 1;
-    }
+  if (s.scene.started && dark_mode) {
+    clipped_brightness = 1.0f;
   }
 
   int brightness = brightness_filter.update(clipped_brightness);
