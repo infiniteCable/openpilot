@@ -118,6 +118,19 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, override, accel
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
   
   return commands
+
+
+def acc_hud_status_value(main_switch_on, acc_faulted, long_active, override):
+  if acc_faulted:
+    acc_hud_control = 6
+  elif long_active:
+    acc_hud_control = 4 if override else 3
+  elif main_switch_on:
+    acc_hud_control = 2
+  else:
+    acc_hud_control = 0
+
+  return acc_hud_control
   
 
 def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values, distance_stock_values):  
