@@ -37,7 +37,6 @@ class CarController(CarControllerBase):
     self.lat_active_prev = False
     self.torque_wind_down = 0
     self.long_heartbeat = 0
-    self.long_active = False
     self.long_active_prev = False
     self.acc_control = 0
 
@@ -149,13 +148,12 @@ class CarController(CarControllerBase):
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
      
       if self.CP.flags & VolkswagenFlags.MEB:
-        self.long_active = CC.longActive and not CS.out.gasPressed
-        just_disabled = True if self.long_active_prev and not self.long_active else False
-        self.long_active_prev = self.long_active
+        just_disabled = True if self.long_active_prev and not CC.longActive else False
+        self.long_active_prev = CC.longActive
         current_speed = CS.out.vEgo * CV.MS_TO_KPH
         reversing = CS.out.gearShifter in [car.CarState.GearShifter.reverse]
-        self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, self.long_active, just_disabled)
-        can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, self.long_active, accel,
+        self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, just_disabled)
+        can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
                                                            self.acc_control, stopping, starting, CS.esp_hold_confirmation,
                                                            current_speed, reversing, CS.meb_acc_02_values))
 
