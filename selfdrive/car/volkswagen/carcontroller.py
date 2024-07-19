@@ -152,10 +152,11 @@ class CarController(CarControllerBase):
         self.long_active_prev = CC.longActive
         current_speed = CS.out.vEgo * CV.MS_TO_KPH
         reversing = CS.out.gearShifter in [car.CarState.GearShifter.reverse]
-        self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, just_disabled)
+        user_override = CS.out.gasPressed
+        self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, just_disabled, user_override)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
                                                            self.acc_control, stopping, starting, CS.esp_hold_confirmation,
-                                                           current_speed, reversing, CS.meb_acc_02_values))
+                                                           current_speed, reversing, user_override, CS.meb_acc_02_values))
 
       else:
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive)
