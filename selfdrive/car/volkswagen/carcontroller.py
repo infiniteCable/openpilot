@@ -38,6 +38,7 @@ class CarController(CarControllerBase):
     self.torque_wind_down = 0
     self.long_heartbeat = 0
     self.long_active_prev = False
+    self.acc_control = 0
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -151,9 +152,9 @@ class CarController(CarControllerBase):
         self.long_active_prev = CC.longActive
         current_speed = CS.out.vEgo * CV.MS_TO_KPH
         reversing = CS.out.gearShifter in [car.CarState.GearShifter.reverse]
-        acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, just_disabled)
+        self.acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, just_disabled)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel,
-                                                           acc_control, stopping, starting, CS.esp_hold_confirmation,
+                                                           self.acc_control, stopping, starting, CS.esp_hold_confirmation,
                                                            current_speed, reversing, CS.meb_acc_02_values))
 
       else:
@@ -181,8 +182,8 @@ class CarController(CarControllerBase):
         if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
           lead_distance = 512
         set_speed = hud_control.setSpeed * CV.MS_TO_KPH
-        acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.enabled, CC.cruiseControl.override)
-        can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, set_speed,
+        #acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.enabled, CC.cruiseControl.override)
+        can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, self.acc_control, set_speed,
                                                          lead_distance, hud_control.leadDistanceBars, self.long_heartbeat,
                                                          CS.esp_hold_confirmation, CS.meb_acc_01_values, CS.distance_stock_values))
         
