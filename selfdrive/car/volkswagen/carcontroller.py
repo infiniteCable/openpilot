@@ -149,7 +149,7 @@ class CarController(CarControllerBase):
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
      
       if self.CP.flags & VolkswagenFlags.MEB:
-        self.long_active = CC.longActive and not CC.cruiseControl.override
+        self.long_active = CC.enabled and not CC.cruiseControl.override
         just_disabled = True if self.long_active_prev and not self.long_active else False
         self.long_active_prev = self.long_active
         current_speed = CS.out.vEgo * CV.MS_TO_KPH
