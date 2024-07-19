@@ -323,13 +323,16 @@ class CarState(CarStateBase):
 
     ret.accFaulted = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (6, 7)
     self.acc_type = cam_cp.vl["MEB_ACC_02"]["ACC_Typ"]
-    
-    ret.cruiseState.available   = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (2, 3, 4, 5)
-    ret.cruiseState.enabled     = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (3, 4, 5)
-    ret.cruiseState.nonAdaptive = False #bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
-    ret.cruiseState.standstill  = self.esp_hold_confirmation
 
-    if self.CP.pcmCruise:
+    ret.cruiseState.available = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (2, 3, 4, 5)
+    ret.cruiseState.enabled   = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (3, 4, 5)
+
+    if self.CP.openpilotLongitudinalControl:
+      ret.cruiseState.standstill = False
+      
+    else:
+      ret.cruiseState.standstill  = self.esp_hold_confirmation
+      ret.cruiseState.nonAdaptive = bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
       ret.cruiseState.speed = int(round(cam_cp.vl["MEB_ACC_01"]["ACC_Wunschgeschw_02"])) * CV.KPH_TO_MS
       if ret.cruiseState.speed > 50: # settable maximum 180km/h
         ret.cruiseState.speed = 0
