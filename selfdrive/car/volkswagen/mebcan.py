@@ -58,13 +58,11 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
   })
   return packer.make_can_msg("GRA_ACC_01", bus, values)
 
-def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled, user_override):
+def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled):
   if acc_faulted:
     acc_control = 6
   elif just_disabled:
     acc_control = 5
-  elif user_override:
-    acc_control = 4
   elif long_active:
     acc_control = 3
   elif main_switch_on:
@@ -75,7 +73,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled, u
   return acc_control
   
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, speed, reversing, user_override, meb_acc_02_values):
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, speed, reversing, meb_acc_02_values):
   commands = []
 
   if starting:
@@ -89,7 +87,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_Typ": acc_type,
     "ACC_Status_ACC": acc_control,
     "ACC_StartStopp_Info": acc_enabled,
-    "ACC_Sollbeschleunigung_02": accel if acc_enabled and not user_override else 3.01,
+    "ACC_Sollbeschleunigung_02": accel if acc_enabled and else 3.01,
     "ACC_zul_Regelabw_unten": 0.2,  # TODO: dynamic adjustment of comfort-band
     "ACC_zul_Regelabw_oben": 0.2,  # TODO: dynamic adjustment of comfort-band
     "ACC_neg_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
