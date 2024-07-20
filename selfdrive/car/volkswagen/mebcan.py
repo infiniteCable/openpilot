@@ -78,14 +78,16 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled):
 def acc_hold_type(main_switch_on, acc_faulted, long_active, just_disabled, starting, stopping, esp_hold, just_started):
   if acc_faulted or not main_switch_on:
     acc_hold_type = 0
-  elif just_disabled: # disabling of acc control
-    acc_hold_type = 5
+  elif just_disabled:
+    acc_hold_type = 5 # disable acc confirmation
   elif starting:
-    acc_hold_type = 4  # hold release and startup
-  elif esp_hold or stopping:
-    acc_hold_type = 1  # hold or hold request
-  elif just_started: # signal right after starting
-    acc_hold_type = 5
+    acc_hold_type = 4 # hold release and startup
+  elif stopping:
+    acc_hold_type = 1 # hold or hold request
+  elif esp_hold and long_active:
+    acc_hold_type = 1 # hold
+  #elif just_started:
+  #  acc_hold_type = 6 # exit hold mechanic
   else:
     acc_hold_type = 0
 
