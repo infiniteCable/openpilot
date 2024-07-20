@@ -41,6 +41,7 @@ def create_lka_hud_control(packer, bus, ldw_stock_values, lat_active, steering_p
     "LDW_Texte": hud_alert,
   })
   return packer.make_can_msg("LDW_02", bus, values)
+  
 
 def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resume=False):
   values = {s: gra_stock_values[s] for s in [
@@ -57,6 +58,7 @@ def create_acc_buttons_control(packer, bus, gra_stock_values, cancel=False, resu
     "GRA_Tip_Wiederaufnahme": resume,
   })
   return packer.make_can_msg("GRA_ACC_01", bus, values)
+  
 
 def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled):
   if acc_faulted:
@@ -73,19 +75,25 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled):
   return acc_control
   
 
-def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, just_started, esp_hold, speed, reversing, meb_acc_02_values):
-  commands = []
-
-  if acc_control == 5: # disabling of acc control
+def acc_hold_type(main_switch_on, acc_faulted, long_active, just_disabled, starting, stopping, esp_hold, just_started):
+  if acc_faulted or not main_switch_on:
+    acc_hold_type = 0
+  elif just_disabled: # disabling of acc control
     acc_hold_type = 5
   elif starting:
     acc_hold_type = 4  # hold release and startup
   elif esp_hold or stopping:
     acc_hold_type = 1  # hold or hold request
-  elif just_started: # signal right fter starting
+  elif just_started: # signal right after starting
     acc_hold_type = 5
   else:
     acc_hold_type = 0
+
+  return acc_hold_type
+  
+
+def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, acc_hold_type, stopping, starting, just_started, esp_hold, speed, reversing, meb_acc_02_values):
+  commands = []
 
   values = {
     "ACC_Typ": acc_type,
@@ -99,7 +107,7 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "ACC_Anfahren": starting,
     "ACC_Anhalten": stopping,
     "ACC_Anhalteweg": 20.46,
-    "ACC_Anforderung_HMS": acc_hold_type if acc_enabled else 0,
+    "ACC_Anforderung_HMS": acc_hold_type,
     "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     #"SET_ME_0XFE": 0xFE,
     #"SET_ME_0X1": 0x1,
