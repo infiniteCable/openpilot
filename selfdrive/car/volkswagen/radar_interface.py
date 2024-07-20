@@ -70,5 +70,5 @@ class RadarInterface(RadarInterfaceBase):
     else:
       del self.pts[addr]
 
-  ret.points = list(self.pts.values())
-  return ret
+    ret.points = list(self.pts.values())
+    return ret
