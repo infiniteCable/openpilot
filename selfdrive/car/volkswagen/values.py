@@ -192,7 +192,7 @@ class VolkswagenMQBPlatformConfig(PlatformConfig):
 
 @dataclass
 class VolkswagenMEBPlatformConfig(PlatformConfig):
-  dbc_dict: DbcDict = field(default_factory=lambda: dbc_dict('vw_meb', None))
+  dbc_dict: DbcDict = field(default_factory=lambda: dbc_dict('vw_meb', 'vw_meb'))
   # Volkswagen uses the VIN WMI and chassis code to match in the absence of the comma power
   # on camera-integrated cars, as we lose too many ECUs to reliably identify the vehicle
   chassis_codes: set[str] = field(default_factory=set)
