@@ -175,7 +175,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
     "Unknown_03": 106,
     "Unknown_01": 0,
     "Unknown_08": 0,
-    "ACC_Special_Events": 3 if esp_hold else 0,
+    "ACC_Special_Events": 3 if esp_hold and acc_control == 3 else 0,
     "Zeitluecke_3_Signal": zeitluecke_3,
     "Zeitluecke_4_Signal": zeitluecke_4,
     "Zeitluecke_5_Signal": zeitluecke_5,
