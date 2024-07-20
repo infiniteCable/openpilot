@@ -58,7 +58,7 @@ class RadarInterface(RadarInterfaceBase):
       self.pts[addr].trackId = self.track_id
       self.track_id += 1
 
-    valid = msg['Same_Lane_01_Detection'] > 0
+    valid = msg['Same_Lane_01_Detection'] > 10 # this is at least 10 if the car is sure about the object
     if valid:
       self.pts[addr].measured = True
       self.pts[addr].dRel = msg['Same_Lane_01_Long_Distance']
