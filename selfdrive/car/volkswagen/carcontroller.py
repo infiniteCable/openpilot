@@ -155,9 +155,11 @@ class CarController(CarControllerBase):
         just_started = True if self.long_started_prev and not starting else False
         self.long_started_prev = starting
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, just_disabled)
+        acc_hold_type = self.CCS.acc_hold_type(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, just_disabled, starting,
+                                               stopping, CS.esp_hold_confirmation, just_started)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel, acc_control,
-                                                           stopping, starting, just_started, CS.esp_hold_confirmation, current_speed,
-                                                           reversing, CS.meb_acc_02_values))
+                                                           acc_hold_type, stopping, starting, just_started, CS.esp_hold_confirmation,
+                                                           current_speed, reversing, CS.meb_acc_02_values))
 
       else:
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.enabled)
