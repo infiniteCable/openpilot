@@ -283,8 +283,9 @@ class CarState(CarStateBase):
     self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
 
     # Update gas, brakes, and gearshift.
-    ret.gasPressed = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"] > 0
-    ret.gas = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"]
+    # accel pressure on meb eps 03 has a really low frequency
+    ret.gas = pt_cp.vl["MEB_Motor_01"]["Accel_Pedal_Pressure"]
+    ret.gasPressed = ret.gas > 0
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
     ret.brake = pt_cp.vl["MEB_ESP_01"]["VL_Brake_Pressure"]
     #brake_light = bool(pt_cp.vl["MEB_Light_01"]["Brake_Light"])
