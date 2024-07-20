@@ -76,12 +76,14 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled):
 def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, just_started, esp_hold, speed, reversing, meb_acc_02_values):
   commands = []
 
-  if acc_control == 5:
+  if acc_control == 5: # disabling of acc control
     acc_hold_type = 5
   elif starting:
     acc_hold_type = 4  # hold release and startup
   elif esp_hold or stopping:
     acc_hold_type = 1  # hold or hold request
+  elif just_started: # signal right fter starting
+    acc_hold_type = 5
   else:
     acc_hold_type = 0
 
