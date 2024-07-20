@@ -76,7 +76,9 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled):
 def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_control, stopping, starting, esp_hold, speed, reversing, meb_acc_02_values):
   commands = []
 
-  if starting:
+  if acc_control == 5:
+    acc_hold_type = 5
+  elif starting:
     acc_hold_type = 4  # hold release and startup
   elif esp_hold or stopping:
     acc_hold_type = 1  # hold or hold request
@@ -171,7 +173,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
     "Unknown_03": 106,
     "Unknown_01": 0,
     "Unknown_08": 0,
-    #"ACC_Special_Events": 3 if esp_hold and acc_hud_status > 0 else 0,
+    "ACC_Special_Events": 3 if esp_hold and acc_hud_status == 4 else 0,
     "Zeitluecke_3_Signal": zeitluecke_3,
     "Zeitluecke_4_Signal": zeitluecke_4,
     "Zeitluecke_5_Signal": zeitluecke_5,
