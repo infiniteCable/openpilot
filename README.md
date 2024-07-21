@@ -2,27 +2,29 @@ THIS PROJECT IS STILL IN PROGRESS
 
 DO NOT USE!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-Part 1: Harness build (done at Gateway/J533/ICAS1 which could be acc controlling capable) -> will be documented (camera harness also possible for steering only)
+Part 1: Harness build (done at Gateway/J533/ICAS1 which is acc controlling capable) (camera harness also possible for steering only)
 
-Part 2: can bus command sniffing (in progress) -> all signals are possible candidates at the moment
+Part 2: can bus command sniffing and tests (in progress) -> all signals are possible candidates
 
-Part 3: Steering command tests with C3x (tuning in progress with new MEB signal (no counter, no checksum, seems to be angle controlled) -> works)
+Part 3: Steering command with C3x (working with new signal (no counter, no checksum, angle controlled with angle change torque))
 
-Part 3.1: checksum calculation
+Part 4: ACC command with C3x (working with new signals, still not everything understood or incorrect)
 
-Part 4: ACC command tests with C3x (open)
+Part 5: checksum calculations (in progress)
 
-Part 4.1: checksum calculation
+Adaption to Seat Cupra Born (VW MEB plattform)
 
-Adaption to Seat Cupra Born (MEB)
+Actually maniupating I don't see SECOC have any effect on manipulating steering and acc data. It just works.
 
-Guess:Steering and ACC receiver on engine can bus and HUD receiver on control and view can bus seem not to be SECOC secured. Security is done between J533 and original sender but not beginning from J533 and actual receiver. Actually maniupating i don't see SECOC have any effect on manipulating steering data. It just works.
-
-Panda can 0 is intercepting sensors can bus directed to J533. (camera + radar data filter + sender) 
+Panda can 0 is intercepting sensors can bus directed to J533 (CANBUS Fahrwerkssensoren CAN L Pin 7, CAN H Pin 8). (camera + radar data filter + sender) 
 
 Panda can 2 is intercepting sensors can bus directed to sensors. (camera + radar data filter + receiver) 
 
-Panda can 1 is connected to engine can bus. (no function at the moment, because filtering + sending to J533 works)
+Panda can 1 is connected to engine can bus (CANBUS Antrieb CAN L Pin 13, CAN H Pin 14). (no function at the moment, because filtering + sending to J533 works)
+
+Panda Power with J533 power Pin 11 and ground Pin 31. No OBD needed.
+
+Ingition is done with CAN Bus signal
 
 
 
