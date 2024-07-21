@@ -38,7 +38,6 @@ class CarController(CarControllerBase):
     self.torque_wind_down = 0
     self.long_heartbeat = 0
     self.long_active_prev = False
-    self.long_started_prev = False
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -152,13 +151,11 @@ class CarController(CarControllerBase):
         self.long_active_prev = CC.longActive
         current_speed = CS.out.vEgo * CV.MS_TO_KPH
         reversing = CS.out.gearShifter in [car.CarState.GearShifter.reverse]
-        just_started = True if self.long_started_prev and not starting else False
-        self.long_started_prev = starting
         acc_control = self.CCS.acc_control_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, just_disabled)
         acc_hold_type = self.CCS.acc_hold_type(CS.out.cruiseState.available, CS.out.accFaulted, CC.longActive, just_disabled, starting,
-                                               stopping, CS.esp_hold_confirmation, just_started)
+                                               stopping, CS.esp_hold_confirmation)
         can_sends.extend(self.CCS.create_acc_accel_control(self.packer_pt, CANBUS.pt, CS.acc_type, CC.longActive, accel, acc_control,
-                                                           acc_hold_type, stopping, starting, just_started, CS.esp_hold_confirmation,
+                                                           acc_hold_type, stopping, starting CS.esp_hold_confirmation,
                                                            current_speed, reversing, CS.meb_acc_02_values))
 
       else:
