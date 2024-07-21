@@ -1,5 +1,6 @@
 from opendbc.can.parser import CANParser
 from cereal import car
+from openpilot.common.conversions import Conversions as CV
 from openpilot.selfdrive.car.volkswagen.values import DBC, VolkswagenFlags
 from openpilot.selfdrive.car.interfaces import RadarInterfaceBase
 
@@ -67,7 +68,7 @@ class RadarInterface(RadarInterfaceBase):
       self.pts[signal_part].measured = True
       self.pts[signal_part].dRel     = msg['Same_Lane_01_Long_Distance']
       self.pts[signal_part].yRel     = -msg['Same_Lane_01_Lat_Distance'] # left is positive
-      self.pts[signal_part].vRel     = float('nan')
+      self.pts[signal_part].vRel     = msg['Same_Lane_01_Rel_Velo'] * CV.KPH_TO_MS
       self.pts[signal_part].aRel     = float('nan')
       self.pts[signal_part].yvRel    = float('nan')
     else:
