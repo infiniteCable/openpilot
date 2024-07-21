@@ -4,6 +4,8 @@ from openpilot.selfdrive.car.volkswagen.values import DBC, VolkswagenFlags
 from openpilot.selfdrive.car.interfaces import RadarInterfaceBase
 
 RADAR_ADDR = 0x24F
+RADAR_SAME_LANE_01 = 1
+RADAR_SAME_LANE_02 = 2
 
 def get_radar_can_parser(CP):
   if CP.flags & VolkswagenFlags.MEB:
@@ -53,22 +55,43 @@ class RadarInterface(RadarInterfaceBase):
     addr = RADAR_ADDR
     msg = self.rcp.vl["MEB_Distance_01"]
 
-    if addr not in self.pts:
-      self.pts[addr] = car.RadarData.RadarPoint.new_message()
-      self.pts[addr].trackId = self.track_id
-      self.track_id += 1
-
     valid = msg['Same_Lane_01_Detection'] > 0
     if valid:
-      self.pts[addr].measured = True
-      self.pts[addr].dRel = msg['Same_Lane_01_Long_Distance']
-      self.pts[addr].yRel = msg['Same_Lane_01_Lat_Distance']
-      self.pts[addr].vRel = float('nan')
-      self.pts[addr].aRel = float('nan')
-      self.pts[addr].yvRel = float('nan')
+      signal_part = RADAR_SAME_LANE_01
+      
+      if signal_part not in self.pts:
+        self.pts[signal_part] = car.RadarData.RadarPoint.new_message()
+        self.pts[signal_part].trackId = self.track_id
+        self.track_id += 1
+
+      self.pts[signal_part].measured = True
+      self.pts[signal_part].dRel     = msg['Same_Lane_01_Long_Distance']
+      self.pts[signal_part].yRel     = msg['Same_Lane_01_Lat_Distance']
+      self.pts[signal_part].vRel     = float('nan')
+      self.pts[signal_part].aRel     = float('nan')
+      self.pts[signal_part].yvRel    = float('nan')
 
     else:
-      del self.pts[addr]
+      del self.pts[signal_part]
+
+    valid = msg['Same_Lane_02_Detection'] > 0
+    if valid:
+      signal_part = RADAR_SAME_LANE_02
+      
+      if signal_part not in self.pts:
+        self.pts[signal_part] = car.RadarData.RadarPoint.new_message()
+        self.pts[signal_part].trackId = self.track_id
+        self.track_id += 1
+
+      self.pts[signal_part].measured = True
+      self.pts[signal_part].dRel     = msg['Same_Lane_02_Long_Distance']
+      self.pts[signal_part].yRel     = msg['Same_Lane_02_Lat_Distance']
+      self.pts[signal_part].vRel     = float('nan')
+      self.pts[signal_part].aRel     = float('nan')
+      self.pts[signal_part].yvRel    = float('nan')
+
+    else:
+      del self.pts[signal_part]
 
     ret.points = list(self.pts.values())
     return ret
