@@ -10,7 +10,7 @@ Part 3: Steering command with C3x (working with new signal (no counter, no check
 
 Part 4: ACC command with C3x (working with new signals, still not everything understood or incorrect)
 
-Part 5: Radar Tracks (working with new signal that contains 2 detection parts for same, 2 for right and 2 for left lane) -> using same lane at the moment
+Part 5: Radar Tracks (in progress with new signal that contains 2 detection parts for same, 2 for right and 2 for left lane) -> using same lane at the moment
 
 Part 6: checksum calculations (in progress)
 
