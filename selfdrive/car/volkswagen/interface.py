@@ -54,7 +54,7 @@ class CarInterface(CarInterfaceBase):
       ret.transmissionType = TransmissionType.direct
       ret.networkLocation = NetworkLocation.fwdCamera
       ret.steerControlType = car.CarParams.SteerControlType.angle
-      ret.radarUnavailable = False
+      #ret.radarUnavailable = False
       #ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
 
       #ret.dashcamOnly = True
