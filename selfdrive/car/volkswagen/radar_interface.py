@@ -52,13 +52,12 @@ class RadarInterface(RadarInterfaceBase):
       errors.append("canError")
     ret.errors = errors
 
-    addr = RADAR_ADDR
     msg = self.rcp.vl["MEB_Distance_01"]
 
-    valid = msg['Same_Lane_01_Detection'] > 0
+    signal_part = RADAR_SAME_LANE_01
+    valid = msg['Same_Lane_01_Detection'] > 0 and msg['Same_Lane_01_Long_Distance'] > 0
+    
     if valid:
-      signal_part = RADAR_SAME_LANE_01
-      
       if signal_part not in self.pts:
         self.pts[signal_part] = car.RadarData.RadarPoint.new_message()
         self.pts[signal_part].trackId = self.track_id
@@ -74,10 +73,10 @@ class RadarInterface(RadarInterfaceBase):
     else:
       del self.pts[signal_part]
 
-    valid = msg['Same_Lane_02_Detection'] > 0
-    if valid:
-      signal_part = RADAR_SAME_LANE_02
-      
+    signal_part = RADAR_SAME_LANE_02
+    valid = msg['Same_Lane_02_Detection'] > 0 and msg['Same_Lane_02_Long_Distance'] > 0
+    
+    if valid:      
       if signal_part not in self.pts:
         self.pts[signal_part] = car.RadarData.RadarPoint.new_message()
         self.pts[signal_part].trackId = self.track_id
