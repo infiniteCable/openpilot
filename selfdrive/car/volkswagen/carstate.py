@@ -284,10 +284,10 @@ class CarState(CarStateBase):
 
     # Update gas, brakes, and gearshift.
     # accel pressure on meb eps 03 has a really low frequency
-    ret.gas = pt_cp.vl["MEB_Motor_01"]["Accel_Pedal_Pressure"]
-    ret.gasPressed = ret.gas > 0
-    ret.brake = pt_cp.vl["MEB_ESP_01"]["Brake_Pressure"] # this is break general
-    ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"]) # this is break from user
+    ret.gasPressed = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"] > 0
+    ret.gas = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"]
+    ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
+    ret.brake = pt_cp.vl["MEB_ESP_01"]["Brake_Pressure"] # this is break not from user
     #brake_light = bool(pt_cp.vl["MEB_Light_01"]["Brake_Light"])
     #ret.regenBraking = brake_light and not ret.brakePressed and not ret.standstill
     #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
