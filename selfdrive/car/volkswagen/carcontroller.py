@@ -2,8 +2,7 @@ from cereal import car
 from opendbc.can.packer import CANPacker
 from openpilot.common.numpy_fast import clip, interp
 from openpilot.common.conversions import Conversions as CV
-from openpilot.common.realtime import DT_CTRL
-from openpilot.selfdrive.car import apply_driver_steer_torque_limits, apply_std_steer_angle_limits
+from openpilot.selfdrive.car import DT_CTRL, apply_driver_steer_torque_limits, apply_std_steer_angle_limits
 from openpilot.selfdrive.car.interfaces import CarControllerBase
 from openpilot.selfdrive.car.volkswagen import mqbcan, pqcan, mebcan
 from openpilot.selfdrive.car.volkswagen.values import CANBUS, CarControllerParams, VolkswagenFlags
@@ -23,7 +22,7 @@ class CarController(CarControllerBase):
       self.CCS = mebcan
     else:
       self.CCS = mqbcan
-    
+
     self.packer_pt = CANPacker(dbc_name)
     self.ext_bus = CANBUS.pt if CP.networkLocation == car.CarParams.NetworkLocation.fwdCamera else CANBUS.cam
 
@@ -56,7 +55,7 @@ class CarController(CarControllerBase):
         #   * avoid HCA refused
         #   * easy user intervention
         #   * keep it near maximum regarding speed to get full torque in shortest time
-        
+
         if CC.latActive:
           hca_enabled          = True
           self.lat_active_prev = True
@@ -69,10 +68,10 @@ class CarController(CarControllerBase):
 
           if self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
             self.torque_wind_down += self.CCP.TORQUE_WIND_DOWN_NORMAL_STEPS
-            
+
           elif CS.out.steeringPressed and self.torque_wind_down > self.CCP.TORQUE_WIND_DOWN_USER: # user action results in decreasing the angle change torque
             self.torque_wind_down = max(self.torque_wind_down - self.CCP.TORQUE_WIND_DOWN_CRITICAL_STEPS, self.CCP.TORQUE_WIND_DOWN_USER)
-            
+
           elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MAX: # following desired target
             if self.torque_wind_down < torque_wind_down_target:
               self.torque_wind_down = min(self.torque_wind_down + self.CCP.TORQUE_WIND_DOWN_CRITICAL_STEPS, torque_wind_down_target)
@@ -80,9 +79,9 @@ class CarController(CarControllerBase):
               self.torque_wind_down -= self.CCP.TORQUE_WIND_DOWN_NORMAL_STEPS
 
           #if abs(apply_angle) > 45:
-          #  new_steer = self.CCP.STEER_MAX - 
-          #  apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP) 
-        
+          #  new_steer = self.CCP.STEER_MAX -
+          #  apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP)
+
         else:
           if self.lat_active_prev and self.torque_wind_down > 0: # decrement angle change torque to zero before disabling lane assist to prevent EPS fault
             hca_enabled            = True
@@ -106,7 +105,7 @@ class CarController(CarControllerBase):
         #   * Don't send uninterrupted steering for > 360 seconds
         # MQB racks reset the uninterrupted steering timer after a single frame
         # of HCA disabled; this is done whenever output happens to be zero.
-        
+
         if CC.latActive:
           new_steer = int(round(actuators.steer * self.CCP.STEER_MAX))
           apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP)
@@ -145,7 +144,7 @@ class CarController(CarControllerBase):
       accel = clip(actuators.accel, self.CCP.ACCEL_MIN, self.CCP.ACCEL_MAX) if CC.longActive else 0
       stopping = actuators.longControlState == LongCtrlState.stopping
       starting = actuators.longControlState == LongCtrlState.pid and (CS.esp_hold_confirmation or CS.out.vEgo < self.CP.vEgoStopping)
-     
+
       if self.CP.flags & VolkswagenFlags.MEB:
         just_disabled = True if self.long_active_prev and not CC.longActive else False
         self.long_active_prev = CC.longActive
@@ -178,7 +177,7 @@ class CarController(CarControllerBase):
           self.long_heartbeat = 221
         elif self.long_heartbeat == 221:
           self.long_heartbeat = 360
-        
+
         lead_distance = 0
         if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
           lead_distance = 512
@@ -187,7 +186,7 @@ class CarController(CarControllerBase):
         can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, set_speed,
                                                          lead_distance, hud_control.leadDistanceBars, self.long_heartbeat,
                                                          CS.esp_hold_confirmation, CS.meb_acc_01_values, CS.distance_stock_values))
-        
+
       else:
         lead_distance = 0
         if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
