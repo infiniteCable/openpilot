@@ -50,14 +50,12 @@ class CarInterface(CarInterfaceBase):
     elif ret.flags & VolkswagenFlags.MEB: # TODO
       # Set global MEB parameters
       ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.volkswagenMeb)]
-      ret.enableBsm = True
+      ret.enableBsm        = True
       ret.transmissionType = TransmissionType.direct
-      ret.networkLocation = NetworkLocation.fwdCamera
+      ret.networkLocation  = NetworkLocation.fwdCamera # TODO signal sources: I am connected at gateway/ICAS 1 right now
       ret.steerControlType = car.CarParams.SteerControlType.angle
       ret.radarUnavailable = False
       #ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
-
-      #ret.dashcamOnly = True
 
     else:
       # Set global MQB parameters
@@ -87,7 +85,6 @@ class CarInterface(CarInterfaceBase):
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
     elif ret.flags & VolkswagenFlags.MEB:
       ret.steerActuatorDelay = 0.2
-      #CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
     else:
       ret.steerActuatorDelay = 0.1
       ret.lateralTuning.pid.kpBP = [0.]
@@ -99,15 +96,18 @@ class CarInterface(CarInterfaceBase):
     # Global longitudinal tuning defaults, can be overridden per-vehicle
 
     if ret.flags & VolkswagenFlags.MEB:
+      ret.openpilotLongitudinalControl      = True
       ret.experimentalLongitudinalAvailable = True
+      ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
+      
     else:
       ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
-    if experimental_long:
-      # Proof-of-concept, prep for E2E only. No radar points available. Panda ALLOW_DEBUG firmware required.
-      ret.openpilotLongitudinalControl = True
-      ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
-      if ret.transmissionType == TransmissionType.manual:
-        ret.minEnableSpeed = 4.5
+      if experimental_long:
+        # Proof-of-concept, prep for E2E only. No radar points available. Panda ALLOW_DEBUG firmware required.
+        ret.openpilotLongitudinalControl = True
+        ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
+        if ret.transmissionType == TransmissionType.manual:
+          ret.minEnableSpeed = 4.5
 
     ret.pcmCruise = not ret.openpilotLongitudinalControl
     ret.stoppingControl = True
