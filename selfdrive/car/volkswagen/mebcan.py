@@ -146,11 +146,17 @@ def acc_hud_status_value(main_switch_on, acc_faulted, long_active, override):
   
 
 def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values, distance_stock_values):  
+  zeitluecke_1 = 0
+  zeitluecke_2 = 0
   zeitluecke_3 = 0
   zeitluecke_4 = 0
   zeitluecke_5 = 0
 
-  if distance == 3:
+  if distance == 1:
+    zeitluecke_1 = 50
+  elif distance == 2:
+    zeitluecke_2 = 50
+  elif distance == 3:
     zeitluecke_3 = 50
   elif distance == 4:
     zeitluecke_4 = 50
@@ -184,6 +190,8 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
     "Unknown_01": 0,
     "Unknown_08": 0,
     "ACC_Special_Events": 3 if esp_hold and acc_control == 3 else 0,
+    "Zeitluecke_1_Signal": zeitluecke_1,
+    "Zeitluecke_2_Signal": zeitluecke_2,
     "Zeitluecke_3_Signal": zeitluecke_3,
     "Zeitluecke_4_Signal": zeitluecke_4,
     "Zeitluecke_5_Signal": zeitluecke_5,
@@ -212,11 +220,6 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
     "ACC_Driving_Type": meb_acc_01_values["ACC_Driving_Type"],
     #"Lead_Type": meb_acc_01_values["Lead_Type"],
     #"ACC_Special_Events": meb_acc_01_values["ACC_Special_Events"],
-    #"Zeitluecke_1_Signal": meb_acc_01_values["Zeitluecke_1_Signal"],
-    #"Zeitluecke_2_Signal": meb_acc_01_values["Zeitluecke_2_Signal"],
-    #"Zeitluecke_3_Signal": meb_acc_01_values["Zeitluecke_3_Signal"],
-    #"Zeitluecke_4_Signal": meb_acc_01_values["Zeitluecke_4_Signal"],
-    #"Zeitluecke_5_Signal": meb_acc_01_values["Zeitluecke_5_Signal"],
   })
 
   return packer.make_can_msg("MEB_ACC_01", bus, values)
