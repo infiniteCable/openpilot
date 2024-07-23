@@ -163,7 +163,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
   elif distance == 5:
     zeitluecke_5 = 50
 
-  lead_distance = distance_stock_values["Same_Lane_01_Long_Distance"]
+  lead_distance = min(distance_stock_values["Same_Lane_01_Long_Distance"], 100)
   
   values = {
     #"STA_Primaeranz": acc_hud_status,
