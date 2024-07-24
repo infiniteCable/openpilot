@@ -186,7 +186,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
     "ACC_Standby_Override": 1 if acc_control != 3 else 0,
     "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     "ACC_Limiter_Mode": 0,
-    "ACC_Driving_Type": 0xF if lead_distance > 0 else 0,
+    "ACC_Driving_Type": 3 if lead_distance > 0 else 0,
     "Unknown_03": 106,
     "Unknown_01": 0,
     "Unknown_08": 0,
@@ -218,7 +218,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
     #"ACC_Standby_Override": meb_acc_01_values["ACC_Standby_Override"],
     #"ACC_AKTIV_regelt": meb_acc_01_values["ACC_AKTIV_regelt"],
     #"ACC_Limiter_Mode": meb_acc_01_values["ACC_Limiter_Mode"],
-    "ACC_Driving_Type": meb_acc_01_values["ACC_Driving_Type"],
+    #"ACC_Driving_Type": meb_acc_01_values["ACC_Driving_Type"],
     #"Lead_Type": meb_acc_01_values["Lead_Type"],
     #"ACC_Special_Events": meb_acc_01_values["ACC_Special_Events"],
   })
