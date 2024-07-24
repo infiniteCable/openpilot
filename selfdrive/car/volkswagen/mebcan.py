@@ -1,3 +1,5 @@
+from openpilot.common.numpy_fast import clip
+
 def create_steering_control_angle(packer, bus, apply_angle, lkas_enabled, torque_wind_down):
   values = {
     "Steering_Angle": abs(apply_angle),
@@ -153,7 +155,7 @@ def acc_hud_status_value(main_switch_on, acc_faulted, long_active, override):
   return acc_hud_control
   
 
-def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values, distance_stock_values):  
+def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values, distance_stock_values):  
   zeitluecke_1 = 0
   zeitluecke_2 = 0
   zeitluecke_3 = 0
@@ -161,17 +163,17 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
   zeitluecke_5 = 0
 
   if distance == 1:
-    zeitluecke_1 = 50
+    zeitluecke_1 = gap
   elif distance == 2:
-    zeitluecke_2 = 50
+    zeitluecke_2 = gap
   elif distance == 3:
-    zeitluecke_3 = 50
+    zeitluecke_3 = gap
   elif distance == 4:
-    zeitluecke_4 = 50
+    zeitluecke_4 = gap
   elif distance == 5:
-    zeitluecke_5 = 50
+    zeitluecke_5 = gap
 
-  lead_distance = min(abs(distance_stock_values["Same_Lane_01_Long_Distance"]), 100) # abs because of shift negative value is possible
+  lead_dist = clip(min(distance_stock_values["Same_Lane_01_Long_Distance"] * 0.75, 1, 100)) # scaling, prevent negative values because of signal shift
   
   values = {
     #"STA_Primaeranz": acc_hud_status,
@@ -184,7 +186,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
     "Heartbeat":               heartbeat, # do the same as radar would do, still check if this is necessary
     "Lead_Type_Detected":      1 if lead_distance > 0 else 0, # object should be displayed
     "Lead_Type":               3 if lead_distance > 0 else 0, # displaying a car
-    "Lead_Distance":           lead_distance if lead_distance > 0 else 0, # hud distance of object
+    "Lead_Distance":           lead_dist if lead_distance > 0 else 0, # hud distance of object
     "ACC_Enabled":             1 if acc_control == 3 else 0,
     "ACC_Standby_Override":    1 if acc_control != 3 else 0,
     "ACC_AKTIV_regelt":        1 if acc_control == 3 else 0,
