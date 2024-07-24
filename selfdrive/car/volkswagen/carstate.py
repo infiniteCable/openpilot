@@ -318,7 +318,7 @@ class CarState(CarStateBase):
     self.meb_acc_02_values = cam_cp.vl["MEB_ACC_02"]
 
     ret.stockFcw = False
-    ret.stockAeb = False
+    ret.stockAeb = pt_cp.vl["MEB_ESP_05"]["AEB_Active"] > 0
 
     self.esp_hold_confirmation = bool(pt_cp.vl["MEB_ESP_05"]["ESP_Hold"])
 
