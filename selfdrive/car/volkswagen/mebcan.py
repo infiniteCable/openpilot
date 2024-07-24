@@ -186,7 +186,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
     "ACC_Standby_Override": 1 if acc_control != 3 else 0,
     "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
     "ACC_Limiter_Mode": 0,
-    "ACC_Driving_Type": 3 if lead_distance > 0 else 0,
+    "ACC_Driving_Type": 0xF if lead_distance > 0 else 0,
     "Unknown_03": 106,
     "Unknown_01": 0,
     "Unknown_08": 0,
