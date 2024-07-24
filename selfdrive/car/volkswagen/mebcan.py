@@ -23,6 +23,8 @@ def create_steering_control(packer, bus, apply_steer, lkas_enabled):
 
 
 def create_lka_hud_control(packer, bus, ldw_stock_values, lat_active, steering_pressed, hud_alert, hud_control, sound_alert):
+display_mode = 1 if lat_active else 0 # travel assist style showing yellow lanes when op is active
+  
   values = {}
   if len(ldw_stock_values):
     values = {s: ldw_stock_values[s] for s in [
@@ -37,8 +39,8 @@ def create_lka_hud_control(packer, bus, ldw_stock_values, lat_active, steering_p
     "LDW_Gong": sound_alert,
     "LDW_Status_LED_gelb": 1 if lat_active and steering_pressed else 0,
     "LDW_Status_LED_gruen": 1 if lat_active and not steering_pressed else 0,
-    "LDW_Lernmodus_links": 4 if hud_control.leftLaneDepart else 2 + hud_control.leftLaneVisible,
-    "LDW_Lernmodus_rechts": 4 if hud_control.rightLaneDepart else 2 + hud_control.rightLaneVisible,
+    "LDW_Lernmodus_links": 3 + display_mode if hud_control.leftLaneDepart else 1 + hud_control.leftLaneVisible + display_mode,
+    "LDW_Lernmodus_rechts": 3 + display_mode if hud_control.rightLaneDepart else 1 + hud_control.rightLaneVisible + display_mode,
     "LDW_Texte": hud_alert,
   })
   return packer.make_can_msg("LDW_02", bus, values)
@@ -79,7 +81,7 @@ def acc_control_value(main_switch_on, acc_faulted, long_active, just_disabled):
 def acc_hold_type(main_switch_on, acc_faulted, long_active, just_disabled, starting, stopping, esp_hold):
   if acc_faulted or not main_switch_on:
     acc_hold_type = 0
-  elif just_disabled:
+  elif just_disabled: # prevent errors
     acc_hold_type = 5 # disable acc confirmation
   elif starting:
     acc_hold_type = 4 # hold release and startup
@@ -97,25 +99,21 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
   commands = []
 
   values = {
-    "ACC_Typ": acc_type,
-    "ACC_Status_ACC": acc_control,
-    "ACC_StartStopp_Info": acc_enabled,
-    "ACC_Sollbeschleunigung_02": accel if acc_enabled else 3.01,
-    "ACC_zul_Regelabw_unten": 0.2,  # TODO: dynamic adjustment of comfort-band
-    "ACC_zul_Regelabw_oben": 0.2,  # TODO: dynamic adjustment of comfort-band
+    "ACC_Typ":                    acc_type,
+    "ACC_Status_ACC":             acc_control,
+    "ACC_StartStopp_Info":        acc_enabled,
+    "ACC_Sollbeschleunigung_02":  accel if acc_enabled else 3.01,
+    "ACC_zul_Regelabw_unten":     0.2,  # TODO: dynamic adjustment of comfort-band
+    "ACC_zul_Regelabw_oben":      0.2,  # TODO: dynamic adjustment of comfort-band
     "ACC_neg_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
     "ACC_pos_Sollbeschl_Grad_02": 4.0 if acc_enabled else 0,  # TODO: dynamic adjustment of jerk limits
-    "ACC_Anfahren": starting,
-    "ACC_Anhalten": stopping,
-    "ACC_Anhalteweg": 20.46,
-    "ACC_Anforderung_HMS": acc_hold_type,
-    "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
-    #"SET_ME_0XFE": 0xFE,
-    #"SET_ME_0X1": 0x1,
-    #"SET_ME_0X9": 0x9,
-    "Speed": speed,
-    "Reversing": reversing,
-    #"Accel_Boost": 1 if speed != 0 else 0, 
+    "ACC_Anfahren":               starting,
+    "ACC_Anhalten":               stopping,
+    "ACC_Anhalteweg":             20.46,
+    "ACC_Anforderung_HMS":        acc_hold_type,
+    "ACC_AKTIV_regelt":           1 if acc_control == 3 else 0,
+    "Speed":                      speed, # dont know if neccessary
+    "Reversing":                  reversing, # dont know if neccessary
   }
 
   values.update({
@@ -125,12 +123,12 @@ def create_acc_accel_control(packer, bus, acc_type, acc_enabled, accel, acc_cont
     "SET_ME_0XFE": meb_acc_02_values["SET_ME_0XFE"],
     "SET_ME_0X1": meb_acc_02_values["SET_ME_0X1"],
     "SET_ME_0X9": meb_acc_02_values["SET_ME_0X9"],
-    #"Accel_Boost": meb_acc_02_values["Accel_Boost"],
   })
   
   commands.append(packer.make_can_msg("MEB_ACC_02", bus, values))
 
   # satisfy car to prevent errors when pressing Travel Assist Button
+  # the button does nothing with this
   values_ta = {
      "Travel_Assist_Status" : 2, # ready
    	 "Travel_Assist_Request" : 0, # no request
@@ -173,38 +171,34 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
   elif distance == 5:
     zeitluecke_5 = 50
 
-  lead_distance = min(distance_stock_values["Same_Lane_01_Long_Distance"], 100)
+  lead_distance = min(abs(distance_stock_values["Same_Lane_01_Long_Distance"]), 100) # abs because of shift negative value is possible
   
   values = {
     #"STA_Primaeranz": acc_hud_status,
-    "ACC_Status_ACC": acc_control,
-    "ACC_Wunschgeschw_02": set_speed if set_speed < 250 else 327.36,
+    "ACC_Status_ACC":          acc_control,
+    "ACC_Wunschgeschw_02":     set_speed if set_speed < 250 else 327.36,
     "ACC_Gesetzte_Zeitluecke": distance,
-    "ACC_Display_Prio": 1,
-    "ACC_Abstandsindex_02": lead_distance,
-    "ACC_EGO_Fahrzeug": 1 if acc_control == 3 else 0,
-    #"SET_ME_0X3FF": 0x3FF,
-    "Heartbeat": heartbeat,
-    #"SET_ME_0XFFFF": 0xFFFF,
-    #"SET_ME_0X7FFF": 0x7FFF,
-    #"SET_ME_0X1": 1,
-    "Lead_Type_Detected": 1 if lead_distance > 0 else 0,
-    "Lead_Type": 3 if lead_distance > 0 else 0,
-    "Lead_Distance": lead_distance if lead_distance > 0 else 0,
-    "ACC_Enabled": 1 if acc_control == 3 else 0,
-    "ACC_Standby_Override": 1 if acc_control != 3 else 0,
-    "ACC_AKTIV_regelt": 1 if acc_control == 3 else 0,
-    "ACC_Limiter_Mode": 0,
-    "Lead_Brightness": 3 if acc_control == 3 else 0,
-    "Unknown_03": 106,
-    "Unknown_01": 0,
-    "Unknown_08": 0,
-    "ACC_Special_Events": 3 if esp_hold and acc_control == 3 else 0,
-    "Zeitluecke_1_Signal": zeitluecke_1,
-    "Zeitluecke_2_Signal": zeitluecke_2,
-    "Zeitluecke_3_Signal": zeitluecke_3,
-    "Zeitluecke_4_Signal": zeitluecke_4,
-    "Zeitluecke_5_Signal": zeitluecke_5,
+    "ACC_Display_Prio":        1,
+    "ACC_Abstandsindex_02":    lead_distance,
+    "ACC_EGO_Fahrzeug":        1 if acc_control == 3 else 0,
+    "Heartbeat":               heartbeat, # do the same as radar would do, still check if this is necessary
+    "Lead_Type_Detected":      1 if lead_distance > 0 else 0, # object should be displayed
+    "Lead_Type":               3 if lead_distance > 0 else 0, # displaying a car
+    "Lead_Distance":           lead_distance if lead_distance > 0 else 0, # hud distance of object
+    "ACC_Enabled":             1 if acc_control == 3 else 0,
+    "ACC_Standby_Override":    1 if acc_control != 3 else 0,
+    "ACC_AKTIV_regelt":        1 if acc_control == 3 else 0,
+    "ACC_Limiter_Mode":        0,
+    "Lead_Brightness":         3 if acc_control == 3 else 0, # object shows in colour
+    "Unknown_03":              106, # prevents errors
+    "Unknown_01":              0, # prevents errors
+    "Unknown_08":              0, # prevents errors
+    "ACC_Special_Events":      3 if esp_hold and acc_control == 3 else 0, # acc ready message at standstill
+    "Zeitluecke_1_Signal":     zeitluecke_1,
+    "Zeitluecke_2_Signal":     zeitluecke_2,
+    "Zeitluecke_3_Signal":     zeitluecke_3,
+    "Zeitluecke_4_Signal":     zeitluecke_4,
+    "Zeitluecke_5_Signal":     zeitluecke_5,
   }
 
   values.update({
@@ -212,24 +206,12 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, lead_distance, d
     "Unknown_Area_01": meb_acc_01_values["Unknown_Area_01"],
     "SET_ME_0X1": meb_acc_01_values["SET_ME_0X1"],
     "SET_ME_0X3FF": meb_acc_01_values["SET_ME_0X3FF"],
-    #"Heartbeat": meb_acc_01_values["Heartbeat"],
     "SET_ME_0XFFFF": meb_acc_01_values["SET_ME_0XFFFF"],
     "SET_ME_0X7FFF": meb_acc_01_values["SET_ME_0X7FFF"],
-    #"ACC_Enabled": meb_acc_01_values["ACC_Enabled"],
-    #"Unknown_02": meb_acc_01_values["Unknown_03"],
-    #"Unknown_03": meb_acc_01_values["Unknown_03"],
     "Unknown_04": meb_acc_01_values["Unknown_04"],
     "Unknown_05": meb_acc_01_values["Unknown_05"],
     "Unknown_06": meb_acc_01_values["Unknown_06"],
     "Unknown_07": meb_acc_01_values["Unknown_07"],
-    #"Unknown_08": meb_acc_01_values["Unknown_07"],
-    #"Lead_Type_Detected": meb_acc_01_values["Lead_Type_Detected"],
-    #"ACC_Standby_Override": meb_acc_01_values["ACC_Standby_Override"],
-    #"ACC_AKTIV_regelt": meb_acc_01_values["ACC_AKTIV_regelt"],
-    #"ACC_Limiter_Mode": meb_acc_01_values["ACC_Limiter_Mode"],
-    #"ACC_Driving_Type": meb_acc_01_values["ACC_Driving_Type"],
-    #"Lead_Type": meb_acc_01_values["Lead_Type"],
-    #"ACC_Special_Events": meb_acc_01_values["ACC_Special_Events"],
   })
 
   return packer.make_can_msg("MEB_ACC_01", bus, values)
