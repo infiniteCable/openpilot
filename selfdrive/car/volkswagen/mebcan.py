@@ -37,8 +37,8 @@ def create_lka_hud_control(packer, bus, ldw_stock_values, lat_active, steering_p
     "LDW_Gong": sound_alert,
     "LDW_Status_LED_gelb": 1 if lat_active and steering_pressed else 0,
     "LDW_Status_LED_gruen": 1 if lat_active and not steering_pressed else 0,
-    "LDW_Lernmodus_links": 3 if hud_control.leftLaneDepart else 1 + hud_control.leftLaneVisible,
-    "LDW_Lernmodus_rechts": 3 if hud_control.rightLaneDepart else 1 + hud_control.rightLaneVisible,
+    "LDW_Lernmodus_links": 4 if hud_control.leftLaneDepart else 2 + hud_control.leftLaneVisible,
+    "LDW_Lernmodus_rechts": 4 if hud_control.rightLaneDepart else 2 + hud_control.rightLaneVisible,
     "LDW_Texte": hud_alert,
   })
   return packer.make_can_msg("LDW_02", bus, values)
