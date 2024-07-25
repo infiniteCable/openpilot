@@ -66,7 +66,7 @@ class RadarInterface(RadarInterfaceBase):
     valid = msg['Same_Lane_01_Detection'] > 0
     if valid:
       self.pts[signal_part].measured = True
-      self.pts[signal_part].dRel     = abs(msg['Same_Lane_01_Long_Distance']) # absolut because of a little bit of shifting at the moment
+      self.pts[signal_part].dRel     = max(msg['Same_Lane_01_Long_Distance'], 0) #because of a little bit of shifting negative values possible
       self.pts[signal_part].yRel     = -msg['Same_Lane_01_Lat_Distance'] # left is positive
       self.pts[signal_part].vRel     = msg['Same_Lane_01_Rel_Velo'] * CV.KPH_TO_MS
       self.pts[signal_part].aRel     = float('nan')
