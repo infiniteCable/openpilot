@@ -173,7 +173,10 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_distan
   elif distance == 5:
     zeitluecke_5 = gap
 
-  lead_dist = int(round(clip(distance_stock_values["Same_Lane_01_Long_Distance"] * 0.75, 1, 100))) # scaling, prevent negative values because of signal shift
+  lead_dist = clip(distance_stock_values["Same_Lane_01_Long_Distance"] * 0.75, 0, 100) # scaling, prevent negative values because of signal shift
+
+  if lead_distance > 0 and lead_dist == 0:
+    lead_dist = 50
   
   values = {
     #"STA_Primaeranz": acc_hud_status,
