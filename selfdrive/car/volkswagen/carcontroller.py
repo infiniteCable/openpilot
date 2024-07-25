@@ -182,7 +182,7 @@ class CarController(CarControllerBase):
           self.long_heartbeat = 360
 
         t_follow = get_T_FOLLOW(hud_control.leadDistanceBars - 1)
-        t_gap = (t_follow * CS.out.vEgo) * CV.MS_TO_KPH
+        t_gap = t_follow * CS.out.vEgo # in m, we have to scale our dest signal soon with suitable factor and regard maybe different factors of our zeitluecke signals
         lead_distance = 0
         if hud_control.leadVisible and self.frame * DT_CTRL > 1.0:  # Don't display lead until we know the scaling factor
           lead_distance = 512
