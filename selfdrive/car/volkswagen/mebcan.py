@@ -162,8 +162,9 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_distan
   zeitluecke_4 = 0
   zeitluecke_5 = 0
 
+  gap = gap * 5 #for testing
   if distance == 1:
-    zeitluecke_1 = gap
+    zeitluecke_1 = gap 
   elif distance == 2:
     zeitluecke_2 = gap
   elif distance == 3:
