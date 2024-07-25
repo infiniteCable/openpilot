@@ -30,7 +30,7 @@ Ingition is done with CAN Bus signal
 
 
 
-Allow lateral on brake with panda disallowing long messages on brake, simple dark mode for onroad screen (minimum brightness), turn screen of for onroad screen when no status or alert changes, panda not working for any other brands than Volkswagen. Driver monitoring is more aggressive. Enabled lateral torque controller which works good for disabled steering wheel centering.
+This branch contains custom changes additionally that are still not completely implemented
 
 [![openpilot on the comma 3X](https://github.com/commaai/openpilot/assets/8762862/f09e6d29-db2d-4179-80c2-51e8d92bdb5c)](https://comma.ai/shop/comma-3x)
 
