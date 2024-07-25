@@ -180,7 +180,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_distan
     "ACC_Status_ACC":          acc_control,
     "ACC_Wunschgeschw_02":     set_speed if set_speed < 250 else 327.36,
     "ACC_Gesetzte_Zeitluecke": distance,
-    "ACC_Anzeige_Zeitluecke":  1 if acc_control == 3 else 0,
+    #"ACC_Anzeige_Zeitluecke":  1 if acc_control == 3 else 0,
     "ACC_Display_Prio":        1,
     "ACC_Abstandsindex_02":    lead_distance,
     "ACC_EGO_Fahrzeug":        1 if acc_control == 3 else 0,
