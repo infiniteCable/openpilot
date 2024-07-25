@@ -25,7 +25,7 @@ def create_steering_control(packer, bus, apply_steer, lkas_enabled):
 
 
 def create_lka_hud_control(packer, bus, ldw_stock_values, lat_active, steering_pressed, hud_alert, hud_control, sound_alert):
-display_mode = 1 if lat_active else 0 # travel assist style showing yellow lanes when op is active
+  display_mode = 1 if lat_active else 0 # travel assist style showing yellow lanes when op is active
   
   values = {}
   if len(ldw_stock_values):
