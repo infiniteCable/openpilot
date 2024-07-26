@@ -82,7 +82,7 @@ class CarControllerParams:
       self.STEERING_POWER_NORMAL_STEPS     = 1     # HCA_03 steering power counter steps for default change events
       self.STEERING_POWER_MAX_BY_SPEED     = 20    # HCA_03 speed in m/s^2 where maximum steering power is reached
       self.STEERING_POWER_MAX_BY_CURVATURE = 0.01  # HCA_03 angle from zero position where maximum steering power is reached
-      self.CURVATURE_MAX                   = 0.05   # HCA_03 maximum curvature in 1/m (at the moment, we estimate that 0.1 1/m is max of signal (0.05 signed))
+      self.CURVATURE_MAX                   = 0.095   # HCA_03 maximum curvature in 1/m (at the moment, we estimate that about 0.2 1/m is max of signal (0.1 signed))
       self.CURVATURE_ERROR                 = 0.002 # HCA_03 curvature error used form ford ~6 degrees at 10 m/s, ~10 degrees at 35 m/s
       self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.0002, 0.0001]) # using ford limits for curvature at the moment
       self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.000225, 0.00015]) # using ford limits for curvature at the moment
