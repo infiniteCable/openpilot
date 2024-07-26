@@ -28,14 +28,14 @@ class CarController(CarControllerBase):
     self.ext_bus = CANBUS.pt if CP.networkLocation == car.CarParams.NetworkLocation.fwdCamera else CANBUS.cam
 
     self.apply_steer_last = 0
-    self.apply_angle_last = 0
+    self.apply_curvature_last = 0
     self.gra_acc_counter_last = None
     self.frame = 0
     self.eps_timer_soft_disable_alert = False
     self.hca_frame_timer_running = 0
     self.hca_frame_same_torque = 0
     self.lat_active_prev = False
-    self.torque_wind_down = 0
+    self.steering_power = 0
     self.long_heartbeat = 0
     self.long_active_prev = False
 
@@ -49,53 +49,54 @@ class CarController(CarControllerBase):
     if self.frame % self.CCP.STEER_STEP == 0:
       if self.CP.flags & VolkswagenFlags.MEB:
         # Logic to avoid HCA refused state
-        #   * angle change torque as counter near zero before standstill OP lane assist deactivation
+        #   * steering power as counter near zero before standstill OP lane assist deactivation
         # MEB rack can be used continously without found time limits yet
-        # Angle change counter is used to:
+        # Steering power counter is used to:
         #   * prevent sudden fluctuations at low speeds
         #   * avoid HCA refused
         #   * easy user intervention
-        #   * keep it near maximum regarding speed to get full torque in shortest time
+        #   * keep it near maximum regarding speed to get full steering power in shortest time
 
         if CC.latActive:
           hca_enabled          = True
           self.lat_active_prev = True
-          apply_angle          = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
+          apply_curvature      = apply_std_steer_angle_limits(actuators.curvature, self.apply_curvature_last, CS.out.vEgoRaw, self.CCP)
+          apply_curvature      = clip(apply_curvature, -self.CCP.CURVATURE_MAX, self.CCP.CURVATURE_MAX)
 
           # torque wind down as lazy counter
-          torque_wind_down_min_by_speed = interp(CS.out.vEgoRaw, [0, self.CCP.TORQUE_WIND_DOWN_MAX_BY_SPEED], [self.CCP.TORQUE_WIND_DOWN_MIN, self.CCP.TORQUE_WIND_DOWN_MAX])
-          torque_wind_down_by_angle     = self.CCP.TORQUE_WIND_DOWN_MAX * abs(apply_angle) / self.CCP.TORQUE_WIND_DOWN_MAX_BY_ANGLE # maximum angle change torque is reached with 10 degrees
-          torque_wind_down_target       = clip(torque_wind_down_by_angle, torque_wind_down_min_by_speed, self.CCP.TORQUE_WIND_DOWN_MAX)
+          steering_power_min_by_speed = interp(CS.out.vEgoRaw, [0, self.CCP.STEERING_POWER_MAX_BY_SPEED], [self.CCP.STEERING_POWER_MIN, self.CCP.STEERING_POWER_MAX])
+          steering_power_by_curvature     = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_CURVATURE # maximum angle change torque is reached with 10 degrees
+          steering_power_target       = clip(steering_power_by_curvature, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
 
-          if self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MIN:  # OP lane assist just activated
-            self.torque_wind_down += self.CCP.TORQUE_WIND_DOWN_NORMAL_STEPS
+          if self.steering_power < self.CCP.STEERING_POWER_MIN:  # OP lane assist just activated
+            self.steering_power += self.CCP.STEERING_POWER_NORMAL_STEPS
 
-          elif CS.out.steeringPressed and self.torque_wind_down > self.CCP.TORQUE_WIND_DOWN_USER: # user action results in decreasing the angle change torque
-            self.torque_wind_down = max(self.torque_wind_down - self.CCP.TORQUE_WIND_DOWN_CRITICAL_STEPS, self.CCP.TORQUE_WIND_DOWN_USER)
+          elif CS.out.steeringPressed and self.steering_power > self.CCP.STEERING_POWER_USER: # user action results in decreasing the angle change torque
+            self.steering_power = max(self.steering_power - self.CCP.STEERING_POWER_CRITICAL_STEPS, self.CCP.STEERING_POWER_USER)
 
-          elif self.torque_wind_down < self.CCP.TORQUE_WIND_DOWN_MAX: # following desired target
-            if self.torque_wind_down < torque_wind_down_target:
-              self.torque_wind_down = min(self.torque_wind_down + self.CCP.TORQUE_WIND_DOWN_CRITICAL_STEPS, torque_wind_down_target)
-            elif self.torque_wind_down > torque_wind_down_target:
-              self.torque_wind_down -= self.CCP.TORQUE_WIND_DOWN_NORMAL_STEPS
+          elif self.steering_power < self.CCP.STEERING_POWERN_MAX: # following desired target
+            if self.steering_power < steering_power_target:
+              self.steering_power = min(self.torque_wind_down + self.CCP.STEERING_POWER_CRITICAL_STEPS, steering_power_target)
+            elif self.steering_power > steering_power_target:
+              self.steering_power -= self.CCP.STEERING_POWER_NORMAL_STEPS
 
           #if abs(apply_angle) > 45:
           #  new_steer = self.CCP.STEER_MAX -
           #  apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.CCP)
 
         else:
-          if self.lat_active_prev and self.torque_wind_down > 0: # decrement angle change torque to zero before disabling lane assist to prevent EPS fault
+          if self.lat_active_prev and self.steering_power > 0: # decrement power to zero before disabling lane assist to prevent EPS fault
             hca_enabled            = True
-            apply_angle            = CS.out.steeringAngleDeg
-            self.torque_wind_down -= self.CCP.TORQUE_WIND_DOWN_NORMAL_STEPS
+            apply_curvature        = CS.out.steeringAngleDeg
+            self.steering_power   -= self.CCP.STEERING_POWER_NORMAL_STEPS
           else:
             hca_enabled           = False
             self.lat_active_prev  = False
-            self.torque_wind_down = 0
-            apply_angle           = 0
+            self.steering_power   = 0
+            apply_curvature       = 0
 
-        self.apply_angle_last = clip(apply_angle, -self.CCP.ANGLE_MAX, self.CCP.ANGLE_MAX)
-        can_sends.append(self.CCS.create_steering_control_angle(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, self.torque_wind_down))
+        self.apply_curvature_last = apply_curvature
+        can_sends.append(self.CCS.create_steering_control_curvature(self.packer_pt, CANBUS.pt, apply_curvature, hca_enabled, self.steering_power))
 
       else:
         # Logic to avoid HCA state 4 "refused":
