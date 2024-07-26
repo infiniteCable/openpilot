@@ -1,13 +1,13 @@
 from openpilot.common.numpy_fast import clip
 
-def create_steering_control_angle(packer, bus, apply_angle, lkas_enabled, torque_wind_down):
+def create_steering_control_curvature(packer, bus, apply_curvature, lkas_enabled, power):
   values = {
-    "Steering_Angle": abs(apply_angle),
+    "Curvature": abs(apply_curvature),
+    "VZ": 1 if apply_curvature < 0 and lkas_enabled == 1 else 0,
+    "Power": power if lkas_enabled else 0,
     "Active": lkas_enabled,
-    "VZ": 1 if apply_angle < 0 and lkas_enabled == 1 else 0,
     "Active_02": lkas_enabled,
     "Inactive": not lkas_enabled,
-    "Torque_Wind_Down": torque_wind_down if lkas_enabled else 0,
   }
   return packer.make_can_msg("HCA_03", bus, values)
 
