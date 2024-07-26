@@ -11,6 +11,15 @@ from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import get_T
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 LongCtrlState = car.CarControl.Actuators.LongControlState
 
+def apply_meb_curvature_limits(apply_curvature, apply_curvature_last, current_curvature, v_ego_raw, CarControllerParams):
+  apply_curvature = clip(apply_curvature, current_curvature - CarControllerParams.CURVATURE_ERROR,
+                         current_curvature + CarControllerParams.CURVATURE_ERROR)
+
+  # Curvature rate limit after driver torque limit
+  apply_curvature = apply_std_steer_angle_limits(apply_curvature, apply_curvature_last, v_ego_raw, CarControllerParams)
+
+  return clip(apply_curvature, -CarControllerParams.CURVATURE_MAX, CarControllerParams.CURVATURE_MAX)
+
 
 class CarController(CarControllerBase):
   def __init__(self, dbc_name, CP, VM):
@@ -60,12 +69,12 @@ class CarController(CarControllerBase):
         if CC.latActive:
           hca_enabled          = True
           self.lat_active_prev = True
-          apply_curvature      = apply_std_steer_angle_limits(actuators.curvature, self.apply_curvature_last, CS.out.vEgoRaw, self.CCP)
-          apply_curvature      = clip(apply_curvature, -self.CCP.CURVATURE_MAX, self.CCP.CURVATURE_MAX)
+          current_curvature    = CS.out.yawRate / max(CS.out.vEgoRaw, 0.1) # using ford coding, TODO verify sign
+          apply_curvature      = apply_meb_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw, self.CCP)
 
           # torque wind down as lazy counter
           steering_power_min_by_speed = interp(CS.out.vEgoRaw, [0, self.CCP.STEERING_POWER_MAX_BY_SPEED], [self.CCP.STEERING_POWER_MIN, self.CCP.STEERING_POWER_MAX])
-          steering_power_by_curvature     = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_CURVATURE # maximum angle change torque is reached with 10 degrees
+          steering_power_by_curvature = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_CURVATURE # maximum angle change torque is reached with 10 degrees
           steering_power_target       = clip(steering_power_by_curvature, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
 
           if self.steering_power < self.CCP.STEERING_POWER_MIN:  # OP lane assist just activated
@@ -87,13 +96,14 @@ class CarController(CarControllerBase):
         else:
           if self.lat_active_prev and self.steering_power > 0: # decrement power to zero before disabling lane assist to prevent EPS fault
             hca_enabled            = True
-            apply_curvature        = CS.out.steeringAngleDeg
+            current_curvature      = CS.out.yawRate / max(CS.out.vEgoRaw, 0.1) # using ford coding, TODO verify sign
+            apply_curvature        = current_curvatur
             self.steering_power   -= self.CCP.STEERING_POWER_NORMAL_STEPS
           else:
             hca_enabled           = False
             self.lat_active_prev  = False
             self.steering_power   = 0
-            apply_curvature       = 0
+            apply_curvature       = 0.
 
         self.apply_curvature_last = apply_curvature
         can_sends.append(self.CCS.create_steering_control_curvature(self.packer_pt, CANBUS.pt, apply_curvature, hca_enabled, self.steering_power))
