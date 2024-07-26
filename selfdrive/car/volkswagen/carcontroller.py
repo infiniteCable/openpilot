@@ -68,7 +68,7 @@ class CarController(CarControllerBase):
         if CC.latActive:
           hca_enabled          = True
           self.lat_active_prev = True
-          current_curvature    = CS.out.yawRate / max(CS.out.vEgoRaw, 0.1) # using ford coding, TODO verify sign
+          current_curvature    = CS.out.yawRate / max(CS.out.vEgoRaw, 0.1) # using ford coding, TODO verify sign (clockwise is negative)
           apply_curvature      = apply_meb_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw, self.CCP)
 
           # torque wind down as lazy counter
