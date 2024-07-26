@@ -11,12 +11,12 @@ from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import get_T
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 LongCtrlState = car.CarControl.Actuators.LongControlState
 
-def apply_meb_curvature_limits(apply_curvature, apply_curvature_last, current_curvature, v_ego_raw, CarControllerParams):
-  apply_curvature = clip(apply_curvature, current_curvature - CarControllerParams.CURVATURE_ERROR,
-                         current_curvature + CarControllerParams.CURVATURE_ERROR)
+def apply_meb_curvature_limits(apply_curvature, apply_curvature_last, current_curvature, v_ego_raw, CCP):
+  apply_curvature = clip(apply_curvature, current_curvature - CCP.CURVATURE_ERROR,
+                         current_curvature + CCP.CURVATURE_ERROR)
 
   # Curvature rate limit after driver torque limit
-  apply_curvature = apply_std_steer_angle_limits(apply_curvature, apply_curvature_last, v_ego_raw, CarControllerParams)
+  apply_curvature = apply_std_steer_angle_limits(apply_curvature, apply_curvature_last, v_ego_raw, CCP)
 
   return clip(apply_curvature, -CarControllerParams.CURVATURE_MAX, CarControllerParams.CURVATURE_MAX)
 
