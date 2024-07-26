@@ -3,7 +3,7 @@ from openpilot.common.numpy_fast import clip
 def create_steering_control_curvature(packer, bus, apply_curvature, lkas_enabled, power):
   values = {
     "Curvature": abs(apply_curvature),
-    "VZ": 1 if apply_curvature < 0 and lkas_enabled == 1 else 0,
+    "VZ": 1 if apply_curvature > 0 and lkas_enabled == 1 else 0,
     "Power": power if lkas_enabled else 0,
     "Active": lkas_enabled,
     "Active_02": lkas_enabled,
