@@ -82,7 +82,7 @@ class CarController(CarControllerBase):
           elif CS.out.steeringPressed and self.steering_power > self.CCP.STEERING_POWER_USER: # user action results in decreasing the angle change torque
             self.steering_power = max(self.steering_power - self.CCP.STEERING_POWER_CRITICAL_STEPS, self.CCP.STEERING_POWER_USER)
 
-          elif self.steering_power < self.CCP.STEERING_POWERN_MAX: # following desired target
+          elif self.steering_power < self.CCP.STEERING_POWER_MAX: # following desired target
             if self.steering_power < steering_power_target:
               self.steering_power = min(self.torque_wind_down + self.CCP.STEERING_POWER_CRITICAL_STEPS, steering_power_target)
             elif self.steering_power > steering_power_target:
