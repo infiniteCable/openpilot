@@ -75,16 +75,16 @@ class CarControllerParams:
       self.LDW_STEP                        = 10    # LDW_02 message frequency 10Hz
       self.ACC_HUD_STEP                    = 6     # MEB_ACC_01 message frequency 16Hz
       self.STEER_DRIVER_ALLOWANCE          = 80    # Driver intervention threshold 0.8 Nm
-      self.TORQUE_WIND_DOWN_MAX            = 125   # HCA_03 maximum angle change torque
-      self.TORQUE_WIND_DOWN_MIN            = 20    # HCA_03 minimum angle change torque
-      self.TORQUE_WIND_DOWN_USER           = 60    # HCA_03 desired angle change torque for user intervention
-      self.TORQUE_WIND_DOWN_CRITICAL_STEPS = 4     # HCA_03 angle change torque counter steps for critical change events
-      self.TORQUE_WIND_DOWN_NORMAL_STEPS   = 1     # HCA_03 angle change torque counter steps for default change events
-      self.TORQUE_WIND_DOWN_MAX_BY_SPEED   = 20    # HCA_03 speed in m/s^2 where maximum angle change torque is reached
-      self.TORQUE_WIND_DOWN_MAX_BY_ANGLE   = 20    # HCA_03 angle from zero position where maximum angle change torque is reached
-      self.ANGLE_MAX                       = 360   # HCA_03 maximum angle
-      self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 1.6, .3])
-      self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 7.0, 0.8])
+      self.STEERING_POWER_MAX              = 125   # HCA_03 maximum steering power
+      self.STEERING_POWER_MIN              = 20    # HCA_03 minimum steering power
+      self.STEERING_POWER_USER             = 60    # HCA_03 desired steering power for user intervention
+      self.STEERING_POWER_CRITICAL_STEPS   = 4     # HCA_03 steering power counter steps for critical change events
+      self.STEERING_POWER_NORMAL_STEPS     = 1     # HCA_03 steering power counter steps for default change events
+      self.STEERING_POWER_MAX_BY_SPEED     = 20    # HCA_03 speed in m/s^2 where maximum steering power is reached
+      self.STEERING_POWER_MAX_BY_ANGLE     = 20    # HCA_03 angle from zero position where maximum steering power is reached
+      self.CURVATURE_MAX                   = 0.02   # HCA_03 maximum curvature in m^-1, use ford settings at the moment
+      self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.0002, 0.0001]) # using ford limits for curvature at the moment
+      self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.000225, 0.00015]) # using ford limits for curvature at the moment
 
       self.shifter_values    = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
       self.hca_status_values = can_define.dv["MEB_EPS_01"]["LatCon_HCA_Status"]
