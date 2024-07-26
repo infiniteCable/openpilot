@@ -71,20 +71,20 @@ class CarController(CarControllerBase):
           current_curvature    = CS.out.yawRate / max(CS.out.vEgoRaw, 0.1) # using ford coding, TODO verify sign (clockwise is negative)
           apply_curvature      = apply_meb_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw, self.CCP)
 
-          # torque wind down as lazy counter
+          # steering power as lazy counter
           steering_power_min_by_speed = interp(CS.out.vEgoRaw, [0, self.CCP.STEERING_POWER_MAX_BY_SPEED], [self.CCP.STEERING_POWER_MIN, self.CCP.STEERING_POWER_MAX])
-          steering_power_by_curvature = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_CURVATURE # maximum angle change torque is reached with 10 degrees
+          steering_power_by_curvature = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_CURVATURE # maximum steering power is reached with 10 degrees
           steering_power_target       = clip(steering_power_by_curvature, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
 
           if self.steering_power < self.CCP.STEERING_POWER_MIN:  # OP lane assist just activated
             self.steering_power += self.CCP.STEERING_POWER_NORMAL_STEPS
 
-          elif CS.out.steeringPressed and self.steering_power > self.CCP.STEERING_POWER_USER: # user action results in decreasing the angle change torque
+          elif CS.out.steeringPressed and self.steering_power > self.CCP.STEERING_POWER_USER: # user action results in decreasing the steering power
             self.steering_power = max(self.steering_power - self.CCP.STEERING_POWER_CRITICAL_STEPS, self.CCP.STEERING_POWER_USER)
 
           elif self.steering_power < self.CCP.STEERING_POWER_MAX: # following desired target
             if self.steering_power < steering_power_target:
-              self.steering_power = min(self.torque_wind_down + self.CCP.STEERING_POWER_CRITICAL_STEPS, steering_power_target)
+              self.steering_power = min(self.steering_power + self.CCP.STEERING_POWER_CRITICAL_STEPS, steering_power_target)
             elif self.steering_power > steering_power_target:
               self.steering_power -= self.CCP.STEERING_POWER_NORMAL_STEPS
 
