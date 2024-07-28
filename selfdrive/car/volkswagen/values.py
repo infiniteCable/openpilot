@@ -84,8 +84,8 @@ class CarControllerParams:
       self.STEERING_POWER_MAX_BY_CURVATURE = 0.01  # HCA_03 angle from zero position where maximum steering power is reached
       self.CURVATURE_MAX                   = 0.1   # HCA_03 maximum curvature in 1/m (at the moment, we estimate that about 0.2 1/m is max of signal (0.1 signed))
       self.CURVATURE_ERROR                 = 0.002 # HCA_03 curvature error used form ford ~6 degrees at 10 m/s, ~10 degrees at 35 m/s
-      self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.0002, 0.0001]) # using ford limits for curvature at the moment
-      self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.000225, 0.00015]) # using ford limits for curvature at the moment
+      self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.002, 0.001]) # curvature safety limit up
+      self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.0025, 0.0015]) # curvature safety limit down
 
       self.shifter_values    = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
       self.hca_status_values = can_define.dv["MEB_EPS_01"]["LatCon_HCA_Status"]
