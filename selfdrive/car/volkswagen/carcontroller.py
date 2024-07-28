@@ -95,7 +95,7 @@ class CarController(CarControllerBase):
         else:
           if self.lat_active_prev and self.steering_power > 0: # decrement power to zero before disabling lane assist to prevent EPS fault
             hca_enabled            = True
-            current_curvature      = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1) # using ford coding, TODO verify sign
+            current_curvature      = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
             apply_curvature        = current_curvature
             self.steering_power   -= self.CCP.STEERING_POWER_NORMAL_STEPS
           else:
