@@ -14,7 +14,8 @@ function op_install() {
   if [ "$(uname)" == "Darwin" ] && [ $SHELL == "/bin/bash" ]; then
     RC_FILE="$HOME/.bash_profile"
   fi
-  printf "\nalias op='source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )/op.sh" \"\$@\"'\n" >> $RC_FILE
+  CMD="\nalias op='source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )/op.sh" \"\$@\"'\n"
+  grep "alias op=" "$RC_FILE" &> /dev/null || printf "$CMD" >> $RC_FILE
   echo -e " ↳ [${GREEN}✔${NC}] op installed successfully. Open a new shell to use it.\n"
 
   )
@@ -73,7 +74,7 @@ function op_check_git() {
   fi
 
   echo "Checking for git submodules..."
-  for name in body msgq_repo opendbc panda rednose_repo tinygrad_repo; do
+  for name in $(git config --file .gitmodules --get-regexp path | awk '{ print $2 }' | tr '\n' ' '); do
     if [[ -z $(ls $OPENPILOT_ROOT/$name) ]]; then
       echo -e " ↳ [${RED}✗${NC}] git submodule $name not found! Run 'git submodule update --init --recursive'"
       return 1
@@ -188,7 +189,7 @@ function op_setup() {
   echo -e " ↳ [${GREEN}✔${NC}] Dependencies installed successfully.\n"
 
   echo "Getting git submodules..."
-  op_run_command git submodule update --init --recursive
+  op_run_command git submodule update --jobs 4 --init --recursive
   echo -e " ↳ [${GREEN}✔${NC}] Submodules installed successfully.\n"
 
   echo "Pulling git lfs files..."
@@ -212,6 +213,12 @@ function op_venv() {
   )
 
   if [[ "$?" -eq 0 ]]; then
+
+    if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
+      echo "Run 'op venv' or 'source op.sh venv' to activate your venv!"
+      return 1
+    fi
+
     # this must be run in the same shell as the user calling "op"
     op_get_openpilot_dir
     op_run_command source $OPENPILOT_ROOT/.venv/bin/activate
@@ -231,7 +238,9 @@ function op_check() {
 function op_build() {
   (set -e
 
+  CDIR=$(pwd)
   op_before_cmd
+  cd "$CDIR"
   op_run_command scons $@
 
   )
@@ -251,6 +260,15 @@ function op_lint() {
 
   op_before_cmd
   op_run_command pre-commit run --all $@
+
+  )
+}
+
+function op_test() {
+  (set -e
+
+  op_before_cmd
+  op_run_command pytest $@
 
   )
 }
@@ -302,12 +320,13 @@ function op_default() {
   echo -e "  ${BOLD}venv${NC}     Activate the Python virtual environment"
   echo -e "  ${BOLD}check${NC}    Check the development environment (git, os, python) to start using openpilot"
   echo -e "  ${BOLD}setup${NC}    Install openpilot dependencies"
-  echo -e "  ${BOLD}build${NC}    Build openpilot"
+  echo -e "  ${BOLD}build${NC}    Run the openpilot build system in the current working directory"
   echo -e "  ${BOLD}sim${NC}      Run openpilot in a simulator"
   echo -e "  ${BOLD}juggle${NC}   Run Plotjuggler"
   echo -e "  ${BOLD}replay${NC}   Run replay"
   echo -e "  ${BOLD}cabana${NC}   Run cabana"
   echo -e "  ${BOLD}lint${NC}     Run all the pre-commit checks"
+  echo -e "  ${BOLD}test${NC}     Run all unit tests from pytest"
   echo -e "  ${BOLD}help${NC}     Show this message"
   echo -e "  ${BOLD}install${NC}  Install the 'op' tool system wide"
   echo ""
@@ -353,6 +372,7 @@ function _op() {
     juggle )    shift 1; op_juggle "$@" ;;
     cabana )    shift 1; op_cabana "$@" ;;
     lint )      shift 1; op_lint "$@" ;;
+    test )      shift 1; op_test "$@" ;;
     replay )    shift 1; op_replay "$@" ;;
     sim )       shift 1; op_sim "$@" ;;
     install )   shift 1; op_install "$@" ;;
@@ -384,6 +404,7 @@ unset -f op_before_cmd
 unset -f op_sim
 unset -f op_activate_venv
 unset -f op_get_openpilot_dir
+unset -f op_test
 unset DRY
 unset NC
 unset RED
