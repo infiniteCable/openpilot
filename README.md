@@ -6,7 +6,7 @@ Part 1: Harness build (done at Gateway/J533/ICAS1 which is acc controlling capab
 
 Part 2: can bus command sniffing and tests (in progress) -> all signals are possible candidates
 
-Part 3: Steering command with C3x (working with new signal (no counter, no checksum, angle controlled with angle change torque))
+Part 3: Steering command with C3x (working with new signal, using angle at the moment)
 
 Part 4: ACC command with C3x (working with new signals, still not everything understood or incorrect)
 
