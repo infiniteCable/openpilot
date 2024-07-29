@@ -11,12 +11,12 @@ from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import get_T
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 LongCtrlState = car.CarControl.Actuators.LongControlState
 
-def apply_meb_curvature_limits(apply_curvature, apply_curvature_last, current_curvature, v_ego_raw, CCP):
-  if v_ego_raw > 1: # we don't enforce checks for this in panda at the moment, but keep it near measured current curv to project user input
-    apply_curvature = clip(apply_curvature, current_curvature - CCP.CURVATURE_ERROR, current_curvature + CCP.CURVATURE_ERROR)
-  apply_curvature = apply_std_steer_angle_limits(apply_curvature, apply_curvature_last, v_ego_raw, CCP)
-  
-  return clip(apply_curvature, -CCP.CURVATURE_MAX, CCP.CURVATURE_MAX)
+#def apply_meb_curvature_limits(apply_curvature, apply_curvature_last, current_curvature, v_ego_raw, CCP):
+#  if v_ego_raw > 1: # we don't enforce checks for this in panda at the moment, but keep it near measured current curv to project user input
+#    apply_curvature = clip(apply_curvature, current_curvature - CCP.CURVATURE_ERROR, current_curvature + CCP.CURVATURE_ERROR)
+#  apply_curvature = apply_std_steer_angle_limits(apply_curvature, apply_curvature_last, v_ego_raw, CCP)
+#  
+#  return clip(apply_curvature, -CCP.CURVATURE_MAX, CCP.CURVATURE_MAX)
 
 
 class CarController(CarControllerBase):
