@@ -75,7 +75,7 @@ class CarController(CarControllerBase):
           # steering power as lazy counter
           steering_power_min_by_speed = interp(CS.out.vEgoRaw, [0, self.CCP.STEERING_POWER_MAX_BY_SPEED], [self.CCP.STEERING_POWER_MIN, self.CCP.STEERING_POWER_MAX])
           #steering_power_by_curvature = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_CURVATURE # maximum steering power is reached with 10 degrees
-          steering_power_by_angle = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_ANGLE # maximum steering power is reached with 10 degrees
+          steering_power_by_angle = self.CCP.STEERING_POWER_MAX * abs(apply_angle) / self.CCP.STEERING_POWER_MAX_BY_ANGLE # maximum steering power is reached with 10 degrees
           #steering_power_target       = clip(steering_power_by_curvature, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
           steering_power_target       = clip(steering_power_by_angle, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
 
