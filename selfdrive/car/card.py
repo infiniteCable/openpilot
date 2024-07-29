@@ -53,15 +53,11 @@ class Car:
 
     # set alternative experiences from parameters
     self.disengage_on_accelerator = self.params.get_bool("DisengageOnAccelerator")
-    self.not_disengage_lat_on_brake = self.params.get_bool("NotDisengageLatOnBrake")
     self.CP.alternativeExperience = 0
     if not self.disengage_on_accelerator:
       self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
-    if self.not_disengage_lat_on_brake:
-      self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.ALLOW_LATERAL_ON_BRAKE
 
     openpilot_enabled_toggle = self.params.get_bool("OpenpilotEnabledToggle")
-    self.lateral_only = self.params.get_bool("EngageLatOnly")
 
     controller_available = self.CI.CC is not None and openpilot_enabled_toggle and not self.CP.dashcamOnly
 
@@ -116,13 +112,7 @@ class Car:
     if (CS.gasPressed and not self.CS_prev.gasPressed and self.disengage_on_accelerator) or \
       (CS.brakePressed and (not self.CS_prev.brakePressed or not CS.standstill)) or \
       (CS.regenBraking and (not self.CS_prev.regenBraking or not CS.standstill)):
-
-      # set openpilot to lateral control only mode when toggle NotDisengageLatOnBrake is set and the brake was pressed
-      if CS.brakePressed and self.not_disengage_lat_on_brake and self.enabled:
-        self.events.add(EventName.lateralOnly)
-        self.lateral_only = True
-      else:
-        self.events.add(EventName.pedalPressed)
+      self.events.add(EventName.pedalPressed)
 
     CS.events = self.events.to_msg()
 
