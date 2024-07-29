@@ -35,7 +35,8 @@ class CarController(CarControllerBase):
     self.ext_bus = CANBUS.pt if CP.networkLocation == car.CarParams.NetworkLocation.fwdCamera else CANBUS.cam
 
     self.apply_steer_last = 0
-    self.apply_curvature_last = 0
+    #self.apply_curvature_last = 0
+    self.apply_angle_last = 0
     self.gra_acc_counter_last = None
     self.frame = 0
     self.eps_timer_soft_disable_alert = False
@@ -67,13 +68,16 @@ class CarController(CarControllerBase):
         if CC.latActive:
           hca_enabled          = True
           self.lat_active_prev = True
-          current_curvature    = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1) # TODO verify sign (clockwise is negative)
-          apply_curvature      = apply_meb_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw, self.CCP)
+          #current_curvature    = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1) # TODO verify sign (clockwise is negative)
+          #apply_curvature      = apply_meb_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw, self.CCP)
+          apply_angle          = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw, self.CCP)
 
           # steering power as lazy counter
           steering_power_min_by_speed = interp(CS.out.vEgoRaw, [0, self.CCP.STEERING_POWER_MAX_BY_SPEED], [self.CCP.STEERING_POWER_MIN, self.CCP.STEERING_POWER_MAX])
-          steering_power_by_curvature = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_CURVATURE # maximum steering power is reached with 10 degrees
-          steering_power_target       = clip(steering_power_by_curvature, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
+          #steering_power_by_curvature = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_CURVATURE # maximum steering power is reached with 10 degrees
+          steering_power_by_angle = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_ANGLE # maximum steering power is reached with 10 degrees
+          #steering_power_target       = clip(steering_power_by_curvature, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
+          steering_power_target       = clip(steering_power_by_angle, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
 
           if self.steering_power < self.CCP.STEERING_POWER_MIN:  # OP lane assist just activated
             self.steering_power += self.CCP.STEERING_POWER_NORMAL_STEPS
@@ -94,17 +98,20 @@ class CarController(CarControllerBase):
         else:
           if self.lat_active_prev and self.steering_power > 0: # decrement power to zero before disabling lane assist to prevent EPS fault
             hca_enabled            = True
-            current_curvature      = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
-            apply_curvature        = current_curvature
+            #current_curvature      = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
+            #apply_curvature        = current_curvature
+            apply_angle            = CS.out.steeringAngleDeg
             self.steering_power    = min(self.steering_power - self.CCP.STEERING_POWER_NORMAL_STEPS, 0)
           else:
             hca_enabled           = False
             self.lat_active_prev  = False
             self.steering_power   = 0
-            apply_curvature       = 0.
+            #apply_curvature       = 0.
+            apply_angle           = 0
 
-        self.apply_curvature_last = apply_curvature
-        can_sends.append(self.CCS.create_steering_control_curvature(self.packer_pt, CANBUS.pt, apply_curvature, hca_enabled, self.steering_power))
+        #self.apply_curvature_last = apply_curvature
+        self.apply_angle_last = clip(apply_angle, -self.CCP.ANGLE_MAX, self.CCP.ANGLE_MAX)
+        can_sends.append(self.CCS.create_steering_control_curvature(self.packer_pt, CANBUS.pt, apply_angle, hca_enabled, self.steering_power))
 
       else:
         # Logic to avoid HCA state 4 "refused":
@@ -221,7 +228,8 @@ class CarController(CarControllerBase):
     new_actuators = actuators.as_builder()
     new_actuators.steer = self.apply_steer_last / self.CCP.STEER_MAX
     new_actuators.steerOutputCan = self.apply_steer_last
-    new_actuators.curvature = self.apply_curvature_last
+    #new_actuators.curvature = self.apply_curvature_last
+    new_actuators.steeringAngleDeg = self.apply_angle_last
 
     self.gra_acc_counter_last = CS.gra_stock_values["COUNTER"]
     self.frame += 1
