@@ -81,11 +81,15 @@ class CarControllerParams:
       self.STEERING_POWER_CRITICAL_STEPS   = 4     # HCA_03 steering power counter steps for critical change events
       self.STEERING_POWER_NORMAL_STEPS     = 1     # HCA_03 steering power counter steps for default change events
       self.STEERING_POWER_MAX_BY_SPEED     = 20    # HCA_03 speed in m/s^2 where maximum steering power is reached
-      self.STEERING_POWER_MAX_BY_CURVATURE = 0.05  # HCA_03 curvature from zero position where maximum steering power is reached
-      self.CURVATURE_MAX                   = 0.195 # HCA_03 maximum curvature in 1/m, we estimate that about 0.2 1/m is max of signal
-      self.CURVATURE_ERROR                 = 0.01  # HCA_03 curvature error, yaw rate error at standstill in range of about 0.2 deg/sec
-      self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[5, 12, 25], angle_v=[0.004, 0.002, 0.001]) # curvature safety limit up
-      self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[5, 12, 25], angle_v=[0.005, 0.0025, 0.0015]) # curvature safety limit down
+      #self.STEERING_POWER_MAX_BY_CURVATURE = 0.05  # HCA_03 curvature from zero position where maximum steering power is reached
+      self.STEERING_POWER_MAX_BY_ANGLE     = 10    # HCA_03 angle from zero position where maximum angle change torque is reached
+      #self.CURVATURE_MAX                   = 0.195 # HCA_03 maximum curvature in 1/m, we estimate that about 0.2 1/m is max of signal
+      #self.CURVATURE_ERROR                 = 0.01  # HCA_03 curvature error, yaw rate error at standstill in range of about 0.2 deg/sec
+      #self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[5, 12, 25], angle_v=[0.004, 0.002, 0.001]) # curvature safety limit up
+      #self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[5, 12, 25], angle_v=[0.005, 0.0025, 0.0015]) # curvature safety limit down
+      self.ANGLE_MAX                       = 360   # HCA_03 maximum angle
+      self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 1.6, .3])
+      self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 7.0, 0.8])
 
       self.shifter_values    = can_define.dv["Getriebe_11"]["GE_Fahrstufe"]
       self.hca_status_values = can_define.dv["MEB_EPS_01"]["LatCon_HCA_Status"]
