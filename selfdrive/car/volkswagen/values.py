@@ -83,7 +83,7 @@ class CarControllerParams:
       self.STEERING_POWER_MAX_BY_SPEED     = 20    # HCA_03 speed in m/s^2 where maximum steering power is reached
       self.STEERING_POWER_MAX_BY_CURVATURE = 0.01  # HCA_03 curvature from zero position where maximum steering power is reached
       self.CURVATURE_MAX                   = 0.198 # HCA_03 maximum curvature in 1/m, we estimate that about 0.2 1/m is max of signal
-      self.CURVATURE_ERROR                 = 0.02  # HCA_03 curvature error
+      self.CURVATURE_ERROR                 = 0.01  # HCA_03 curvature error
       self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[5, 12, 25], angle_v=[0.004, 0.002, 0.001]) # curvature safety limit up
       self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[5, 12, 25], angle_v=[0.005, 0.0025, 0.0015]) # curvature safety limit down
 
