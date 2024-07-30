@@ -102,7 +102,8 @@ class CarController(CarControllerBase):
             #current_curvature      = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
             #apply_curvature        = current_curvature
             apply_angle            = CS.out.steeringAngleDeg
-            self.steering_power    = min(self.steering_power - self.CCP.STEERING_POWER_NORMAL_STEPS, 0)
+            self.steering_power   -= self.CCP.STEERING_POWER_NORMAL_STEPS
+            self.steering_power    = 0 if self.steering_power < 0 else self.steering_power
           else:
             hca_enabled           = False
             self.lat_active_prev  = False
