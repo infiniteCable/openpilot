@@ -81,7 +81,7 @@ class CarController(CarControllerBase):
           steering_power_target       = clip(steering_power_by_angle, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
 
           if self.steering_power < self.CCP.STEERING_POWER_MIN:  # OP lane assist just activated
-            self.steering_power += self.CCP.STEERING_POWER_NORMAL_STEPS
+            self.steering_power = min(self.steering_power + self.CCP.STEERING_POWER_NORMAL_STEPS, self.CCP.STEERING_POWER_MIN)
 
           elif CS.out.steeringPressed and self.steering_power > self.CCP.STEERING_POWER_USER: # user action results in decreasing the steering power
             self.steering_power = max(self.steering_power - self.CCP.STEERING_POWER_CRITICAL_STEPS, self.CCP.STEERING_POWER_USER)
@@ -90,7 +90,7 @@ class CarController(CarControllerBase):
             if self.steering_power < steering_power_target:
               self.steering_power = min(self.steering_power + self.CCP.STEERING_POWER_CRITICAL_STEPS, steering_power_target)
             elif self.steering_power > steering_power_target:
-              self.steering_power -= self.CCP.STEERING_POWER_NORMAL_STEPS
+              self.steering_power = max(self.steering_power - self.CCP.STEERING_POWER_NORMAL_STEPS, steering_power_target)
 
           #if abs(apply_angle) > 45:
           #  new_steer = self.CCP.STEER_MAX -
@@ -102,8 +102,7 @@ class CarController(CarControllerBase):
             #current_curvature      = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
             #apply_curvature        = current_curvature
             apply_angle            = CS.out.steeringAngleDeg
-            self.steering_power   -= self.CCP.STEERING_POWER_NORMAL_STEPS
-            self.steering_power    = 0 if self.steering_power < 0 else self.steering_power
+            self.steering_power    = max(self.steering_power - self.CCP.STEERING_POWER_NORMAL_STEPS, 0)
           else:
             hca_enabled           = False
             self.lat_active_prev  = False
