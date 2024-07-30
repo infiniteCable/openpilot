@@ -543,7 +543,7 @@ class Controls:
 
     CC.latActive = self.active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                    (not standstill or self.joystick_mode)
-    CC.longActive = self.enabled and not self.lateral_only and not self.events.contains(ET.OVERRIDE_LONGITUDINAL) and self.CP.openpilotLongitudinalControl
+    CC.longActive = self.enabled and not self.events.contains(ET.OVERRIDE_LONGITUDINAL) and self.CP.openpilotLongitudinalControl
 
     actuators = CC.actuators
     actuators.longControlState = self.LoC.long_control_state
@@ -821,7 +821,6 @@ class Controls:
       self.personality = self.read_personality_param()
       if self.CP.notCar:
         self.joystick_mode = self.params.get_bool("JoystickDebugMode")
-      self.lateral_only = self.params.get_bool("EngageLatOnly")
       time.sleep(0.1)
 
   def controlsd_thread(self):
