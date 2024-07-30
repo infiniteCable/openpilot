@@ -68,9 +68,7 @@ dependencies = [
 docs = [
   "Jinja2",
   "natsort",
-  "mkdocs==1.4.3",  # needed for mkdocs-plugin-commonmark
-  "mkdocs-terminal",
-  "mkdocs-plugin-commonmark",
+  "mkdocs",
 ]
 
 testing = [
@@ -96,7 +94,6 @@ dev = [
   "av",
   "azure-identity",
   "azure-storage-blob",
-  "control",
   "dictdiffer",
   "flaky",
   "inputs",
