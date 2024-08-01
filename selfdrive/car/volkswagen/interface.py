@@ -101,6 +101,7 @@ class CarInterface(CarInterfaceBase):
       ret.openpilotLongitudinalControl      = True
       ret.experimentalLongitudinalAvailable = True
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
+      ret.longitudinalActuatorDelay = 0.5 # s
       
     else:
       ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
