@@ -44,7 +44,9 @@ This branch contains custom changes additionally that are still not completely i
 </p>
 
 <h3>
-  <a href="https://docs.comma.ai">Read the docs</a>
+  <a href="https://docs.comma.ai">Docs</a>
+  <span> · </span>
+  <a href="https://docs.comma.ai/contributing/roadmap/">Roadmap</a>
   <span> · </span>
   <a href="https://github.com/commaai/openpilot/blob/master/docs/CONTRIBUTING.md">Contribute</a>
   <span> · </span>
@@ -53,7 +55,7 @@ This branch contains custom changes additionally that are still not completely i
   <a href="https://comma.ai/shop">Try it on a comma 3X</a>
 </h3>
 
-Quick start: `curl -fsSL openpilot.comma.ai | bash`
+Quick start: `bash <(curl -fsSL openpilot.comma.ai)`
 
 ![openpilot tests](https://github.com/commaai/openpilot/actions/workflows/selfdrive_tests.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/commaai/openpilot/branch/master/graph/badge.svg)](https://codecov.io/gh/commaai/openpilot)

@@ -2,7 +2,7 @@
   path = panda
   url = ../../infiniteCable/panda.git
 [submodule "opendbc"]
-  path = opendbc
+  path = opendbc_repo
   url = ../../infiniteCable/opendbc.git
 [submodule "msgq"]
   path = msgq_repo
