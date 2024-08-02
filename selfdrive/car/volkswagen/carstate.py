@@ -320,21 +320,27 @@ class CarState(CarStateBase):
     ret.stockFcw = False
     ret.stockAeb = False
 
-    self.esp_hold_confirmation = bool(pt_cp.vl["MEB_ESP_05"]["ESP_Hold"])
-
-    ret.accFaulted = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (6, 7)
     self.acc_type = cam_cp.vl["MEB_ACC_02"]["ACC_Typ"]
 
     ret.cruiseState.available = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (2, 3, 4, 5)
     ret.cruiseState.enabled   = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (3, 4, 5)
 
-    if self.CP.openpilotLongitudinalControl:
-      ret.cruiseState.standstill = False
-      ret.cruiseState.nonAdaptive = False
-      
-    else:
-      ret.cruiseState.standstill  = self.esp_hold_confirmation
+    if self.CP.pcmCruise:
+      # Cruise Control mode; check for distance UI setting from the radar.
+      # ECM does not manage this, so do not need to check for openpilot longitudinal
       ret.cruiseState.nonAdaptive = bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
+    else:
+      # Speed limiter mode; ECM faults if we command ACC while not pcmCruise
+      ret.cruiseState.nonAdaptive = False # TODO
+
+    ret.accFaulted = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (6, 7)
+
+    self.esp_hold_confirmation = bool(pt_cp.vl["MEB_ESP_05"]["ESP_Hold"])
+    ret.cruiseState.standstill = self.CP.pcmCruise and self.esp_hold_confirmation
+
+    # Update ACC setpoint. When the setpoint is zero or there's an error, the
+    # radar sends a set-speed of ~90.69 m/s / 203mph.
+    if self.CP.pcmCruise:
       ret.cruiseState.speed = int(round(cam_cp.vl["MEB_ACC_01"]["ACC_Wunschgeschw_02"])) * CV.KPH_TO_MS
       if ret.cruiseState.speed > 50: # settable maximum 180km/h
         ret.cruiseState.speed = 0
