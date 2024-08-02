@@ -4,6 +4,8 @@ DO NOT USE!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 Part 1: Harness build (done at Gateway/J533/ICAS1 which is acc controlling capable) (camera harness also possible for steering only)
 
+https://de.aliexpress.com/item/1005003178616926.html
+
 Part 2: can bus command sniffing and tests (in progress) -> all signals are possible candidates
 
 Part 3: Steering command with C3x (working with new signal, using angle at the moment)
