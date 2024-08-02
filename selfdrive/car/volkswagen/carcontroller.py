@@ -75,7 +75,8 @@ class CarController(CarControllerBase):
           # steering power as lazy counter
           steering_power_min_by_speed = interp(CS.out.vEgoRaw, [0, self.CCP.STEERING_POWER_MAX_BY_SPEED], [self.CCP.STEERING_POWER_MIN, self.CCP.STEERING_POWER_MAX])
           #steering_power_by_curvature = self.CCP.STEERING_POWER_MAX * abs(apply_curvature) / self.CCP.STEERING_POWER_MAX_BY_CURVATURE # maximum steering power is reached with 10 degrees
-          steering_power_by_angle = self.CCP.STEERING_POWER_MAX * abs(apply_angle) / self.CCP.STEERING_POWER_MAX_BY_ANGLE # maximum steering power is reached with 10 degrees
+          #steering_power_by_angle = self.CCP.STEERING_POWER_MAX * abs(apply_angle) / self.CCP.STEERING_POWER_MAX_BY_ANGLE # maximum steering power is reached with angle from zero point
+          steering_power_by_angle = self.CCP.STEERING_POWER_MAX * abs(apply_angle - CS.out.steeringAngleDeg) / self.CCP.ANGLE_ERROR # maximum steering power is reached for max angle error
           #steering_power_target       = clip(steering_power_by_curvature, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
           steering_power_target       = clip(steering_power_by_angle, steering_power_min_by_speed, self.CCP.STEERING_POWER_MAX)
 
@@ -101,7 +102,7 @@ class CarController(CarControllerBase):
             #current_curvature      = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
             #apply_curvature        = current_curvature
             apply_angle            = CS.out.steeringAngleDeg
-            self.steering_power    = max(self.steering_power - self.CCP.STEERING_POWER_NORMAL_STEPS, 0)
+            self.steering_power    = max(self.steering_power - self.CCP.STEERING_POWER_CRITICAL_STEPS, 0)
           else:
             hca_enabled           = False
             self.lat_active_prev  = False
