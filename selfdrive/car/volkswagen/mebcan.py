@@ -156,14 +156,14 @@ def acc_hud_status_value(main_switch_on, acc_faulted, long_active, override):
   return acc_hud_control
   
 
-def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_distance, distance, heartbeat, esp_hold, meb_acc_01_values, distance_stock_values):  
+def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_visible, distance, heartbeat, esp_hold, meb_acc_01_values, distance_stock_values):  
   zeitluecke_1 = 0
   zeitluecke_2 = 0
   zeitluecke_3 = 0
   zeitluecke_4 = 0
   zeitluecke_5 = 0
 
-  gap = gap * 6 #for testing
+  gap = gap * 100 #for testing until we scale the signal
   if distance == 1:
     zeitluecke_1 = gap 
   elif distance == 2:
@@ -179,7 +179,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_distan
   # clip to prevent negative values because of radar signal shift
   lead_dist = clip(distance_stock_values["Same_Lane_01_Long_Distance"] * 0.5, 0, 100)
 
-  if lead_distance > 0 and lead_dist == 0:
+  if lead_visible and lead_dist == 0:
     lead_dist = 50
   
   values = {
@@ -189,12 +189,12 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_distan
     "ACC_Gesetzte_Zeitluecke": distance,
     #"ACC_Anzeige_Zeitluecke":  1 if acc_control == 3 else 0,
     "ACC_Display_Prio":        1,
-    "ACC_Abstandsindex_02":    lead_distance,
+    "ACC_Abstandsindex_02":    512,
     "ACC_EGO_Fahrzeug":        1 if acc_control == 3 else 0,
     "Heartbeat":               heartbeat, # do the same as radar would do, still check if this is necessary
-    "Lead_Type_Detected":      1 if lead_distance > 0 else 0, # object should be displayed
-    "Lead_Type":               3 if lead_distance > 0 else 0, # displaying a car
-    "Lead_Distance":           lead_dist if lead_distance > 0 else 0, # hud distance of object
+    "Lead_Type_Detected":      1 if lead_visible > 0 else 0, # object should be displayed
+    "Lead_Type":               3 if lead_visible > 0 else 0, # displaying a car
+    "Lead_Distance":           lead_dist if lead_visible > 0 else 0, # hud distance of object
     "ACC_Enabled":             1 if acc_control == 3 else 0,
     "ACC_Standby_Override":    1 if acc_control != 3 else 0,
     "ACC_AKTIV_regelt":        1 if acc_control == 3 else 0,
