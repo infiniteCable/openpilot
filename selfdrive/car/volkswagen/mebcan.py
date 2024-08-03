@@ -163,7 +163,6 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_visibl
   zeitluecke_4 = 0
   zeitluecke_5 = 0
 
-  gap = gap * 100 #for testing until we scale the signal
   if distance == 1:
     zeitluecke_1 = gap 
   elif distance == 2:
@@ -177,7 +176,7 @@ def create_acc_hud_control(packer, bus, acc_control, set_speed, gap, lead_visibl
 
   # scale lead dist in meter 200 -> 100
   # clip to prevent negative values because of radar signal shift
-  lead_dist = clip(distance_stock_values["Same_Lane_01_Long_Distance"] * 0.3, 0, 100)
+  lead_dist = clip(distance_stock_values["Same_Lane_01_Long_Distance"] * 0.4, 0, 100)
 
   if lead_visible and distance_stock_values["Same_Lane_01_Detection"] == 0:
     lead_dist = 50
