@@ -17,6 +17,10 @@ from openpilot.selfdrive.car.car_helpers import get_car, get_one_can
 from openpilot.selfdrive.car.interfaces import CarInterfaceBase
 from openpilot.selfdrive.controls.lib.events import Events
 
+# PFEIFER - AOL {{
+from openpilot.selfdrive.controls.always_on_lateral import AlwaysOnLateral
+# }} PFEIFER - AOL
+
 REPLAY = "REPLAY" in os.environ
 
 EventName = car.CarEvent.EventName
@@ -56,6 +60,9 @@ class Car:
     self.CP.alternativeExperience = 0
     if not self.disengage_on_accelerator:
       self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
+    # PFEIFER - AOL {{
+    self.CP.alternativeExperience |= AlwaysOnLateral.alternative_experience()
+    # }} PFEIFER - AOL
 
     openpilot_enabled_toggle = self.params.get_bool("OpenpilotEnabledToggle")
 
