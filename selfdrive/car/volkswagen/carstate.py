@@ -313,15 +313,16 @@ class CarState(CarStateBase):
       ret.leftBlindspot = cam_cp.vl["MEB_Drive_State_01"]["Blind_Spot_Left"] > 0
       ret.rightBlindspot = cam_cp.vl["MEB_Drive_State_01"]["Blind_Spot_Right"] > 0
 
-    # detect an object beside the car with radar
-    if self.distance_stock_values['Left_Lane_01_Detection'] > 0 and self.distance_stock_values['Left_Lane_01_Long_Distance'] < 1:
+    # detect an object beside the car with radar and keep minimum of 4 meter
+    front_dist_min = 4 # meter
+    if self.distance_stock_values['Left_Lane_01_Detection'] > 0 and self.distance_stock_values['Left_Lane_01_Long_Distance'] < front_dist_min:
       ret.leftBlindspot = True
-    if self.distance_stock_values['Left_Lane_02_Detection'] > 0 and self.distance_stock_values['Left_Lane_02_Long_Distance'] < 1:
+    if self.distance_stock_values['Left_Lane_02_Detection'] > 0 and self.distance_stock_values['Left_Lane_02_Long_Distance'] < front_dist_min:
       ret.leftBlindspot = True
 
-    if self.distance_stock_values['Right_Lane_01_Detection'] > 0 and self.distance_stock_values['Right_Lane_01_Long_Distance'] < 1:
+    if self.distance_stock_values['Right_Lane_01_Detection'] > 0 and self.distance_stock_values['Right_Lane_01_Long_Distance'] < front_dist_min:
       ret.rightBlindspot = True
-    if self.distance_stock_values['Right_Lane_02_Detection'] > 0 and self.distance_stock_values['Right_Lane_02_Long_Distance'] < 1:
+    if self.distance_stock_values['Right_Lane_02_Detection'] > 0 and self.distance_stock_values['Right_Lane_02_Long_Distance'] < front_dist_min:
       ret.rightBlindspot = True
 
     # Consume factory LDW data relevant for factory SWA (Lane Change Assist)
