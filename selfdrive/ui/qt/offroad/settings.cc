@@ -151,6 +151,10 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
   toggles["ExperimentalMode"]->setActiveIcon("../assets/img_experimental.svg");
   toggles["ExperimentalMode"]->setConfirmation(true, true);
   toggles["ExperimentalLongitudinalEnabled"]->setConfirmation(true, false);
+  // PFEIFER - AOL {{
+  toggles["AlwaysOnLateralEnabled"]->setConfirmation(true, true);
+  toggles["AlwaysOnLateralMainEnables"]->setConfirmation(true, true);
+  // }} PFEIFER - AOL
 
   connect(toggles["ExperimentalLongitudinalEnabled"], &ToggleControl::toggleFlipped, [=]() {
     updateToggles();
@@ -193,6 +197,23 @@ void TogglesPanel::updateToggles() {
                                   .arg(tr("New Driving Visualization"))
                                   .arg(tr("The driving visualization will transition to the road-facing wide-angle camera at low speeds to better show some turns. The Experimental mode logo will also be shown in the top right corner."));
 
+  // PFEIFER - AOL {{
+  // Disable all AOL toggles while on-road
+  // AlwaysOnLateralMainEnables and DisengageLatOnBrake will cause errors if toggled on-road
+  // DisengageLatOnBlinker and DisengageLatOnBrake are disabled so we do not need to read them from the fs on each controls loop
+  auto aol_toggle = toggles["AlwaysOnLateralEnabled"];
+  auto aol_main_toggle = toggles["AlwaysOnLateralMainEnables"];
+  auto dlobrake_toggle = toggles["DisengageLatOnBrake"];
+  auto dloblinker_toggle = toggles["DisengageLatOnBlinker"];
+  auto dlolsblinker_toggle = toggles["DisengageLatOnLowSpeedBlinker"];
+  bool aol_locked = params.getBool("AlwaysOnLateralEnabledLock");
+  aol_toggle->setEnabled(!aol_locked);
+  aol_main_toggle->setEnabled(!aol_locked);
+  dlobrake_toggle->setEnabled(!aol_locked);
+  dloblinker_toggle->setEnabled(!aol_locked);
+  dlolsblinker_toggle->setEnabled(!aol_locked);
+  // }} PFEIFER - AOL
+  
   const bool is_release = params.getBool("IsReleaseBranch");
   auto cp_bytes = params.get("CarParamsPersistent");
   if (!cp_bytes.empty()) {
