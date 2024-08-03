@@ -76,22 +76,22 @@ class RadarInterface(RadarInterfaceBase):
 
     # ---------------------------------- #
 
-    #signal_part = RADAR_SAME_LANE_02
-    #if signal_part not in self.pts:
-    #  self.pts[signal_part]         = car.RadarData.RadarPoint.new_message()
-    #  self.pts[signal_part].trackId = self.track_id
-    #  self.track_id                += 1
+    signal_part = RADAR_SAME_LANE_02
+    if signal_part not in self.pts:
+      self.pts[signal_part]         = car.RadarData.RadarPoint.new_message()
+      self.pts[signal_part].trackId = self.track_id
+      self.track_id                += 1
 
-    #valid = msg['Same_Lane_02_Detection'] > 0 and msg['Same_Lane_02_Long_Distance'] > 0
-    #if valid:
-    #  self.pts[signal_part].measured = True
-    #  self.pts[signal_part].dRel     = msg['Same_Lane_02_Long_Distance']
-    #  self.pts[signal_part].yRel     = -msg['Same_Lane_02_Lat_Distance']
-    #  self.pts[signal_part].vRel     = float('nan')
-    #  self.pts[signal_part].aRel     = float('nan')
-    #  self.pts[signal_part].yvRel    = float('nan')
-    #else:
-    #  del self.pts[signal_part]
+    valid = msg['Same_Lane_02_Detection'] > 0
+    if valid:
+      self.pts[signal_part].measured = True
+      self.pts[signal_part].dRel     = max(msg['Same_Lane_02_Long_Distance'], 0)
+      self.pts[signal_part].yRel     = -msg['Same_Lane_02_Lat_Distance']
+      self.pts[signal_part].vRel     = msg['Same_Lane_02_Rel_Velo'] * CV.KPH_TO_MS
+      self.pts[signal_part].aRel     = float('nan')
+      self.pts[signal_part].yvRel    = float('nan')
+    else:
+      del self.pts[signal_part]
 
     # ---------------------------------- #
 
