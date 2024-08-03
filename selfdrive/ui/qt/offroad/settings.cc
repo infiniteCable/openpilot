@@ -81,6 +81,43 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       tr("Display speed in km/h instead of mph."),
       "../assets/offroad/icon_metric.png",
     },
+
+    // PFEIFER - AOL {{
+    {
+      "AlwaysOnLateralEnabled",
+      tr("Always on Lateral"),
+      QString("<b>%1</b><br><br>%2")
+      .arg(tr("WARNING: Always on lateral has not been tested on all cars. You may receive cruise faults when disabling longitudinal control if this is not compatible with your car. Please test in a safe environment before using on road."))
+      .arg(tr("When enabled lateral control will remain engaged after longitudinal is disengaged. Main cruise button toggles lateral control off.")),
+      "../assets/img_experimental_white.svg",
+    },
+    {
+      "AlwaysOnLateralMainEnables",
+      tr("Main cruise engages AOL"),
+      QString("<b>%1</b><br><br>%2")
+      .arg(tr("WARNING: Engaging lateral upon toggling main cruise likely has issues with many cars. You may receive cruise faults upon pressing the main cruise button. Please test in a safe environment before using on road."))
+      .arg(tr("Engages Always on Lateral whenever main is pressed.")),
+      "../assets/img_experimental_white.svg",
+    },
+    {
+      "DisengageLatOnBrake",
+      tr("Disengage Lateral on Brake Pedal"),
+      tr("Disables lateral while the brake is being applied. Only changes behavior of Always on Lateral."),
+      "../assets/img_experimental_white.svg",
+    },
+    {
+      "DisengageLatOnBlinker",
+      tr("Disengage Lateral on Blinker"),
+      tr("Disables lateral while a blinker is activated. Only changes behavior of Always on Lateral."),
+      "../assets/img_experimental_white.svg",
+    },
+    {
+      "DisengageLatOnLowSpeedBlinker",
+      tr("Disengage Lateral on Low Speed Blinker"),
+      tr("Disables lateral while a blinker is activated and we are below LatBlinkerLowSpeedLimit (default 25mph). If 'Disengage Lateral on Blinker' is also enabled lateral will still be disabled at all speeds. Only changes behavior of Always on Lateral."),
+      "../assets/img_experimental_white.svg",
+    },
+    // }} PFEIFER - AOL
   };
 
 
