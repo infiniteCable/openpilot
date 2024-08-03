@@ -102,6 +102,16 @@ class CarInterface(CarInterfaceBase):
       ret.experimentalLongitudinalAvailable = True
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
       ret.longitudinalActuatorDelay = 0.5 # s
+
+      #ret.longitudinalTuning.deadzoneBP = [0., 8.05]
+      #ret.longitudinalTuning.deadzoneV = [.0, .14]
+      #ret.longitudinalTuning.kpBP = [0., 5., 20.]
+      #ret.longitudinalTuning.kpV = [1.3, 1.0, 0.7]
+      #ret.longitudinalTuning.kiBP = [0., 5., 12., 20., 27.]
+      #ret.longitudinalTuning.kiV = [.35, .23, .20, .17, .1]
+
+      ret.vEgoStarting = 0.3
+      ret.vEgoStopping = 0.5
       
     else:
       ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
@@ -112,11 +122,12 @@ class CarInterface(CarInterfaceBase):
         if ret.transmissionType == TransmissionType.manual:
           ret.minEnableSpeed = 4.5
 
+      ret.vEgoStarting = 0.1
+      ret.vEgoStopping = 0.5
+
     ret.pcmCruise = not ret.openpilotLongitudinalControl
     ret.stoppingControl = True
     ret.stopAccel = -0.55
-    ret.vEgoStarting = 0.1
-    ret.vEgoStopping = 0.5
     ret.autoResumeSng = ret.minEnableSpeed == -1
 
     return ret
