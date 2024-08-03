@@ -32,7 +32,9 @@ Ingition is done with CAN Bus signal
 
 
 
-This branch contains custom changes
+This branch contains custom changes beside of MEB adaption and always-on-lateral logic from 
+pfeiferj
+
 
 [![openpilot on the comma 3X](https://github.com/commaai/openpilot/assets/8762862/f09e6d29-db2d-4179-80c2-51e8d92bdb5c)](https://comma.ai/shop/comma-3x)
 <div align="center" style="text-align: center;">
