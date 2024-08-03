@@ -109,6 +109,9 @@ class CarInterface(CarInterfaceBase):
       ret.longitudinalTuning.kpV = [0.5, 0.2, 0.1]
       ret.longitudinalTuning.kiBP = [0., 5., 20.]
       ret.longitudinalTuning.kiV = [0.2, 0.1, 0.05]
+
+      if experimental_long:
+        ret.longitudinalTuning.kpV = [0.5, 0.2, -0.1] # experimental OP long is less smooth
       
     else:
       ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
