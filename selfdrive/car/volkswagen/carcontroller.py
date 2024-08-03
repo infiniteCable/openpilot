@@ -201,7 +201,7 @@ class CarController(CarControllerBase):
           self.long_heartbeat = 360
 
         set_speed = hud_control.setSpeed * CV.MS_TO_KPH
-        gap = max(CS.out.vEgo * CV.MS_TO_KPH * get_T_FOLLOW(hud_control.leadDistanceBars - 1) * 2, 200)
+        gap = CS.out.vEgo * get_T_FOLLOW(hud_control.leadDistanceBars - 1) * 2
         acc_hud_status = self.CCS.acc_hud_status_value(CS.out.cruiseState.available, CS.out.accFaulted, CC.enabled and CS.out.cruiseState.enabled, CC.cruiseControl.override)
         can_sends.append(self.CCS.create_acc_hud_control(self.packer_pt, CANBUS.pt, acc_hud_status, hud_control.setSpeed * CV.MS_TO_KPH,
                                                          gap, hud_control.leadVisible,
