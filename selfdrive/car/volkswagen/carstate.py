@@ -305,11 +305,24 @@ class CarState(CarStateBase):
     # Update seatbelt fastened status.
     ret.seatbeltUnlatched = pt_cp.vl["Airbag_02"]["AB_Gurtschloss_FA"] != 3
 
+    self.distance_stock_values = cam_cp.vl["MEB_Distance_01"]
+
     # Consume blind-spot monitoring info/warning LED states, if available.
     # Infostufe: BSM LED on, Warnung: BSM LED flashing
     if self.CP.enableBsm:
       ret.leftBlindspot = cam_cp.vl["MEB_Drive_State_01"]["Blind_Spot_Left"] > 0
       ret.rightBlindspot = cam_cp.vl["MEB_Drive_State_01"]["Blind_Spot_Right"] > 0
+
+    # detect an object beside the car with radar
+    if self.distance_stock_values['Left_Lane_01_Detection'] > 0 and self.distance_stock_values['Left_Lane_01_Long_Distance'] < 1:
+      ret.leftBlindspot = True
+    if self.distance_stock_values['Left_Lane_02_Detection'] > 0 and self.distance_stock_values['Left_Lane_02_Long_Distance'] < 1:
+      ret.leftBlindspot = True
+
+    if self.distance_stock_values['Right_Lane_01_Detection'] > 0 and self.distance_stock_values['Right_Lane_01_Long_Distance'] < 1:
+      ret.rightBlindspot = True
+    if self.distance_stock_values['Right_Lane_02_Detection'] > 0 and self.distance_stock_values['Right_Lane_02_Long_Distance'] < 1:
+      ret.rightBlindspot = True
 
     # Consume factory LDW data relevant for factory SWA (Lane Change Assist)
     # and capture it for forwarding to the blind spot radar controller
