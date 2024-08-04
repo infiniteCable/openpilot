@@ -102,7 +102,7 @@ class CarInterface(CarInterfaceBase):
     if ret.flags & VolkswagenFlags.MEB:
       ret.openpilotLongitudinalControl      = True
       ret.experimentalLongitudinalAvailable = True
-      if params.get_bool('ExperimentalLongitudinalEnabled')
+      if experimental_long:
         ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
       ret.longitudinalActuatorDelay = 0.5 # s
 
