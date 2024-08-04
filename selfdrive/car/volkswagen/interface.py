@@ -3,6 +3,7 @@ from panda import Panda
 from openpilot.selfdrive.car import get_safety_config
 from openpilot.selfdrive.car.interfaces import CarInterfaceBase
 from openpilot.selfdrive.car.volkswagen.values import CAR, CANBUS, CarControllerParams, NetworkLocation, TransmissionType, GearShifter, VolkswagenFlags
+from openpilot.common.params import Params
 
 ButtonType = car.CarState.ButtonEvent.Type
 EventName = car.CarEvent.EventName
@@ -21,6 +22,7 @@ class CarInterface(CarInterfaceBase):
 
   @staticmethod
   def _get_params(ret, candidate: CAR, fingerprint, car_fw, experimental_long, docs):
+    params = Params()
     ret.carName = "volkswagen"
     ret.radarUnavailable = True
 
@@ -100,7 +102,8 @@ class CarInterface(CarInterfaceBase):
     if ret.flags & VolkswagenFlags.MEB:
       ret.openpilotLongitudinalControl      = True
       ret.experimentalLongitudinalAvailable = True
-      ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
+      if params.get_bool('ExperimentalLongitudinalEnabled')
+        ret.safetyConfigs[0].safetyParam |= Panda.FLAG_VOLKSWAGEN_LONG_CONTROL
       ret.longitudinalActuatorDelay = 0.5 # s
 
       #ret.longitudinalTuning.deadzoneBP = [0., 8.05]
