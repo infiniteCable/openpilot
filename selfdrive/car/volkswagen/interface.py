@@ -56,13 +56,15 @@ class CarInterface(CarInterfaceBase):
       ret.transmissionType = TransmissionType.direct
       ret.networkLocation  = NetworkLocation.fwdCamera # TODO signal sources: I am connected at gateway/ICAS 1 right now
       ret.steerControlType = car.CarParams.SteerControlType.angle
-      ret.radarUnavailable = False
       #ret.flags |= VolkswagenFlags.STOCK_HCA_PRESENT.value
 
       if any(msg in fingerprint[1] for msg in (0x520, 0x86, 0xFD, 0x13D)):  # Airbag_02, LWI_01, ESP_21, MEB_EPS_01
         ret.networkLocation = NetworkLocation.gateway
       else:
         ret.networkLocation = NetworkLocation.fwdCamera
+
+      if ret.networkLocation == NetworkLocation.gateway:
+        ret.radarUnavailable = False
 
     else:
       # Set global MQB parameters
