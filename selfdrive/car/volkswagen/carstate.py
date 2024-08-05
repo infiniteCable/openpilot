@@ -285,16 +285,16 @@ class CarState(CarStateBase):
 
     # VW Emergency Assist status tracking and mitigation
     self.eps_stock_values = pt_cp.vl["LH_EPS_03"]
+    #ret.carFaultedNonCritical =
 
     # Update gas, brakes, and gearshift.
     # accel pressure on meb eps 03 has a really low frequency
     ret.gasPressed = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"] > 0
-    ret.gas = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"]
+    ret.gas = pt_cp.vl["MEB_ESP_03"]["Accelerator_Pressure"] * 0.392 # signal width in percent
     ret.brakePressed = bool(pt_cp.vl["Motor_14"]["MO_Fahrer_bremst"])
-    ret.brake = pt_cp.vl["MEB_ESP_01"]["Brake_Pressure"] # this is break not from user
-    #brake_light = bool(pt_cp.vl["MEB_Light_01"]["Brake_Light"])
-    #ret.regenBraking = brake_light and not ret.brakePressed and not ret.standstill
-    #ret.parkingBrake = bool(pt_cp.vl["Kombi_01"]["KBI_Handbremse"])  # FIXME: need to include an EPB check as well
+    ret.brake = pt_cp.vl["MEB_ESP_01"]["Brake_Pressure"] * 0.195 # this is break general from car for signal width in percent
+    #ret.regenBraking = find signal
+    #ret.parkingBrake = find signal
 
     # Update gear and/or clutch position data.
     ret.gearShifter = self.parse_gear_shifter(self.CCP.shifter_values.get(pt_cp.vl["Getriebe_11"]["GE_Fahrstufe"], None))
@@ -309,13 +309,13 @@ class CarState(CarStateBase):
     # Update seatbelt fastened status.
     ret.seatbeltUnlatched = pt_cp.vl["Airbag_02"]["AB_Gurtschloss_FA"] != 3
 
-    self.distance_stock_values = cam_cp.vl["MEB_Distance_01"]
+    self.distance_stock_values = ext_cp.vl["MEB_Distance_01"]
 
     # Consume blind-spot monitoring info/warning LED states, if available.
     # Infostufe: BSM LED on, Warnung: BSM LED flashing
     if self.CP.enableBsm:
-      ret.leftBlindspot = cam_cp.vl["MEB_Drive_State_01"]["Blind_Spot_Left"] > 0
-      ret.rightBlindspot = cam_cp.vl["MEB_Drive_State_01"]["Blind_Spot_Right"] > 0
+      ret.leftBlindspot = ext_cp.vl["MEB_Drive_State_01"]["Blind_Spot_Left"] > 0
+      ret.rightBlindspot = ext_cp.vl["MEB_Drive_State_01"]["Blind_Spot_Right"] > 0
 
     # detect an object beside the car with radar and keep minimum of 4 meter
     front_dist_min = 4
@@ -335,13 +335,13 @@ class CarState(CarStateBase):
     # Consume factory LDW data relevant for factory SWA (Lane Change Assist)
     # and capture it for forwarding to the blind spot radar controller
     self.ldw_stock_values = cam_cp.vl["LDW_02"]
-    self.meb_acc_01_values = cam_cp.vl["MEB_ACC_01"]
-    self.meb_acc_02_values = cam_cp.vl["MEB_ACC_02"]
+    self.meb_acc_01_values = ext_cp.vl["MEB_ACC_01"]
+    self.meb_acc_02_values = ext_cp.vl["MEB_ACC_02"]
 
-    ret.stockFcw = False
-    ret.stockAeb = False
+    ret.stockFcw = False # find signal
+    ret.stockAeb = False # find signal
 
-    self.acc_type = cam_cp.vl["MEB_ACC_02"]["ACC_Typ"]
+    self.acc_type = ext_cp.vl["MEB_ACC_02"]["ACC_Typ"]
 
     ret.cruiseState.available = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (2, 3, 4, 5)
     ret.cruiseState.enabled   = pt_cp.vl["MEB_Motor_01"]["TSK_Status"] in (3, 4, 5)
@@ -349,7 +349,7 @@ class CarState(CarStateBase):
     if self.CP.pcmCruise:
       # Cruise Control mode; check for distance UI setting from the radar.
       # ECM does not manage this, so do not need to check for openpilot longitudinal
-      ret.cruiseState.nonAdaptive = bool(cam_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
+      ret.cruiseState.nonAdaptive = bool(ext_cp.vl["MEB_ACC_01"]["ACC_Limiter_Mode"])
     else:
       # Speed limiter mode; ECM faults if we command ACC while not pcmCruise
       ret.cruiseState.nonAdaptive = False # TODO
@@ -362,11 +362,11 @@ class CarState(CarStateBase):
     # Update ACC setpoint. When the setpoint is zero or there's an error, the
     # radar sends a set-speed of ~90.69 m/s / 203mph.
     if self.CP.pcmCruise:
-      ret.cruiseState.speed = int(round(cam_cp.vl["MEB_ACC_01"]["ACC_Wunschgeschw_02"])) * CV.KPH_TO_MS
+      ret.cruiseState.speed = int(round(ext_cp.vl["MEB_ACC_01"]["ACC_Wunschgeschw_02"])) * CV.KPH_TO_MS
       if ret.cruiseState.speed > 50: # settable maximum 180km/h
         ret.cruiseState.speed = 0
 
-    self.distance_stock_values = cam_cp.vl["MEB_Distance_01"]
+    self.distance_stock_values = ext_cp.vl["MEB_Distance_01"]
 
     # Update button states for turn signals and ACC controls, capture all ACC button state/config for passthrough
     ret.leftBlinker = bool(pt_cp.vl["Blinkmodi_02"]["BM_links"])
@@ -518,16 +518,13 @@ class CarState(CarStateBase):
       ("Getriebe_11", 100),       # From J743 Auto transmission control module
       ("ZV_02", 5),               # From ZV
       ("MEB_EPS_01", 100),        #
-      ("MEB_ESP_04", 50),         #
       ("ESP_21", 50),             #
       ("ESP_24", 20),             #
       ("MEB_ABS_01", 50),         #
       ("MEB_ESP_01", 100),        #
-      ("MEB_ESP_02", 100),        #
       ("MEB_ESP_03", 10),         #
       ("MEB_ESP_05", 50),         #
       ("MEB_Light_01", 5),        #
-      ("MEB_TSK_01", 5),          #
       ("MEB_Motor_01", 50),       #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
@@ -539,7 +536,6 @@ class CarState(CarStateBase):
       ("LDW_02", 10),              # From R242 Driver assistance camera
       ("MEB_ACC_01", 17),          #
       ("MEB_ACC_02", 50),          #
-      ("MEB_Side_Assist_01", 200), #
       ("MEB_Drive_State_01", 20),  #
       ("MEB_Distance_01", 25),     #
     ]
