@@ -116,12 +116,12 @@ class CarInterface(CarInterfaceBase):
       #ret.longitudinalTuning.deadzoneBP = [0., 8.05]
       #ret.longitudinalTuning.deadzoneV = [.0, .14]
       ret.longitudinalTuning.kpBP = [0., 5., 20.]
-      ret.longitudinalTuning.kpV = [0.5, 0.2, 0.1]
+      ret.longitudinalTuning.kpV = [0.2, 0.1, 0.]
       ret.longitudinalTuning.kiBP = [0., 5., 20.]
-      ret.longitudinalTuning.kiV = [0.2, 0.15, 0.1]
+      ret.longitudinalTuning.kiV = [0., 0., -0.1]
 
-      if params.get_bool('ExperimentalMode'):
-        ret.longitudinalTuning.kpV = [0.5, 0.2, -0.2] # experimental OP long is less smooth
+      #if params.get_bool('ExperimentalMode'):
+      #  ret.longitudinalTuning.kpV = [0.5, 0.2, -0.2] # experimental OP long is less smooth
       
     else:
       ret.experimentalLongitudinalAvailable = ret.networkLocation == NetworkLocation.gateway or docs
