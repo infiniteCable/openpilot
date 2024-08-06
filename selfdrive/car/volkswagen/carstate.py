@@ -18,10 +18,6 @@ class CarState(CarStateBase):
     self.upscale_lead_car_signal = False
     self.eps_stock_values = False
 
-    # PFEIFER - AOL {{
-    self.main_enabled = False
-    # }} PFEIFER - AOL
-
   def create_button_events(self, pt_cp, buttons):
     button_events = []
 
