@@ -375,7 +375,7 @@ class CarState(CarStateBase):
     ret.espActive = bool(pt_cp.vl["ESP_21"]["ESP_Eingriff"]) # verify
 
     # EV battery charge WattHours
-    ret.fuelGauge = pt_cp.vl["HVEM_02"]["HVEM_Nutzbare_Energie"]
+    #ret.fuelGauge = pt_cp.vl["HVEM_02"]["HVEM_Nutzbare_Energie"]
 
     self.frame += 1
     return ret
