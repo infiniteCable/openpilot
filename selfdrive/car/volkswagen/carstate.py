@@ -373,6 +373,9 @@ class CarState(CarStateBase):
     # Additional safety checks performed in CarInterface.
     ret.espDisabled = bool(pt_cp.vl["ESP_24"]["ESP_Off_Lampe"])
 
+    # EV battery charge WattHours
+    ret.fuelGauge = pt_cp.vl["HVEM_02"]["HVEM_Nutzbare_Energie"]
+
     self.frame += 1
     return ret
 
@@ -522,6 +525,7 @@ class CarState(CarStateBase):
       ("MEB_ESP_05", 50),         #
       ("MEB_Light_01", 5),        #
       ("MEB_Motor_01", 50),       #
+      ("HVEM_02", 10),            #
     ]
     return CANParser(DBC[CP.carFingerprint]["pt"], messages, CANBUS.pt)
 
