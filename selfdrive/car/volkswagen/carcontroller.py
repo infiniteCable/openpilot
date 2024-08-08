@@ -1,8 +1,8 @@
 from cereal import car
 from opendbc.can.packer import CANPacker
-from openpilot.common.numpy_fast import clip, interp
-from openpilot.common.conversions import Conversions as CV
 from openpilot.selfdrive.car import DT_CTRL, apply_driver_steer_torque_limits, apply_std_steer_angle_limits
+from openpilot.selfdrive.car.conversions import Conversions as CV
+from openpilot.selfdrive.car.helpers import clip, interp
 from openpilot.selfdrive.car.interfaces import CarControllerBase
 from openpilot.selfdrive.car.volkswagen import mqbcan, pqcan, mebcan
 from openpilot.selfdrive.car.volkswagen.values import CANBUS, CarControllerParams, VolkswagenFlags
@@ -15,13 +15,13 @@ LongCtrlState = car.CarControl.Actuators.LongControlState
 #  if v_ego_raw > 1: # we don't enforce checks for this in panda at the moment, but keep it near measured current curv to project user input
 #    apply_curvature = clip(apply_curvature, current_curvature - CCP.CURVATURE_ERROR, current_curvature + CCP.CURVATURE_ERROR)
 #  apply_curvature = apply_std_steer_angle_limits(apply_curvature, apply_curvature_last, v_ego_raw, CCP)
-#  
+#
 #  return clip(apply_curvature, -CCP.CURVATURE_MAX, CCP.CURVATURE_MAX)
 
 
 class CarController(CarControllerBase):
-  def __init__(self, dbc_name, CP, VM):
-    super().__init__(dbc_name, CP, VM)
+  def __init__(self, dbc_name, CP):
+    super().__init__(dbc_name, CP)
     self.CCP = CarControllerParams(CP)
 
     if CP.flags & VolkswagenFlags.PQ:
