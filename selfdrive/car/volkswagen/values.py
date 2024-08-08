@@ -74,20 +74,20 @@ class CarControllerParams:
     elif CP.flags & VolkswagenFlags.MEB:
       self.LDW_STEP                        = 10    # LDW_02 message frequency 10Hz
       self.ACC_HUD_STEP                    = 6     # MEB_ACC_01 message frequency 16Hz
-      self.STEER_DRIVER_ALLOWANCE          = 80    # Driver intervention threshold 0.8 Nm
-      self.STEERING_POWER_MAX              = 125   # HCA_03 maximum steering power
+      self.STEER_DRIVER_ALLOWANCE          = 60    # Driver intervention threshold 0.6 Nm
+      self.STEERING_POWER_MAX              = 127   # HCA_03 maximum steering power
       self.STEERING_POWER_MIN              = 20    # HCA_03 minimum steering power
-      self.STEERING_POWER_USER             = 60    # HCA_03 desired steering power for user intervention
+      self.STEERING_POWER_USER             = 40    # HCA_03 desired steering power for user intervention
       self.STEERING_POWER_CRITICAL_STEPS   = 4     # HCA_03 steering power counter steps for critical change events
       self.STEERING_POWER_NORMAL_STEPS     = 1     # HCA_03 steering power counter steps for default change events
       self.STEERING_POWER_MAX_BY_SPEED     = 20    # HCA_03 speed in m/s^2 where maximum steering power is reached
       #self.STEERING_POWER_MAX_BY_CURVATURE = 0.05  # HCA_03 curvature from zero position where maximum steering power is reached
-      self.STEERING_POWER_MAX_BY_ANGLE     = 90    # HCA_03 angle from zero position where maximum angle change torque is reached
+      self.STEERING_POWER_MAX_BY_ANGLE     = 120    # HCA_03 angle from zero position where maximum angle change torque is reached
       #self.CURVATURE_MAX                   = 0.195 # HCA_03 maximum curvature in 1/m, we estimate that about 0.2 1/m is max of signal
       #self.CURVATURE_ERROR                 = 0.01  # HCA_03 curvature error, yaw rate error at standstill in range of about 0.2 deg/sec
       #self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[5, 12, 25], angle_v=[0.004, 0.002, 0.001]) # curvature safety limit up
       #self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[5, 12, 25], angle_v=[0.005, 0.0025, 0.0015]) # curvature safety limit down
-      self.ANGLE_ERROR                     = 40    # HCA_03 maximum difference from steering angle
+      self.ANGLE_ERROR                     = 60    # HCA_03 maximum difference from steering angle
       self.ANGLE_MAX                       = 360   # HCA_03 maximum angle
       self.ANGLE_RATE_LIMIT_UP             = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 5.0, 0.6])
       self.ANGLE_RATE_LIMIT_DOWN           = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[10., 7.0, 0.8])
