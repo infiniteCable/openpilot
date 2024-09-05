@@ -190,6 +190,10 @@ void UIState::updateStatus() {
     } else {
       status = ss.getEnabled() ? STATUS_ENGAGED : STATUS_DISENGAGED;
     }
+    //if (state != cereal::ControlsState::AlertSize::NONE) {
+    //  auto params = Params();
+    //  params.putBool("EnableScreenEvent", true);
+    //}
   }
 
   // Handle onroad/offroad transition
@@ -284,6 +288,9 @@ void Device::resetInteractiveTimeout(int timeout) {
 
 void Device::updateBrightness(const UIState &s) {
   float clipped_brightness = offroad_brightness;
+  auto params = Params();
+  bool dark_mode = params.getBool("DarkMode");
+
   if (s.scene.started && s.scene.light_sensor > 0) {
     clipped_brightness = s.scene.light_sensor;
 
@@ -296,6 +303,10 @@ void Device::updateBrightness(const UIState &s) {
 
     // Scale back to 10% to 100%
     clipped_brightness = std::clamp(100.0f * clipped_brightness, 10.0f, 100.0f);
+  }
+
+  if (s.scene.started && dark_mode) {
+    clipped_brightness = 1.0f;
   }
 
   int brightness = brightness_filter.update(clipped_brightness);
@@ -313,15 +324,22 @@ void Device::updateBrightness(const UIState &s) {
 
 void Device::updateWakefulness(const UIState &s) {
   bool ignition_just_turned_off = !s.scene.ignition && ignition_on;
+  bool ignition_just_turned_on = s.scene.ignition && !ignition_on;
+
   ignition_on = s.scene.ignition;
 
-  if (ignition_just_turned_off) {
+  auto params = Params();
+  bool enable_screen_event = params.getBool("EnableScreenEvent");
+  bool disable_screen_timer = params.getBool("DisableScreenTimer");
+
+  if (ignition_just_turned_off || ignition_just_turned_on && disable_screen_timer || enable_screen_event) {
     resetInteractiveTimeout();
+    params.putBool("EnableScreenEvent", false);
   } else if (interactive_timeout > 0 && --interactive_timeout == 0) {
     emit interactiveTimeout();
   }
 
-  setAwake(s.scene.ignition || interactive_timeout > 0);
+  setAwake(s.scene.ignition && !disable_screen_timer || interactive_timeout > 0);
 }
 
 UIState *uiState() {

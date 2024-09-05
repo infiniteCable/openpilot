@@ -21,7 +21,6 @@ class Plant:
     if not Plant.messaging_initialized:
       Plant.radar = messaging.pub_sock('radarState')
       Plant.controls_state = messaging.pub_sock('controlsState')
-      Plant.selfdrive_state = messaging.pub_sock('selfdriveState')
       Plant.car_state = messaging.pub_sock('carState')
       Plant.plan = messaging.sub_sock('longitudinalPlan')
       Plant.messaging_initialized = True
@@ -62,7 +61,6 @@ class Plant:
     # note that this is worst case for MPC, since model will delay long mpc by one time step
     radar = messaging.new_message('radarState')
     control = messaging.new_message('controlsState')
-    ss = messaging.new_message('selfdriveState')
     car_state = messaging.new_message('carState')
     model = messaging.new_message('modelV2')
     a_lead = (v_lead - self.v_lead_prev)/self.ts
@@ -113,8 +111,8 @@ class Plant:
     model.modelV2.acceleration = acceleration
 
     control.controlsState.longControlState = LongCtrlState.pid if self.enabled else LongCtrlState.off
-    ss.selfdriveState.experimentalMode = self.e2e
-    ss.selfdriveState.personality = self.personality
+    control.controlsState.experimentalMode = self.e2e
+    control.controlsState.personality = self.personality
     control.controlsState.forceDecel = self.force_decel
     car_state.carState.vEgo = float(self.speed)
     car_state.carState.standstill = self.speed < 0.01
@@ -124,7 +122,6 @@ class Plant:
     sm = {'radarState': radar.radarState,
           'carState': car_state.carState,
           'controlsState': control.controlsState,
-          'selfdriveState': ss.selfdriveState,
           'modelV2': model.modelV2}
     self.planner.update(sm)
     self.speed = self.planner.v_desired_filter.x
