@@ -108,8 +108,10 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"ControlsReady", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
     {"CurrentBootlog", PERSISTENT},
     {"CurrentRoute", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
+	{"DarkMode", PERSISTENT},
     {"DisableLogging", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
     {"DisablePowerDown", PERSISTENT},
+	{"DisableScreenTimer", PERSISTENT},
     {"DisableUpdates", PERSISTENT},
     {"DisengageOnAccelerator", PERSISTENT},
     {"DmModelInitialized", CLEAR_ON_ONROAD_TRANSITION},
@@ -117,6 +119,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"DoReboot", CLEAR_ON_MANAGER_START},
     {"DoShutdown", CLEAR_ON_MANAGER_START},
     {"DoUninstall", CLEAR_ON_MANAGER_START},
+	{"EnableScreenEvent", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
     {"ExperimentalLongitudinalEnabled", PERSISTENT | DEVELOPMENT_ONLY},
     {"ExperimentalMode", PERSISTENT},
     {"ExperimentalModeConfirmed", PERSISTENT},
@@ -199,6 +202,19 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"UpdaterTargetBranch", CLEAR_ON_MANAGER_START},
     {"UpdaterLastFetchTime", PERSISTENT},
     {"Version", PERSISTENT},
+	
+	// PFEIFER - AOL {{
+    {"AlwaysOnLateralEnabled", PERSISTENT},
+    {"AlwaysOnLateralEnabledLock", PERSISTENT | CLEAR_ON_OFFROAD_TRANSITION},
+    {"AlwaysOnLateralEnabledConfirmed", PERSISTENT},
+    {"AlwaysOnLateralMainEnablesConfirmed", PERSISTENT},
+    {"AlwaysOnLateralMainEnables", PERSISTENT},
+    {"LateralActive", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
+    {"DisengageLatOnBrake", PERSISTENT},
+    {"DisengageLatOnBlinker", PERSISTENT},
+    {"DisengageLatOnLowSpeedBlinker", PERSISTENT},
+    {"LatBlinkerLowSpeedLimit", PERSISTENT},
+    // }} PFEIFER - AOL
 };
 
 } // namespace
