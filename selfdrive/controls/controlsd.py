@@ -35,16 +35,9 @@ from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
 from openpilot.system.hardware import HARDWARE
 
-JOYSTICK_MAX_LAT_ACCEL = 2.5 # m/s^2
-
 # PFEIFER - AOL {{
 from openpilot.selfdrive.controls.always_on_lateral import AlwaysOnLateral
 # }} PFEIFER - AOL
-
-SOFT_DISABLE_TIME = 3  # seconds
-LDW_MIN_SPEED = 31 * CV.MPH_TO_MS
-LANE_DEPARTURE_THRESHOLD = 0.1
-CAMERA_OFFSET = 0.04
 
 REPLAY = "REPLAY" in os.environ
 SIMULATION = "SIMULATION" in os.environ
@@ -134,7 +127,7 @@ class Controls:
 
     self.LoC = LongControl(self.CP)
     self.VM = VehicleModel(self.CP)
-    
+
     self.ldw = LaneDepartureWarning()
 
     self.LaC: LatControl
@@ -391,7 +384,7 @@ class Controls:
 
       if self.sm['modelV2'].frameDropPerc > 20:
         self.events.add(EventName.modeldLagging)
-        
+
     # decrement personality on distance button press
     if self.CP.openpilotLongitudinalControl:
       if any(not be.pressed and be.type == ButtonType.gapAdjustCruise for be in CS.buttonEvents):
