@@ -472,7 +472,7 @@ class Controls:
     CC.latActive = self.active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                    (not standstill or self.joystick_mode)
     # PFEIFER - AOL {{
-    self.aol.update(CS, self.state, self.CP)
+    self.aol.update(CS, self.state_machine.state, self.CP)
     if self.aol.enabled:
       CC.latActive = self.aol.lat_active
     # }} PFEIFER - AOL
