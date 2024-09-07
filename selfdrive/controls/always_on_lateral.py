@@ -21,6 +21,7 @@ from panda import ALTERNATIVE_EXPERIENCE
 from openpilot.selfdrive.controls.lib.events import EngagementAlert, AudibleAlert
 from openpilot.selfdrive.controls.lib.events import ET
 from openpilot.common.realtime import DT_CTRL
+from openpilot.selfdrive.controls.lib.selfdrive import StateMachine
 
 State = log.SelfdriveState.OpenpilotState
 ACTIVE_STATES = (State.enabled, State.softDisabling, State.overriding)
@@ -47,6 +48,7 @@ class AlwaysOnLateral:
     self.AM = controls.AM
     self.sm = controls.sm
     self.controls = controls
+    self.state_machine = StateMachine()
 
     # UI Toggles
     self.disengage_lat_on_brake: bool = False
