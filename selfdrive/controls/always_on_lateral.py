@@ -222,17 +222,17 @@ class AlwaysOnLateral:
       self.controls.state = State.disabled
       # only alert if OP is not active as it will alert itself
       if not self.op_active:
-        self.controls.current_alert_types.append(ET.IMMEDIATE_DISABLE)
+        self.state_machine.current_alert_types.append(ET.IMMEDIATE_DISABLE)
     elif self.soft_disabling:
       if not self.controls.events.contains(ET.SOFT_DISABLE):
         # no more soft disabling condition, so go back to ENABLED
         self.soft_disabling = False
 
       elif self.soft_disable_timer > 0:
-        self.controls.current_alert_types.append(ET.SOFT_DISABLE)
+        self.state_machine.current_alert_types.append(ET.SOFT_DISABLE)
         # only alert if OP is not active as it will alert itself
         if not self.op_active:
-          self.controls.current_alert_types.append(ET.SOFT_DISABLE)
+          self.state_machine.current_alert_types.append(ET.SOFT_DISABLE)
 
       elif self.soft_disable_timer <= 0:
         self.disabled = True
@@ -243,11 +243,11 @@ class AlwaysOnLateral:
       self.soft_disable_timer = int(SOFT_DISABLE_TIME / DT_CTRL)
       # only alert if OP is not active as it will alert itself
       if not self.op_active:
-        self.controls.current_alert_types.append(ET.SOFT_DISABLE)
+        self.state_machine.current_alert_types.append(ET.SOFT_DISABLE)
 
     # Ensure we send warnings when only lat is active
     if self.lat_active:
-      self.controls.current_alert_types.append(ET.WARNING)
+      self.state_machine.current_alert_types.append(ET.WARNING)
 
   @property
   def lat_active(self):
