@@ -12,12 +12,12 @@ import time
 
 from cereal import messaging, log
 from msgq.visionipc import VisionIpcServer, VisionStreamType
-from cereal.messaging import SubMaster, PubMaster
+from cereal.messaging import PubMaster
 from openpilot.common.basedir import BASEDIR
 from openpilot.common.params import Params
 from openpilot.common.prefix import OpenpilotPrefix
 from openpilot.common.transformations.camera import CameraConfig, DEVICE_CAMERAS
-from openpilot.selfdrive.controls.lib.alertmanager import set_offroad_alert
+from openpilot.selfdrive.selfdrived.alertmanager import set_offroad_alert
 from openpilot.selfdrive.test.helpers import with_processes
 from openpilot.selfdrive.test.process_replay.migration import migrate_controlsState
 from openpilot.tools.lib.logreader import LogReader
@@ -34,34 +34,24 @@ DATA: dict[str, capnp.lib.capnp._DynamicStructBuilder] = dict.fromkeys(
   "liveCalibration", "modelV2", "radarState", "driverMonitoringState", "carState",
   "driverStateV2", "roadCameraState", "wideRoadCameraState", "driverCameraState"], None)
 
-def setup_common(click, pm: PubMaster):
-  Params().put("DongleId", "123456789012345")
-  pm.send('deviceState', DATA['deviceState'])
-
 def setup_homescreen(click, pm: PubMaster):
-  setup_common(click, pm)
+  pass
 
 def setup_settings_device(click, pm: PubMaster):
-  setup_common(click, pm)
-
   click(100, 100)
 
 def setup_onroad(click, pm: PubMaster):
-  setup_common(click, pm)
-
   vipc_server = VisionIpcServer("camerad")
   for stream_type, cam, _ in STREAMS:
     vipc_server.create_buffers(stream_type, 5, False, cam.width, cam.height)
   vipc_server.start_listener()
 
-  packet_id = 0
-  for _ in range(20):
+  for packet_id in range(30):
     for service, data in DATA.items():
       if data:
         data.clear_write_flag()
         pm.send(service, data)
 
-    packet_id = packet_id + 1
     for stream_type, _, image in STREAMS:
       vipc_server.send(stream_type, image, packet_id, packet_id, packet_id)
 
@@ -105,6 +95,7 @@ def setup_onroad_alert(click, pm: PubMaster, text1, text2, size, status=log.Self
   cs.alertStatus = status
   cs.alertType = "test_onroad_alert"
   pm.send('selfdriveState', dat)
+  time.sleep(UI_DELAY)
 
 def setup_onroad_alert_small(click, pm: PubMaster):
   setup_onroad_alert(click, pm, 'This is a small alert message', '', log.SelfdriveState.AlertSize.small)
@@ -116,7 +107,6 @@ def setup_onroad_alert_full(click, pm: PubMaster):
   setup_onroad_alert(click, pm, 'Full Alert', 'This is a full alert message', log.SelfdriveState.AlertSize.full)
 
 def setup_offroad_alert(click, pm: PubMaster):
-  setup_common(click, pm)
   for alert in OFFROAD_ALERTS:
     set_offroad_alert(alert, True)
 
@@ -125,7 +115,6 @@ def setup_offroad_alert(click, pm: PubMaster):
   click(240, 216)
 
 def setup_update_available(click, pm: PubMaster):
-  setup_common(click, pm)
   Params().put_bool("UpdateAvailable", True)
   release_notes_path = os.path.join(BASEDIR, "RELEASES.md")
   with open(release_notes_path) as file:
@@ -135,9 +124,14 @@ def setup_update_available(click, pm: PubMaster):
   setup_settings_device(click, pm)
   click(240, 216)
 
+def setup_pair_device(click, pm: PubMaster):
+  click(1950, 435)
+  click(1800, 900)
 
 CASES = {
   "homescreen": setup_homescreen,
+  "prime": setup_homescreen,
+  "pair_device": setup_pair_device,
   "settings_device": setup_settings_device,
   "onroad": setup_onroad,
   "onroad_sidebar": setup_onroad_sidebar,
@@ -164,11 +158,12 @@ class TestUI:
     sys.modules["mouseinfo"] = False
 
   def setup(self):
-    self.sm = SubMaster(["uiDebug"])
     self.pm = PubMaster(list(DATA.keys()))
-    while not self.sm.valid["uiDebug"]:
-      self.sm.update(1)
-    time.sleep(UI_DELAY) # wait a bit more for the UI to start rendering
+    DATA['deviceState'].deviceState.networkType = log.DeviceState.NetworkType.wifi
+    for _ in range(10):
+      self.pm.send('deviceState', DATA['deviceState'])
+      DATA['deviceState'].clear_write_flag()
+      time.sleep(0.05)
     try:
       self.ui = pywinctl.getWindowsWithTitle("ui")[0]
     except Exception as e:
@@ -194,8 +189,6 @@ class TestUI:
     self.setup()
 
     setup_case(self.click, self.pm)
-
-    time.sleep(UI_DELAY) # wait a bit more for the UI to finish rendering
 
     im = self.screenshot()
     plt.imsave(SCREENSHOTS_DIR / f"{name}.png", im)
@@ -243,8 +236,15 @@ def create_screenshots():
 
   t = TestUI()
 
-  with OpenpilotPrefix():
-    for name, setup in CASES.items():
+  for name, setup in CASES.items():
+    with OpenpilotPrefix():
+      params = Params()
+      params.put("DongleId", "123456789012345")
+      if name == 'prime':
+        params.put('PrimeType', '1')
+      elif name == 'pair_device':
+        params.put('ApiCache_Device', '{"is_paired":0, "prime_type":-1}')
+
       t.test_ui(name, setup)
 
 if __name__ == "__main__":
