@@ -20,10 +20,6 @@ from openpilot.selfdrive.controls.lib.vehicle_model import VehicleModel
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
 
-# PFEIFER - AOL {{
-from openpilot.selfdrive.controls.always_on_lateral import AlwaysOnLateral
-# }} PFEIFER - AOL
-
 State = log.SelfdriveState.OpenpilotState
 LaneChangeState = log.LaneChangeState
 LaneChangeDirection = log.LaneChangeDirection
@@ -93,11 +89,6 @@ class Controls:
     # Check which actuators can be enabled
     standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
     CC.latActive = self.sm['selfdriveState'].active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and not standstill
-    # PFEIFER - AOL {{
-    self.aol.update(CS, self.state_machine.state, self.CP)
-    if self.aol.enabled:
-      CC.latActive = self.aol.lat_active
-    # }} PFEIFER - AOL
     CC.longActive = CC.enabled and not any(e.overrideLongitudinal for e in self.sm['onroadEvents']) and self.CP.openpilotLongitudinalControl
 
     actuators = CC.actuators
