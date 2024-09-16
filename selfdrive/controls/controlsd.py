@@ -89,7 +89,7 @@ class Controls:
 
     # Check which actuators can be enabled
     standstill = CS.vEgo <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
-    CC.latActive = (self.sm['selfdriveState'].active or self.mem_params.get_bool("SteerAlwaysOn")) and not CS.steerFaultTemporary and not CS.steerFaultPermanent and not standstill
+    CC.latActive = (self.sm['selfdriveState'].active or (self.mem_params.get_bool("SteerAlwaysOn") and CS.cruiseState.available)) and not CS.steerFaultTemporary and not CS.steerFaultPermanent and not standstill
     CC.longActive = CC.enabled and not any(e.overrideLongitudinal for e in self.sm['onroadEvents']) and self.CP.openpilotLongitudinalControl
 
     actuators = CC.actuators
