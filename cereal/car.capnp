@@ -619,7 +619,8 @@ struct CarParams {
     volkswagenMqbEvo @29;
     chryslerCusw @30;
     psa @31;
-    volkswagenMeb @32;
+    fcaGiorgio @32;
+    volkswagenMeb @33;
   }
 
   enum SteerControlType {
@@ -714,5 +715,5 @@ struct CarParams {
   brakeMaxVDEPRECATED @16 :List(Float32);
   directAccelControlDEPRECATED @30 :Bool;
   maxSteeringAngleDegDEPRECATED @54 :Float32;
-  longitudinalActuatorDelayLowerBoundDEPRECATEDDEPRECATED @61 :Float32;
+  longitudinalActuatorDelayLowerBoundDEPRECATED @61 :Float32;
 }
