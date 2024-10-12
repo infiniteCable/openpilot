@@ -13,11 +13,8 @@ const int YUV_BUFFER_COUNT = 20;
 typedef struct FrameMetadata {
   uint32_t frame_id;
   uint32_t request_id;
-
-  // Timestamps
   uint64_t timestamp_sof;
   uint64_t timestamp_eof;
-
   float processing_time;
 } FrameMetadata;
 
@@ -39,6 +36,7 @@ public:
   VisionBuf *cur_yuv_buf;
   VisionBuf *cur_camera_buf;
   std::unique_ptr<VisionBuf[]> camera_bufs;
+  std::unique_ptr<VisionBuf[]> camera_bufs_raw;
   std::unique_ptr<FrameMetadata[]> camera_bufs_metadata;
   int out_img_width, out_img_height;
 
