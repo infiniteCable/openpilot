@@ -152,7 +152,7 @@ void Device::updateBrightness(const UIState &s) {
   auto params = Params();
   bool dark_mode = params.getBool("DarkMode");
 
-  if (s.scene.started && s.scene.light_sensor > 0) {
+  if (s.scene.started && s.scene.light_sensor >= 0) {
     clipped_brightness = s.scene.light_sensor;
 
     // CIE 1931 - https://www.photonstophotos.net/GeneralTopics/Exposure/Psychometric_Lightness_and_Gamma.htm

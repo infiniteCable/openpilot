@@ -43,6 +43,7 @@ public:
   float dc_gain_on_grey;
   float dc_gain_off_grey;
 
+  float ev_scale = 1.0;
   float sensor_analog_gains[ANALOG_GAIN_MAX_CNT];
   int analog_gain_min_idx;
   int analog_gain_max_idx;
@@ -61,7 +62,7 @@ public:
   std::vector<i2c_random_wr_payload> init_reg_array;
 
   uint32_t bits_per_pixel;
-  uint32_t bayer_pattern = CAM_ISP_PATTERN_BAYER_GRGRGR;
+  uint32_t bayer_pattern;
   uint32_t mipi_format;
   uint32_t mclk_frequency;
   uint32_t frame_data_type;
@@ -72,7 +73,14 @@ public:
   uint32_t black_level;
   std::vector<uint32_t> color_correct_matrix;  // 3x3
   std::vector<uint32_t> gamma_lut_rgb;         // gamma LUTs are length 64 * sizeof(uint32_t); same for r/g/b here
+  void prepare_gamma_lut() {
+    for (int i = 0; i < 64; i++) {
+      gamma_lut_rgb[i] |= ((uint32_t)(gamma_lut_rgb[i+1] - gamma_lut_rgb[i]) << 10);
+    }
+    gamma_lut_rgb.pop_back();
+  }
   std::vector<uint32_t> linearization_lut;     // length 288
+  std::vector<uint32_t> linearization_pts;     // length 4
   std::vector<uint32_t> vignetting_lut;        // 2x length 884
 };
 

@@ -78,6 +78,7 @@ float ar0231_parse_temp_sensor(uint16_t calib1, uint16_t calib2, uint16_t data_r
 
 AR0231::AR0231() {
   image_sensor = cereal::FrameData::ImageSensor::AR0231;
+  bayer_pattern = CAM_ISP_PATTERN_BAYER_GRGRGR;
   pixel_size_mm = 0.003;
   data_word = true;
   frame_width = 1928;
@@ -126,8 +127,8 @@ AR0231::AR0231() {
     0x00000fbc, 0x000000bb, 0x00000009,
     0x00000fb6, 0x00000fe0, 0x000000ea,
   };
-  for (int i = 0; i < 64; i++) {
-    float fx = i / 63.0;
+  for (int i = 0; i < 65; i++) {
+    float fx = i / 64.0;
     const float gamma_k = 0.75;
     const float gamma_b = 0.125;
     const float mp = 0.01; // ideally midpoint should be adaptive
@@ -137,6 +138,25 @@ AR0231::AR0231() {
       ((rk * (fx-mp) * (1-(gamma_k*mp+gamma_b)) * (1+1/(rk*(1-mp))) / (1+rk*(fx-mp))) + gamma_k*mp + gamma_b) :
       ((rk * (fx-mp) * (gamma_k*mp+gamma_b) * (1+1/(rk*mp)) / (1-rk*(fx-mp))) + gamma_k*mp + gamma_b);
     gamma_lut_rgb.push_back((uint32_t)(fx*1023.0 + 0.5));
+  }
+  prepare_gamma_lut();
+  linearization_lut = {
+    0x02000000, 0x02000000, 0x02000000, 0x02000000,
+    0x020007ff, 0x020007ff, 0x020007ff, 0x020007ff,
+    0x02000bff, 0x02000bff, 0x02000bff, 0x02000bff,
+    0x020017ff, 0x020017ff, 0x020017ff, 0x020017ff,
+    0x02001bff, 0x02001bff, 0x02001bff, 0x02001bff,
+    0x020023ff, 0x020023ff, 0x020023ff, 0x020023ff,
+    0x00003fff, 0x00003fff, 0x00003fff, 0x00003fff,
+    0x00003fff, 0x00003fff, 0x00003fff, 0x00003fff,
+    0x00003fff, 0x00003fff, 0x00003fff, 0x00003fff,
+  };
+  for (int i = 0; i < 252; i++) {
+    linearization_lut.push_back(0x0);
+  }
+  linearization_pts = {0x07ff0bff, 0x17ff1bff, 0x23ff3fff, 0x3fff3fff};
+  for (int i = 0; i < 884*2; i++) {
+    vignetting_lut.push_back(0xff);
   }
 }
 
