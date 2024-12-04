@@ -26,4 +26,4 @@ class LatControlAngle(LatControl):
     angle_log.saturated = self._check_saturation(angle_control_saturated, CS, False)
     angle_log.steeringAngleDeg = float(CS.steeringAngleDeg)
     angle_log.steeringAngleDesiredDeg = angle_steers_des
-    return 0, float(angle_steers_des), angle_log
+    return 0, float(angle_steers_des), float(curvature_desired), curvature_log
