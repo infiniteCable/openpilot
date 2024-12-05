@@ -17,14 +17,14 @@ class LatControlCurvature(LatControl):
     if not active:
       curvature_log.active = False
       curvature_desired = 0.0
+      angle_steers_des = float(CS.steeringAngleDeg)
     else:
       curvature_log.active = True
       curvature_desired = VM.calc_curvature_3dof(modelV2, CS.latAccel, CS.longAccel, CS.yawRate, CS.vEgo, math.radians(CS.steeringAngleDeg))
+      angle_steers_des = math.degrees(VM.get_steer_from_curvature(-curvature_desired, CS.vEgo, params.roll))
+      angle_steers_des += params.angleOffsetDeg
 
-    angle_steers_des = math.degrees(VM.get_steer_from_curvature(-curvature_desired, CS.vEgo, params.roll))
-    angle_steers_des += params.angleOffsetDeg
     angle_control_saturated = abs(angle_steers_des - CS.steeringAngleDeg) > STEER_ANGLE_SATURATION_THRESHOLD
     curvature_log.saturated = self._check_saturation(angle_control_saturated, CS, False)
-
     curvature_log.curvatureDesired = float(curvature_desired)
     return 0, 0.0, float(curvature_desired), curvature_log
