@@ -15,6 +15,7 @@ A depends on longitudinal speed, u [m/s], and vehicle parameters CP
 
 import numpy as np
 from numpy.linalg import solve
+from openpilot.common.simple_kalman import KF1D, get_kalman_gain
 
 from cereal import car
 
@@ -84,21 +85,40 @@ class VehicleModel:
     velocities = modelV2.velocity.x
     positions = modelV2.position.x
     orientations = modelV2.orientationRate.z
+    times = modelV2.position.t
+
+    state = np.zeros(3)
+    input_vector = np.zeros(2)
+
+    A = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    C = np.array([1, 1, 1])
+    Q = np.diag([0.01, 0.001, 0.0001])
+    R = np.array([[0.1]])
+    K = get_kalman_gain(1.0, A, C, Q, R)
+    kalman_filter = KF1D([[u_measured], [a_y / u_measured if u_measured > 0.1 else 0.0]], A, C, K)
 
     for i in range(len(velocities) - 1):
       u = u_measured if u_measured > 0.1 else velocities[i]
-      
       if u > 0.1:
+        delta_t = times[i + 1] - times[i]
+
         v = a_y / u
+
         A, B = create_dyn_state_matrices_3dof(u, v, yaw_rate, self)
-        state = np.array([u, v, yaw_rate])
-        input_vector = np.array([sa, a_x])
+        state[:] = [u, v, yaw_rate]
+        input_vector[:] = [sa, a_x]
+
         x_dot = A @ state + B @ input_vector
-        current_curvature = x_dot[2] / u if u > 0.1 else 0.0
-        
+        state += x_dot * delta_t
+
+        z = u_measured
+        state = kalman_filter.update(z)
+
+        current_curvature = state[2] / state[0] if state[0] > 0.1 else 0.0
+
         if previous_curvature is not None and (previous_curvature * current_curvature < 0):
           break
-          
+
         curvature += current_curvature
         previous_curvature = current_curvature
 
