@@ -43,6 +43,7 @@ class Controls:
 
     self.steer_limited = False
     self.desired_curvature = 0.0
+    self.desired_curvature_3dof = 0.0
 
     self.pose_calibrator = PoseCalibrator()
     self.calibrated_pose: Pose|None = None
@@ -113,10 +114,10 @@ class Controls:
 
     # Steering PID loop and lateral MPC
     self.desired_curvature = clip_curvature(CS.vEgo, self.desired_curvature, model_v2.action.desiredCurvature)
-    #actuators.curvature = self.desired_curvature
-    actuators.steer, actuators.steeringAngleDeg, actuators.curvature, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
-                                                                                                self.steer_limited, self.desired_curvature,
-                                                                                                self.calibrated_pose) # TODO what if not available
+    actuators.steer, actuators.steeringAngleDeg, curvature_3dof, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
+                                                                                           self.steer_limited, self.desired_curvature,
+                                                                                           self.calibrated_pose, model_v2) # TODO what if not available
+    actuators.curvature = clip_curvature(CS.vEgo, self.desired_curvature_3dof, curvature_3dof)
 
     # Ensure no NaNs/Infs
     for p in ACTUATOR_FIELDS:
