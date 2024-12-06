@@ -17,7 +17,7 @@ import numpy as np
 from numpy.linalg import solve
 from openpilot.common.simple_kalman import KF1D, get_kalman_gain
 
-from cereal import car
+from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
 SEGMENT_LENGTH_3DOF: int = 5
@@ -67,7 +67,7 @@ class VehicleModel:
     else:
       return kin_ss_sol(sa, u, self)
 
-  def calc_curvature_3dof(self, modelV2, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float, time_horizon: float = 2.0) -> float:
+  def calc_curvature_3dof(self, modelV2: log.ModelDataV2, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float, time_horizon: float = 2.0) -> float:
     """
     Calculate curvature by combining the predicted path (Baseline) and 3-DoF model with measured inputs,
     while correcting for deviations between the two curvatures.
