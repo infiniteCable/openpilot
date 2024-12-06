@@ -196,7 +196,7 @@ class Controls:
     if self.CP.steerControlType == car.CarParams.SteerControlType.angle:
       cs.lateralControlState.angleState = lac_log
     elif self.CP.steerControlType == car.CarParams.SteerControlType.curvature:
-      cs.lateralControlState.curvatureStateDEPRECATEDe = lac_log
+      cs.lateralControlState.curvatureStateDEPRECATED = lac_log
     elif lat_tuning == 'pid':
       cs.lateralControlState.pidState = lac_log
     elif lat_tuning == 'torque':
