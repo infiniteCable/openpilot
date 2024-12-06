@@ -117,7 +117,9 @@ class Controls:
     actuators.steer, actuators.steeringAngleDeg, curvature_3dof, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
                                                                                            self.steer_limited, self.desired_curvature,
                                                                                            self.calibrated_pose, model_v2) # TODO what if not available
-    actuators.curvature = clip_curvature(CS.vEgo, self.desired_curvature_3dof, curvature_3dof)
+    curvature_3dof_clip = clip_curvature(CS.vEgo, self.desired_curvature_3dof, curvature_3dof)
+    #actuators.curvature = curvature_3dof_clip if curvature_3dof != 0 else self.desired_curvature
+    actuators.curvature = curvature_3dof_clip
     self.desired_curvature_3dof = actuators.curvature
 
     # Ensure no NaNs/Infs
