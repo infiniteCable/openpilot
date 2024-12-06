@@ -86,7 +86,7 @@ class VehicleModel:
     """
     curvatures_baseline = []
     curvatures_3dof = []
-    segment_length = int(SEGMENT_LENGTH_3DOF)
+    segment_length = SEGMENT_LENGTH_3DOF
 
     positions_x = modelV2.position.x
     positions_y = modelV2.position.y
