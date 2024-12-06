@@ -118,6 +118,7 @@ class Controls:
                                                                                            self.steer_limited, self.desired_curvature,
                                                                                            self.calibrated_pose, model_v2) # TODO what if not available
     actuators.curvature = clip_curvature(CS.vEgo, self.desired_curvature_3dof, curvature_3dof)
+    self.desired_curvature_3dof = actuators.curvature
 
     # Ensure no NaNs/Infs
     for p in ACTUATOR_FIELDS:
