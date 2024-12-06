@@ -20,6 +20,8 @@ from openpilot.common.simple_kalman import KF1D, get_kalman_gain
 from cereal import car
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
+SEGMENT_LENGTH_3DOF = 5
+CURVATURE_CORR_ALPHA_3DOF = 0.5
 
 
 class VehicleModel:
@@ -65,8 +67,10 @@ class VehicleModel:
     else:
       return kin_ss_sol(sa, u, self)
 
-  def calc_curvature_3dof(self, modelV2, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float) -> float:
-    """Calculate curvature using the 3-DoF model with additional measured inputs and model data.
+  def calc_curvature_3dof(self, modelV2, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float, time_horizon: float = 2.0) -> float:
+    """
+    Calculate curvature by combining the predicted path (Baseline) and 3-DoF model with measured inputs,
+    while correcting for deviations between the two curvatures.
 
     Args:
       modelV2: Model data structure containing position, orientation, velocity, etc.
@@ -75,55 +79,64 @@ class VehicleModel:
       yaw_rate: Measured yaw rate [rad/s]
       u_measured: Measured longitudinal speed [m/s]
       sa: Steering angle [rad]
+      time_horizon: Time horizon [s] over which to aggregate the curvature.
 
     Returns:
-      Curvature factor [1/m]
+      Corrected curvature factor [1/m]
     """
-    curvature = 0.0
-    previous_curvature = None
+    curvatures_baseline = []
+    curvatures_3dof = []
+    segment_length = SEGMENT_LENGTH_3DOF
 
-    velocities = modelV2.velocity.x
-    positions = modelV2.position.x
-    orientations = modelV2.orientationRate.z
+    positions_x = modelV2.position.x
+    positions_y = modelV2.position.y
     times = modelV2.position.t
 
-    state = np.zeros(3)
-    input_vector = np.zeros(2)
+    if len(positions_x) < segment_length or len(positions_y) < segment_length:
+      return 0.0
 
-    A = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-    C = np.array([1, 1, 1])
-    Q = np.diag([0.01, 0.001, 0.0001])
-    R = np.array([[0.1]])
-    K = get_kalman_gain(1.0, A, C, Q, R)
-    kalman_filter = KF1D([[u_measured], [a_y / u_measured if u_measured > 0.1 else 0.0]], A, C, K)
+    for i in range(0, len(positions_x) - segment_length, segment_length):
+      x_segment = positions_x[i:i + segment_length]
+      y_segment = positions_y[i:i + segment_length]
+      t_segment = times[i:i + segment_length]
 
-    for i in range(len(velocities) - 1):
-      u = u_measured if u_measured > 0.1 else velocities[i]
-      if u > 0.1:
+      dx = np.gradient(x_segment, t_segment)
+      dy = np.gradient(y_segment, t_segment)
+      ddx = np.gradient(dx, t_segment)
+      ddy = np.gradient(dy, t_segment)
+      curvature_baseline = np.abs(ddx * dy - ddy * dx) / (dx**2 + dy**2)**(3/2)
+      curvature_baseline = np.nanmean(curvature_baseline)
+      curvatures_baseline.append(curvature_baseline)
+
+      u = u_measured if u_measured > 0.1 else dx[0]
+      v = a_y / u if u > 0.1 else 0.0
+      A, B = create_dyn_state_matrices_3dof(u, v, yaw_rate, self)
+      state = np.array([u, v, yaw_rate])
+      input_vector = np.array([sa, a_x])
+      delta_t = t_segment[-1] - t_segment[0]
+      x_dot = A @ state + B @ input_vector
+      state += x_dot * delta_t
+      curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
+      curvatures_3dof.append(curvature_3dof)
+
+    combined_curvatures = []
+    alpha = CURVATURE_CORR_ALPHA_3DOF
+    for cb, c3d in zip(curvatures_baseline, curvatures_3dof):
+      delta_curvature = cb - c3d
+      corrected_curvature = cb + alpha * delta_curvature
+      combined_curvatures.append(corrected_curvature)
+
+    relevant_curvatures = []
+    total_time = 0.0
+    for i, curvature in enumerate(combined_curvatures):
+      if total_time >= time_horizon:
+        break
+      if i < len(times) - 1:
         delta_t = times[i + 1] - times[i]
+        total_time += delta_t
+        relevant_curvatures.append(curvature)
 
-        v = a_y / u
-
-        A, B = create_dyn_state_matrices_3dof(u, v, yaw_rate, self)
-        state[:] = [u, v, yaw_rate]
-        input_vector[:] = [sa, a_x]
-
-        x_dot = A @ state + B @ input_vector
-        state += x_dot * delta_t
-
-        z = u_measured
-        state = kalman_filter.update(z)
-
-        current_curvature = state[2] / state[0] if state[0] > 0.1 else 0.0
-
-        if previous_curvature is not None and (previous_curvature * current_curvature < 0):
-          break
-
-        curvature += current_curvature
-        previous_curvature = current_curvature
-
-    curvature /= i if i > 0 else 1
-    return curvature
+    return sum(relevant_curvatures) / len(relevant_curvatures) if relevant_curvatures else 0.0
 
   def calc_curvature(self, sa: float, u: float, roll: float) -> float:
     """Returns the curvature. Multiplied by the speed this will give the yaw rate.
