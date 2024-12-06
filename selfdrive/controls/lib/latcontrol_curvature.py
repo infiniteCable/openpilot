@@ -26,5 +26,5 @@ class LatControlCurvature(LatControl):
 
     angle_control_saturated = abs(angle_steers_des - CS.steeringAngleDeg) > STEER_ANGLE_SATURATION_THRESHOLD
     curvature_log.saturated = self._check_saturation(angle_control_saturated, CS, False)
-    curvature_log.curvatureDesired = float(curvature_desired)
+    curvature_log.desiredCurvature = float(curvature_desired)
     return 0, 0.0, float(curvature_desired), curvature_log
