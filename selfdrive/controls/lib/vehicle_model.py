@@ -103,7 +103,7 @@ class VehicleModel:
     dy = np.gradient(positions_y, times)
     ddx = np.gradient(dx, times)
     ddy = np.gradient(dy, times)
-    curvature_baseline = np.abs(ddx * dy - ddy * dx) / (dx**2 + dy**2)**(3/2)
+    curvature_baseline = (ddx * dy - ddy * dx) / (dx**2 + dy**2)**(3/2)
     curvature_baseline = np.nanmean(curvature_baseline)
     
     # Calculate curvature using the 3-DoF model
