@@ -20,7 +20,7 @@ from openpilot.common.simple_kalman import KF1D, get_kalman_gain
 from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
-CURVATURE_CORR_ALPHA_3DOF = 0.04
+CURVATURE_CORR_ALPHA_3DOF = 0.1
 
 
 class VehicleModel:
@@ -151,7 +151,7 @@ class VehicleModel:
     x_dot = A @ state + B @ input_vector
     state += x_dot * 0.1
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
-    
+    curvature_3dof = curvature_3dof * (-1)
     # Calculate correction factor
     delta_curvature = desired_curvature - curvature_3dof
     corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
