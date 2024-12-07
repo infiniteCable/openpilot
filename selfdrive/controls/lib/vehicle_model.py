@@ -91,17 +91,15 @@ class VehicleModel:
     positions_y = modelV2.position.y
     times = modelV2.position.t
 
-    if len(positions_x) < SEGMENT_LENGTH_3DOF or len(positions_y) < SEGMENT_LENGTH_3DOF:
+    segment_length = np.int_(SEGMENT_LENGTH_3DOF)
+
+    if len(positions_x) < segment_length or len(positions_y) < segment_length:
       return 0.0
 
-    range_end = int(len(positions_x) - SEGMENT_LENGTH_3DOF)
-
-    for i in range(0, range_end, SEGMENT_LENGTH_3DOF):
-      end_idx = int(i + SEGMENT_LENGTH_3DOF)
-      
-      x_segment = positions_x[i:end_idx]
-      y_segment = positions_y[i:end_idx]
-      t_segment = times[i:end_idx]
+    for i in range(0, len(positions_x) - segment_length, segment_length):      
+      x_segment = positions_x[i:i + segment_length]
+      y_segment = positions_y[i:i + segment_length]
+      t_segment = times[i:i + segment_length]
 
       dx = np.gradient(x_segment, t_segment)
       dy = np.gradient(y_segment, t_segment)
