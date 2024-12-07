@@ -20,7 +20,7 @@ from openpilot.common.simple_kalman import KF1D, get_kalman_gain
 from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
-CURVATURE_CORR_ALPHA_3DOF = 0.1
+CURVATURE_CORR_ALPHA_3DOF = 0.2
 
 
 class VehicleModel:
@@ -140,7 +140,7 @@ class VehicleModel:
     """
     
     # Extract desired curvature from model
-    desired_curvature = modelV2.action.desiredCurvature
+    desired_curvature = -modelV2.action.desiredCurvature
     
     # Calculate curvature using the 3-DoF model
     u = max(u_measured, 0.1)
@@ -149,14 +149,14 @@ class VehicleModel:
     state = np.array([u, v, yaw_rate])
     input_vector = np.array([sa, a_x])
     x_dot = A @ state + B @ input_vector
-    state += x_dot * 0.1
+    state += x_dot * 0.25
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
-    curvature_3dof = curvature_3dof * (-1)
+
     # Calculate correction factor
     delta_curvature = desired_curvature - curvature_3dof
     corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
     
-    return corrected_curvature
+    return -corrected_curvature
 
   def calc_curvature(self, sa: float, u: float, roll: float) -> float:
     """Returns the curvature. Multiplied by the speed this will give the yaw rate.
