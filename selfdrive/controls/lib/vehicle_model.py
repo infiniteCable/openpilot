@@ -153,7 +153,7 @@ class VehicleModel:
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
     
     # Calculate correction factor
-    delta_curvature = desired_curvature + curvature_3dof
+    delta_curvature = desired_curvature - curvature_3dof
     corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
     
     return corrected_curvature
