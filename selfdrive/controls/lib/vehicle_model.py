@@ -20,7 +20,7 @@ from openpilot.common.simple_kalman import KF1D, get_kalman_gain
 from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
-CURVATURE_CORR_ALPHA_3DOF = 0.0
+CURVATURE_CORR_ALPHA_3DOF = 0.1
 
 
 class VehicleModel:
@@ -121,7 +121,7 @@ class VehicleModel:
     delta_curvature = curvature_baseline - curvature_3dof
     corrected_curvature = curvature_baseline + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
     
-    return corrected_curvature
+    return -corrected_curvature
 
   def calc_curvature(self, sa: float, u: float, roll: float) -> float:
     """Returns the curvature. Multiplied by the speed this will give the yaw rate.
