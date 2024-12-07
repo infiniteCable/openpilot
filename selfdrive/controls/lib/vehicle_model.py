@@ -20,8 +20,8 @@ from openpilot.common.simple_kalman import KF1D, get_kalman_gain
 from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
-SEGMENT_LENGTH_3DOF: int = 5
-CURVATURE_CORR_ALPHA_3DOF: float = 0.5
+SEGMENT_LENGTH_3DOF = 5
+CURVATURE_CORR_ALPHA_3DOF = 0.5
 
 
 class VehicleModel:
@@ -91,15 +91,13 @@ class VehicleModel:
     positions_y = modelV2.position.y
     times = modelV2.position.t
 
-    segment_length = np.int_(SEGMENT_LENGTH_3DOF)
-
-    if len(positions_x) < segment_length or len(positions_y) < segment_length:
+    if len(positions_x) < SEGMENT_LENGTH_3DOF or len(positions_y) < SEGMENT_LENGTH_3DOF:
       return 0.0
 
-    for i in range(0, len(positions_x) - segment_length, segment_length):      
-      x_segment = positions_x[i:i + segment_length]
-      y_segment = positions_y[i:i + segment_length]
-      t_segment = times[i:i + segment_length]
+    for i in range(0, len(positions_x) - SEGMENT_LENGTH_3DOF, SEGMENT_LENGTH_3DOF):      
+      x_segment = positions_x[i:i + SEGMENT_LENGTH_3DOF]
+      y_segment = positions_y[i:i + SEGMENT_LENGTH_3DOF]
+      t_segment = times[i:i + SEGMENT_LENGTH_3DOF]
 
       dx = np.gradient(x_segment, t_segment)
       dy = np.gradient(y_segment, t_segment)
