@@ -86,19 +86,18 @@ class VehicleModel:
     """
     curvatures_baseline = []
     curvatures_3dof = []
-    segment_length = SEGMENT_LENGTH_3DOF
 
     positions_x = modelV2.position.x
     positions_y = modelV2.position.y
     times = modelV2.position.t
 
-    if len(positions_x) < segment_length or len(positions_y) < segment_length:
+    if len(positions_x) < SEGMENT_LENGTH_3DOF or len(positions_y) < SEGMENT_LENGTH_3DOF:
       return 0.0
 
-    for i in range(0, len(positions_x) - segment_length, segment_length):
-      x_segment = positions_x[i:i + segment_length]
-      y_segment = positions_y[i:i + segment_length]
-      t_segment = times[i:i + segment_length]
+    for i in range(0, len(positions_x) - SEGMENT_LENGTH_3DOF, SEGMENT_LENGTH_3DOF):
+      x_segment = positions_x[i:i + SEGMENT_LENGTH_3DOF]
+      y_segment = positions_y[i:i + SEGMENT_LENGTH_3DOF]
+      t_segment = times[i:i + SEGMENT_LENGTH_3DOF]
 
       dx = np.gradient(x_segment, t_segment)
       dy = np.gradient(y_segment, t_segment)
@@ -120,10 +119,9 @@ class VehicleModel:
       curvatures_3dof.append(curvature_3dof)
 
     combined_curvatures = []
-    alpha = CURVATURE_CORR_ALPHA_3DOF
     for cb, c3d in zip(curvatures_baseline, curvatures_3dof):
       delta_curvature = cb - c3d
-      corrected_curvature = cb + alpha * delta_curvature
+      corrected_curvature = cb + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
       combined_curvatures.append(corrected_curvature)
 
     relevant_curvatures = []
