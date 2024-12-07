@@ -123,6 +123,41 @@ class VehicleModel:
     
     return -corrected_curvature
 
+  def calc_curvature_correction(self, modelV2: log.ModelDataV2, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float) -> float:
+    """
+    Calculate a correction factor for the model's desired curvature based on measured inputs.
+    
+    Args:
+      modelV2: Model data structure containing action.desiredCurvature.
+      a_y: Measured lateral acceleration [m/s^2].
+      a_x: Measured longitudinal acceleration [m/s^2].
+      yaw_rate: Measured yaw rate [rad/s].
+      u_measured: Measured longitudinal speed [m/s].
+      sa: Steering angle [rad].
+    
+    Returns:
+      Corrected curvature factor [1/m].
+    """
+    
+    # Extract desired curvature from model
+    desired_curvature = modelV2.action.desiredCurvature
+    
+    # Calculate curvature using the 3-DoF model
+    u = max(u_measured, 0.1)
+    v = a_y / u if u > 0.1 else 0.0
+    A, B = create_dyn_state_matrices_3dof(u, v, yaw_rate, self)
+    state = np.array([u, v, yaw_rate])
+    input_vector = np.array([sa, a_x])
+    x_dot = A @ state + B @ input_vector
+    state += x_dot * 0.1
+    curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
+    
+    # Calculate correction factor
+    delta_curvature = desired_curvature + curvature_3dof
+    corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
+    
+    return corrected_curvature
+
   def calc_curvature(self, sa: float, u: float, roll: float) -> float:
     """Returns the curvature. Multiplied by the speed this will give the yaw rate.
 
