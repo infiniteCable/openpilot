@@ -87,9 +87,9 @@ class VehicleModel:
     curvatures_baseline = []
     curvatures_3dof = []
 
-    positions_x = modelV2.position.x
-    positions_y = modelV2.position.y
-    times = modelV2.position.t
+    positions_x = list(modelV2.position.x)
+    positions_y = list(modelV2.position.y)
+    times = list(modelV2.position.t)
 
     if len(positions_x) < SEGMENT_LENGTH_3DOF or len(positions_y) < SEGMENT_LENGTH_3DOF:
       return 0.0
