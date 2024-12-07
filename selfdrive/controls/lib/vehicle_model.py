@@ -156,7 +156,7 @@ class VehicleModel:
     delta_curvature = desired_curvature - curvature_3dof
     corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
     
-    return corrected_curvature
+    return -corrected_curvature
 
   def calc_curvature(self, sa: float, u: float, roll: float) -> float:
     """Returns the curvature. Multiplied by the speed this will give the yaw rate.
