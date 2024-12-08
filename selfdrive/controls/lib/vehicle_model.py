@@ -195,7 +195,7 @@ class VehicleModel:
     state += x_dot * 0.1
     curvature_dbm = state[1] / u
   
-    desired_curvature = -modelV2.action.desiredCurvature
+    desired_curvature = modelV2.action.desiredCurvature
     delta_curvature = desired_curvature - curvature_dbm
     corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_DBM * delta_curvature
   
