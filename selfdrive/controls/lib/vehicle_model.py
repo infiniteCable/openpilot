@@ -124,7 +124,7 @@ class VehicleModel:
     
     return -corrected_curvature
 
-  def calc_curvature_correction(self, modelV2: log.ModelDataV2, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float) -> float:
+  def calc_curvature_correction_3dof(self, modelV2: log.ModelDataV2, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float) -> float:
     """
     Calculate a correction factor for the model's desired curvature based on measured inputs.
     
