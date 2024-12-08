@@ -20,7 +20,8 @@ class LatControlCurvature(LatControl):
       angle_steers_des = float(CS.steeringAngleDeg)
     else:
       curvature_log.active = True
-      curvature_desired = VM.calc_curvature_correction(modelV2, CS.latAccel, CS.longAccel, CS.yawRate, CS.vEgo, math.radians(CS.steeringAngleDeg))
+      #curvature_desired = VM.calc_curvature_correction_3dof(modelV2, CS.latAccel, CS.longAccel, CS.yawRate, CS.vEgo, math.radians(CS.steeringAngleDeg))
+      curvature_desired = calc_curvature_correction_dbm(modelV2, math.radians(CS.steeringAngleDeg), CS.vEgo, params)
       angle_steers_des = math.degrees(VM.get_steer_from_curvature(-curvature_desired, CS.vEgo, params.roll))
       angle_steers_des += params.angleOffsetDeg
 
