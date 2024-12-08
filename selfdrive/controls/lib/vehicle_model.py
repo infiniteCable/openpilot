@@ -20,8 +20,8 @@ from openpilot.common.simple_kalman import KF1D, get_kalman_gain
 from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
-CURVATURE_CORR_ALPHA_3DOF = 0.2
-CURVATURE_CORR_ALPHA_DBM = 0.04
+CURVATURE_CORR_ALPHA_3DOF = 0.1
+CURVATURE_CORR_ALPHA_DBM = 0.02
 
 
 class VehicleModel:
