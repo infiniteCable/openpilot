@@ -199,7 +199,7 @@ class VehicleModel:
     delta_curvature = desired_curvature - curvature_dbm
     corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_DBM * delta_curvature
   
-    return -corrected_curvature
+    return corrected_curvature
 
   def curvature_factor(self, u: float) -> float:
     """Returns the curvature factor.
