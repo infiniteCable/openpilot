@@ -189,8 +189,8 @@ class VehicleModel:
     r = 0.0
 
     A, B = create_dyn_state_matrices(u, self)
-    state = np.array([v, r])
-    input_vector = np.array([sa, roll])
+    state = np.array([v, r], dtype=np.float64)
+    input_vector = np.array([sa, roll], dtype=np.float64)
     x_dot = A @ state + B @ input_vector
     state += x_dot * 0.1
     curvature_dbm = state[1] / u
