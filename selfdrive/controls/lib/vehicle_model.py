@@ -21,6 +21,7 @@ from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
 CURVATURE_CORR_ALPHA_3DOF = 0.2
+CURVATURE_CORR_ALPHA_DBM = 0.2
 
 
 class VehicleModel:
@@ -170,6 +171,35 @@ class VehicleModel:
       Curvature factor [1/m]
     """
     return (self.curvature_factor(u) * sa / self.sR) + self.roll_compensation(roll, u)
+
+  def calc_curvature_correction_dbm(self, modelV2: log.ModelDataV2, sa: float, u_measured: float, roll: float) -> float:
+    """
+    Calculate curvature correction using the Dynamic Bicycle Model (DBM).
+  
+    Args:
+      sa: Steering wheel angle [rad].
+      u_measured: Measured longitudinal speed [m/s].
+      roll: Road roll [rad].
+  
+    Returns:
+      Corrected curvature factor [1/m].
+    """
+    u = max(u_measured, 0.1)
+    v = 0.0
+    r = 0.0
+
+    A, B = create_dyn_state_matrices(u, self)
+    state = np.array([v, r])
+    input_vector = np.array([sa, roll])
+    x_dot = A @ state + B @ input_vector
+    state += x_dot * 0.1
+    curvature_dbm = state[1] / u
+  
+    desired_curvature = -modelV2.action.desiredCurvature
+    delta_curvature = desired_curvature - curvature_dbm
+    corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_DBM * delta_curvature
+  
+    return -corrected_curvature
 
   def curvature_factor(self, u: float) -> float:
     """Returns the curvature factor.
