@@ -21,7 +21,7 @@ from openpilot.common.numpy_fast import interp
 from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
-CURVATURE_CORR_ALPHA_3DOF = 0.25
+CURVATURE_CORR_ALPHA_3DOF = 0.3
 CURVATURE_CORR_ALPHA_DBM = 0.05
 
 
@@ -140,7 +140,7 @@ class VehicleModel:
     Returns:
       Corrected curvature factor [1/m].
     """
-    alpha = interp(u_measured, [10, 40], [0.0, CURVATURE_CORR_ALPHA_3DOF])
+    alpha = interp(u_measured, [15, 45], [0.0, CURVATURE_CORR_ALPHA_3DOF])
     u = max(u_measured, 0.1)
     
     v = a_y / u if u > 0.1 else 0.0
