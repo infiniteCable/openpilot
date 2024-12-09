@@ -16,11 +16,12 @@ A depends on longitudinal speed, u [m/s], and vehicle parameters CP
 import numpy as np
 from numpy.linalg import solve
 from openpilot.common.simple_kalman import KF1D, get_kalman_gain
+from openpilot.common.numpy_fast import interp
 
 from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
-CURVATURE_CORR_ALPHA_3DOF = 0.2
+CURVATURE_CORR_ALPHA_3DOF = 0.25
 CURVATURE_CORR_ALPHA_DBM = 0.05
 
 
@@ -139,6 +140,7 @@ class VehicleModel:
     Returns:
       Corrected curvature factor [1/m].
     """
+    alpha = interp(u_measured, [10, 40], [0.0, CURVATURE_CORR_ALPHA_3DOF])
     u = max(u_measured, 0.1)
     
     v = a_y / u if u > 0.1 else 0.0
@@ -149,7 +151,7 @@ class VehicleModel:
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
     
     delta_curvature = -modelV2.action.desiredCurvature - curvature_3dof
-    corrected_curvature = -modelV2.action.desiredCurvature + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
+    corrected_curvature = -modelV2.action.desiredCurvature + alpha * delta_curvature
     
     return -corrected_curvature
 
