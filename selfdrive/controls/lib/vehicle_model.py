@@ -143,6 +143,11 @@ class VehicleModel:
     
     v = a_y / u if u > 0.1 else 0.0
     A, B = create_dyn_state_matrices_3dof(u, v, yaw_rate, self)
+
+    diag_values = np.abs(np.diag(A))
+    regularization = min(diag_values) * 1e-3
+    A += regularization * np.eye(A.shape[0])
+
     input_vector = np.array([sa, a_x])
     state = -solve(A, B @ input_vector)
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
