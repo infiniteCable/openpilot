@@ -184,21 +184,11 @@ class VehicleModel:
     Returns:
       Corrected curvature factor [1/m].
     """
-    u = max(u_measured, 0.1)
-    v = 0.0
-    r = 0.0
-
-    A, B = create_dyn_state_matrices(u, self)
-    state = np.array([v, r])
-    input_vector = np.array([sa, roll])
-    x_dot = A @ state + B @ input_vector
-    state += x_dot * 0.1
-    curvature_dbm = state[1] / u
-  
-    desired_curvature = modelV2.action.desiredCurvature
-    delta_curvature = desired_curvature - curvature_dbm
-    corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_DBM * delta_curvature
-  
+    steady_state = self.steady_state_sol(sa, u_measured, roll)
+    r = steady_state[1]
+    curvature_dbm = r / u_measured if u_measured > 0 else 0.0
+    delta_curvature = modelV2.action.desiredCurvature - curvature_dbm
+    corrected_curvature = modelV2.action.desiredCurvature + CURVATURE_CORR_ALPHA_DBM * delta_curvature
     return corrected_curvature
 
   def curvature_factor(self, u: float) -> float:
