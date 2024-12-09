@@ -139,23 +139,16 @@ class VehicleModel:
     Returns:
       Corrected curvature factor [1/m].
     """
-    
-    # Extract desired curvature from model, ensure correct sign
-    desired_curvature = -modelV2.action.desiredCurvature
-    
-    # Calculate curvature using the 3-DoF model
     u = max(u_measured, 0.1)
+    
     v = a_y / u if u > 0.1 else 0.0
     A, B = create_dyn_state_matrices_3dof(u, v, yaw_rate, self)
-    state = np.array([u, v, yaw_rate])
     input_vector = np.array([sa, a_x])
-    x_dot = A @ state + B @ input_vector
-    state += x_dot * 0.1
+    state = -solve(A, B @ input_vector)
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
-
-    # Calculate correction factor
-    delta_curvature = desired_curvature - curvature_3dof
-    corrected_curvature = desired_curvature + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
+    
+    delta_curvature = -modelV2.action.desiredCurvature - curvature_3dof
+    corrected_curvature = -modelV2.action.desiredCurvature + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
     
     return -corrected_curvature
 
