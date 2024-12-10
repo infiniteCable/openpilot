@@ -21,7 +21,7 @@ from openpilot.common.numpy_fast import interp
 from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
-CURVATURE_CORR_ALPHA_3DOF = 0.6
+CURVATURE_CORR_ALPHA_3DOF = 1
 CURVATURE_CORR_ALPHA_DBM = 0.05
 
 
