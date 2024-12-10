@@ -140,7 +140,7 @@ class VehicleModel:
     Returns:
       Corrected curvature factor [1/m].
     """
-    alpha = interp(u_measured, [18, 38], [0.0, CURVATURE_CORR_ALPHA_3DOF])
+    alpha = interp(u_measured, [18, 27, 40], [0.0, 0.2, CURVATURE_CORR_ALPHA_3DOF])
     u = max(u_measured, 0.1)
     
     v = a_y / u if u > 0.1 else 0.0
