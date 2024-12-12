@@ -5,17 +5,44 @@ from openpilot.common.numpy_fast import clip, interp
 
 
 class PIDController:
-  def __init__(self, k_p, k_i, k_f=0., k_d=0., pos_limit=1e308, neg_limit=-1e308, rate=100):
+  def __init__(self, k_p, k_i, k_f=0., k_d=0.,
+               k_p_pos=0., k_i_pos=0., k_d_pos=0.,
+               k_p_neg=0., k_i_neg=0., k_d_neg=0.,
+               pos_limit=1e308, neg_limit=-1e308, rate=100):
     self._k_p = k_p
     self._k_i = k_i
     self._k_d = k_d
-    self.k_f = k_f   # feedforward gain
+
+    # Assign _pos and _neg values, checking for non-zero entries
+    self._k_p_pos = k_p_pos if any(k_p_pos) else k_p
+    self._k_i_pos = k_i_pos if any(k_i_pos) else k_i
+    self._k_d_pos = k_d_pos if any(k_d_pos) else k_d
+    self._k_p_neg = k_p_neg if any(k_p_neg) else k_p
+    self._k_i_neg = k_i_neg if any(k_i_neg) else k_i
+    self._k_d_neg = k_d_neg if any(k_d_neg) else k_d
+
+    self.k_f = k_f  # feedforward gain
+
     if isinstance(self._k_p, Number):
       self._k_p = [[0], [self._k_p]]
     if isinstance(self._k_i, Number):
       self._k_i = [[0], [self._k_i]]
     if isinstance(self._k_d, Number):
       self._k_d = [[0], [self._k_d]]
+
+    if isinstance(self._k_p_pos, Number):
+      self._k_p_pos = [[0], [self._k_p_pos]]
+    if isinstance(self._k_i_pos, Number):
+      self._k_i_pos = [[0], [self._k_i_pos]]
+    if isinstance(self._k_d_pos, Number):
+      self._k_d_pos = [[0], [self._k_d_pos]]
+
+    if isinstance(self._k_p_neg, Number):
+      self._k_p_neg = [[0], [self._k_p_neg]]
+    if isinstance(self._k_i_neg, Number):
+      self._k_i_neg = [[0], [self._k_i_neg]]
+    if isinstance(self._k_d_neg, Number):
+      self._k_d_neg = [[0], [self._k_d_neg]]
 
     self.pos_limit = pos_limit
     self.neg_limit = neg_limit
@@ -28,19 +55,28 @@ class PIDController:
 
   @property
   def k_p(self):
-    return interp(self.speed, self._k_p[0], self._k_p[1])
+    if self.f >= 0:
+      return interp(self.speed, self._k_p_pos[0], self._k_p_pos[1])
+    else:
+      return interp(self.speed, self._k_p_neg[0], self._k_p_neg[1])
 
   @property
   def k_i(self):
-    return interp(self.speed, self._k_i[0], self._k_i[1])
+    if self.f >= 0:
+      return interp(self.speed, self._k_i_pos[0], self._k_i_pos[1])
+    else:
+      return interp(self.speed, self._k_i_neg[0], self._k_i_neg[1])
 
   @property
   def k_d(self):
-    return interp(self.speed, self._k_d[0], self._k_d[1])
+    if self.f >= 0:
+      return interp(self.speed, self._k_d_pos[0], self._k_d_pos[1])
+    else:
+      return interp(self.speed, self._k_d_neg[0], self._k_d_neg[1])
 
   @property
   def error_integral(self):
-    return self.i/self.k_i
+    return self.i / self.k_i
 
   def reset(self):
     self.p = 0.0
