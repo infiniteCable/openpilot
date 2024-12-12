@@ -9,11 +9,9 @@ class PIDController:
                k_p_pos=0., k_i_pos=0., k_d_pos=0.,
                k_p_neg=0., k_i_neg=0., k_d_neg=0.,
                pos_limit=1e308, neg_limit=-1e308, rate=100):
-    self._k_p = k_p
-    self._k_i = k_i
-    self._k_d = k_d
+                 
+    self.k_f = k_f
 
-    # Assign _pos and _neg values, checking for non-zero entries
     self._k_p_pos = k_p_pos if any(k_p_pos) else k_p
     self._k_i_pos = k_i_pos if any(k_i_pos) else k_i
     self._k_d_pos = k_d_pos if any(k_d_pos) else k_d
@@ -21,27 +19,18 @@ class PIDController:
     self._k_i_neg = k_i_neg if any(k_i_neg) else k_i
     self._k_d_neg = k_d_neg if any(k_d_neg) else k_d
 
-    self.k_f = k_f  # feedforward gain
-
-    if isinstance(self._k_p, Number):
-      self._k_p = [[0], [self._k_p]]
-    if isinstance(self._k_i, Number):
-      self._k_i = [[0], [self._k_i]]
-    if isinstance(self._k_d, Number):
-      self._k_d = [[0], [self._k_d]]
-
-    if isinstance(self._k_p_pos, Number):
+    if isinstance(self._k_p_pos, (float, int)):
       self._k_p_pos = [[0], [self._k_p_pos]]
-    if isinstance(self._k_i_pos, Number):
+    if isinstance(self._k_i_pos, (float, int)):
       self._k_i_pos = [[0], [self._k_i_pos]]
-    if isinstance(self._k_d_pos, Number):
+    if isinstance(self._k_d_pos, (float, int)):
       self._k_d_pos = [[0], [self._k_d_pos]]
 
-    if isinstance(self._k_p_neg, Number):
+    if isinstance(self._k_p_neg, (float, int)):
       self._k_p_neg = [[0], [self._k_p_neg]]
-    if isinstance(self._k_i_neg, Number):
+    if isinstance(self._k_i_neg, (float, int)):
       self._k_i_neg = [[0], [self._k_i_neg]]
-    if isinstance(self._k_d_neg, Number):
+    if isinstance(self._k_d_neg, (float, int)):
       self._k_d_neg = [[0], [self._k_d_neg]]
 
     self.pos_limit = pos_limit
