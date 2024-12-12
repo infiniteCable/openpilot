@@ -50,10 +50,10 @@ class LongControl:
     self.long_control_state = LongCtrlState.off
     self.pid = PIDController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
                              (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
-                             (CP.longitudinalTuning.kpBP_pos, CP.longitudinalTuning.kpV_pos),
-                             (CP.longitudinalTuning.kiBP_pos, CP.longitudinalTuning.kiV_pos),
-                             (CP.longitudinalTuning.kpBP_neg, CP.longitudinalTuning.kpV_neg),
-                             (CP.longitudinalTuning.kiBP_neg, CP.longitudinalTuning.kiV_neg),
+                             (CP.longitudinalTuning.kpBPPos, CP.longitudinalTuning.kpVPos),
+                             (CP.longitudinalTuning.kiBPPos, CP.longitudinalTuning.kiVPos),
+                             (CP.longitudinalTuning.kpBPNeg, CP.longitudinalTuning.kpVNeg),
+                             (CP.longitudinalTuning.kiBPNeg, CP.longitudinalTuning.kiVNeg),
                              k_f=CP.longitudinalTuning.kf, rate=1 / DT_CTRL)
     self.last_output_accel = 0.0
 
