@@ -12,12 +12,12 @@ class PIDControllerCustom:
                  
     self.k_f = k_f
 
-    self._k_p_pos = k_p_pos if any(k_p_pos) else k_p
-    self._k_i_pos = k_i_pos if any(k_i_pos) else k_i
-    self._k_d_pos = k_d_pos if any(k_d_pos) else k_d
-    self._k_p_neg = k_p_neg if any(k_p_neg) else k_p
-    self._k_i_neg = k_i_neg if any(k_i_neg) else k_i
-    self._k_d_neg = k_d_neg if any(k_d_neg) else k_d
+    self._k_p_pos = k_p_pos if self._is_nonzero(k_p_pos) else k_p
+    self._k_i_pos = k_i_pos if self._is_nonzero(k_i_pos) else k_i
+    self._k_d_pos = k_d_pos if self._is_nonzero(k_d_pos) else k_d
+    self._k_p_neg = k_p_neg if self._is_nonzero(k_p_neg) else k_p
+    self._k_i_neg = k_i_neg if self._is_nonzero(k_i_neg) else k_i
+    self._k_d_neg = k_d_neg if self._is_nonzero(k_d_neg) else k_d
 
     if isinstance(self._k_p_pos, (float, int)):
       self._k_p_pos = [[0], [self._k_p_pos]]
@@ -41,6 +41,11 @@ class PIDControllerCustom:
     self.speed = 0.0
 
     self.reset()
+
+  def _is_nonzero(self, value):
+    if isinstance(value, (list, np.ndarray)):
+      return np.any(np.array(value) != 0)
+    return value != 0
 
   @property
   def k_p(self):
