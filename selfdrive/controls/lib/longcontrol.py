@@ -3,6 +3,7 @@ from openpilot.common.numpy_fast import clip
 from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.controls.lib.drive_helpers import CONTROL_N
 from openpilot.common.pid import PIDController
+from openpilot.common.pid_custom import PIDControllerCustom
 from openpilot.selfdrive.modeld.constants import ModelConstants
 
 CONTROL_N_T_IDX = ModelConstants.T_IDXS[:CONTROL_N]
@@ -48,13 +49,13 @@ class LongControl:
   def __init__(self, CP):
     self.CP = CP
     self.long_control_state = LongCtrlState.off
-    self.pid = PIDController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
-                             (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
-                             (CP.longitudinalTuning.kpBPPos, CP.longitudinalTuning.kpVPos),
-                             (CP.longitudinalTuning.kiBPPos, CP.longitudinalTuning.kiVPos),
-                             (CP.longitudinalTuning.kpBPNeg, CP.longitudinalTuning.kpVNeg),
-                             (CP.longitudinalTuning.kiBPNeg, CP.longitudinalTuning.kiVNeg),
-                             k_f=CP.longitudinalTuning.kf, rate=1 / DT_CTRL)
+    self.pid = PIDControllerCustom((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
+                                   (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
+                                   (CP.longitudinalTuning.kpBPPos, CP.longitudinalTuning.kpVPos),
+                                   (CP.longitudinalTuning.kiBPPos, CP.longitudinalTuning.kiVPos),
+                                   (CP.longitudinalTuning.kpBPNeg, CP.longitudinalTuning.kpVNeg),
+                                   (CP.longitudinalTuning.kiBPNeg, CP.longitudinalTuning.kiVNeg),
+                                   k_f=CP.longitudinalTuning.kf, rate=1 / DT_CTRL)
     self.last_output_accel = 0.0
 
   def reset(self):
