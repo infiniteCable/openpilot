@@ -18,7 +18,7 @@ class LatControlCurvaturePID(LatControl):
   def update(self, active, CS, VM, params, steer_limited, desired_curvature, calibrated_pose, modelV2):
     curvature_log = log.ControlsState.LateralCurvatureState.new_message()
     if not active:
-      corrected_curvature = 0.0
+      output_curvature = 0.0
       curvature_log.active = False
       self.pid.reset()
     else:
@@ -32,14 +32,16 @@ class LatControlCurvaturePID(LatControl):
         actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
         actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
 
+      actual_lateral_accel = actual_curvature_vm * CS.vEgo ** 2
       desired_lateral_accel = desired_curvature * CS.vEgo**2
+      gravity_adjusted_lateral_accel = desired_lateral_accel - roll_compensation
       error = desired_curvature - actual_curvature
-      ff = desired_lateral_accel
+      ff = gravity_adjusted_lateral_accel - actual_lateral_accel
       freeze_integrator = steer_limited or CS.steeringPressed or CS.vEgo < 5
-      corrected_curvature = self.pid.update(error, feedforward=ff, speed=CS.vEgo, freeze_integrator=freeze_integrator)
+      output_curvature = self.pid.update(error, feedforward=ff, speed=CS.vEgo, freeze_integrator=freeze_integrator)
 
-      curvature_log.saturated = self._check_saturation(abs(desired_curvature - corrected_curvature) < 1e-5, CS, False)
+      curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
       curvature_log.error = error
-      curvature_log.desiredCurvature = corrected_curvature
+      curvature_log.desiredCurvature = output_curvature
 
-    return 0, 0.0, float(corrected_curvature), curvature_log
+    return 0, 0.0, float(output_curvature), curvature_log
