@@ -27,12 +27,10 @@ class LatControlCurvaturePID(LatControl):
       roll_compensation = params.roll * ACCELERATION_DUE_TO_GRAVITY
       if self.use_steering_angle:
         actual_curvature = actual_curvature_vm
-        curvature_deadzone = abs(VM.calc_curvature(math.radians(self.steering_angle_deadzone_deg), CS.vEgo, 0.0))
       else:
         assert calibrated_pose is not None
         actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
         actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
-        curvature_deadzone = 0.0
 
       desired_lateral_accel = desired_curvature * CS.vEgo**2
       error = desired_curvature - actual_curvature
@@ -40,6 +38,7 @@ class LatControlCurvaturePID(LatControl):
       freeze_integrator = steer_limited or CS.steeringPressed or CS.vEgo < 5
       corrected_curvature = self.pid.update(error, feedforward=ff, speed=CS.vEgo, freeze_integrator=freeze_integrator)
 
+      curvature_log.saturated = self._check_saturation(abs(desired_curvature - corrected_curvature) < 1e-5, CS, False)
       curvature_log.error = error
       curvature_log.desiredCurvature = corrected_curvature
 
