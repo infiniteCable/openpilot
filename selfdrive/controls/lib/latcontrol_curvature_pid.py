@@ -32,8 +32,9 @@ class LatControlCurvaturePID(LatControl):
         actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
         actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
 
-      actual_lateral_accel = actual_curvature_vm * CS.vEgo ** 2
-      desired_lateral_accel = desired_curvature * CS.vEgo**2
+      actual_lateral_accel = actual_curvature * CS.vEgo ** 2
+      desired_lateral_accel = desired_curvature * CS.vEgo ** 2
+      
       gravity_adjusted_lateral_accel = desired_lateral_accel - roll_compensation
       error = desired_curvature - actual_curvature
       ff = gravity_adjusted_lateral_accel - actual_lateral_accel
