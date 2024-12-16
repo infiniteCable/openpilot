@@ -15,6 +15,7 @@ from openpilot.selfdrive.controls.lib.latcontrol import LatControl, MIN_LATERAL_
 from openpilot.selfdrive.controls.lib.latcontrol_pid import LatControlPID
 from openpilot.selfdrive.controls.lib.latcontrol_angle import LatControlAngle, STEER_ANGLE_SATURATION_THRESHOLD
 from openpilot.selfdrive.controls.lib.latcontrol_curvature import LatControlCurvature
+from openpilot.selfdrive.controls.lib.latcontrol_curvature_pid import LatControlCurvaturePID
 from openpilot.selfdrive.controls.lib.latcontrol_torque import LatControlTorque
 from openpilot.selfdrive.controls.lib.longcontrol import LongControl
 from openpilot.selfdrive.controls.lib.vehicle_model import VehicleModel
@@ -43,7 +44,7 @@ class Controls:
 
     self.steer_limited = False
     self.desired_curvature = 0.0
-    self.desired_curvature_3dof = 0.0
+    self.desired_curvature_corr = 0.0
 
     self.pose_calibrator = PoseCalibrator()
     self.calibrated_pose: Pose|None = None
@@ -54,7 +55,8 @@ class Controls:
     if self.CP.steerControlType == car.CarParams.SteerControlType.angle:
       self.LaC = LatControlAngle(self.CP, self.CI)
     elif self.CP.steerControlType == car.CarParams.SteerControlType.curvatureDEPRECATED:
-      self.LaC = LatControlCurvature(self.CP, self.CI)
+      #self.LaC = LatControlCurvature(self.CP, self.CI)
+      self.LaC = LatControlCurvaturePID(self.CP, self.CI)
     elif self.CP.lateralTuning.which() == 'pid':
       self.LaC = LatControlPID(self.CP, self.CI)
     elif self.CP.lateralTuning.which() == 'torque':
@@ -114,13 +116,13 @@ class Controls:
 
     # Steering PID loop and lateral MPC
     self.desired_curvature = clip_curvature(CS.vEgo, self.desired_curvature, model_v2.action.desiredCurvature)
-    actuators.steer, actuators.steeringAngleDeg, curvature_3dof, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
+    actuators.steer, actuators.steeringAngleDeg, curvature_corr, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
                                                                                            self.steer_limited, self.desired_curvature,
                                                                                            self.calibrated_pose, model_v2) # TODO what if not available
-    curvature_3dof_clip = clip_curvature(CS.vEgo, self.desired_curvature_3dof, curvature_3dof)
+    curvature_corr_clip = clip_curvature(CS.vEgo, self.desired_curvature_corr, curvature_corr)
     #actuators.curvature = curvature_3dof_clip if curvature_3dof != 0 else self.desired_curvature
-    actuators.curvature = curvature_3dof_clip
-    self.desired_curvature_3dof = actuators.curvature
+    actuators.curvature = curvature_corr_clip
+    self.desired_curvature_corr = actuators.curvature
 
     # Ensure no NaNs/Infs
     for p in ACTUATOR_FIELDS:
