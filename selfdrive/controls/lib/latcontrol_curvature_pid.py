@@ -10,10 +10,9 @@ from openpilot.selfdrive.controls.lib.vehicle_model import ACCELERATION_DUE_TO_G
 class LatControlCurvaturePID(LatControl):
   def __init__(self, CP, CI):
     super().__init__(CP, CI)
-    self.curvature_params = CP.lateralTuning.curvature.as_builder()
+    self.curvature_params = CP.lateralTuning.torque.as_builder()
     self.pid = PIDController(kp=self.curvature_params.kp, ki=self.curvature_params.ki,
-                             kd=self.curvature_params.kd, k_f=self.curvature_params.kf,
-                             pos_limit=0.195, neg_limit=-0.195)
+                             k_f=self.curvature_params.kf, pos_limit=0.195, neg_limit=-0.195)
     self.use_steering_angle = self.curvature_params.useSteeringAngle
 
   def update(self, active, CS, VM, params, steer_limited, desired_curvature, calibrated_pose, modelV2):
