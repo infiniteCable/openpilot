@@ -40,7 +40,7 @@ class LatControlCurvaturePID(LatControl):
       output_curvature = self.pid.update(error, feedforward=ff, speed=CS.vEgo, freeze_integrator=freeze_integrator)
 
       curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
-      curvature_log.error = np.float32(error)
-      curvature_log.desiredCurvature = np.float32(output_curvature)
+      curvature_log.error = float(np.float32(error))
+      curvature_log.desiredCurvature = float(np.float32(output_curvature))
 
     return 0, 0.0, float(output_curvature), curvature_log
