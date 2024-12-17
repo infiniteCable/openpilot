@@ -2,7 +2,7 @@ import math
 
 from cereal import log
 from openpilot.common.pid import PIDController
-from openpilot.common.numpy_fast import interp
+from openpilot.common.numpy_fast import interp, np
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 from openpilot.selfdrive.controls.lib.vehicle_model import ACCELERATION_DUE_TO_GRAVITY
 
@@ -39,7 +39,7 @@ class LatControlCurvaturePID(LatControl):
       output_curvature = self.pid.update(error, feedforward=ff, speed=CS.vEgo, freeze_integrator=freeze_integrator)
 
       curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
-      #curvature_log.error = error
-      curvature_log.desiredCurvature = output_curvature
+      curvature_log.error = np.float32(error)
+      curvature_log.desiredCurvature = np.float32(output_curvature)
 
     return 0, 0.0, float(output_curvature), curvature_log
