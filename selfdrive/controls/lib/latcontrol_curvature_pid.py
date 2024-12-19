@@ -14,31 +14,25 @@ class LatControlCurvaturePID(LatControl):
     self.pid = PIDController((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV),
                              (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),
                              k_f=CP.lateralTuning.pid.kf, pos_limit=0.195, neg_limit=-0.195)
-    self.use_steering_angle = False #self.curvature_params.useSteeringAngle
 
   def update(self, active, CS, VM, params, steer_limited, desired_curvature, calibrated_pose, modelV2):
     curvature_log = log.ControlsState.LateralCurvatureState.new_message()
-    input_curvature = -desired_curvature
     if not active:
       output_curvature = 0.0
       curvature_log.active = False
       self.pid.reset()
     else:
       curvature_log.active = True
-      actual_curvature_vm = VM.calc_curvature(math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), CS.vEgo, params.roll)
+      actual_curvature_vm = -VM.calc_curvature(math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), CS.vEgo, params.roll)
       roll_compensation = params.roll * ACCELERATION_DUE_TO_GRAVITY
-      if self.use_steering_angle:
-        actual_curvature = actual_curvature_vm
-      else:
-        assert calibrated_pose is not None
-        actual_curvature_pose = -calibrated_pose.angular_velocity.yaw / CS.vEgo
-        actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
+      assert calibrated_pose is not None
+      actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
+      actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
 
-      gravity_adjusted_curvature = input_curvature - (roll_compensation / (CS.vEgo ** 2))
-      error = input_curvature - actual_curvature
-      ff = gravity_adjusted_curvature - actual_curvature
+      gravity_adjusted_curvature = desired_curvature + (roll_compensation / (CS.vEgo ** 2))
+      error = desired_curvature - actual_curvature
       freeze_integrator = steer_limited or CS.steeringPressed or CS.vEgo < 5
-      output_curvature = -self.pid.update(error, feedforward=ff, speed=CS.vEgo, freeze_integrator=freeze_integrator)
+      output_curvature = self.pid.update(error, feedforward=gravity_adjusted_curvature, speed=CS.vEgo, freeze_integrator=freeze_integrator)
 
       curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
       curvature_log.error = float(np.float32(error))
