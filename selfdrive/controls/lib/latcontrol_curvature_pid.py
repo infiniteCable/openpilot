@@ -29,10 +29,9 @@ class LatControlCurvaturePID(LatControl):
       actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
       actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
 
-      gravity_adjusted_curvature = desired_curvature + (roll_compensation / (CS.vEgo ** 2))
       error = desired_curvature - actual_curvature
       freeze_integrator = steer_limited or CS.steeringPressed or CS.vEgo < 5
-      output_curvature = self.pid.update(error, feedforward=gravity_adjusted_curvature, speed=CS.vEgo, freeze_integrator=freeze_integrator)
+      output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo, freeze_integrator=freeze_integrator)
 
       curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
       curvature_log.error = float(np.float32(error))
