@@ -28,7 +28,7 @@ class LatControlCurvaturePID(LatControl):
       actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
       actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
       
-      error = desired_curvature - actual_curvature
+      error = -desired_curvature - actual_curvature
       output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
 
       curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
