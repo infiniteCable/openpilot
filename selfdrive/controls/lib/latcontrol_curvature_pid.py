@@ -27,7 +27,7 @@ class LatControlCurvaturePID(LatControl):
       roll_compensation = params.roll * ACCELERATION_DUE_TO_GRAVITY
       assert calibrated_pose is not None
       actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
-      actual_curvature = -interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
+      actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
 
       gravity_adjusted_curvature = desired_curvature + (roll_compensation / (CS.vEgo ** 2))
       error = desired_curvature - actual_curvature
