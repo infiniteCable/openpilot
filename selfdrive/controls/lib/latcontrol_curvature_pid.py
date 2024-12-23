@@ -5,7 +5,6 @@ from cereal import log
 from openpilot.common.pid import PIDController
 from openpilot.common.numpy_fast import interp
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl
-from openpilot.selfdrive.controls.lib.vehicle_model import ACCELERATION_DUE_TO_GRAVITY
 
 
 class LatControlCurvaturePID(LatControl):
@@ -24,14 +23,12 @@ class LatControlCurvaturePID(LatControl):
     else:
       curvature_log.active = True
       actual_curvature_vm = -VM.calc_curvature(math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), CS.vEgo, params.roll)
-      roll_compensation = params.roll * ACCELERATION_DUE_TO_GRAVITY
       assert calibrated_pose is not None
       actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
       actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
 
-      gravity_adjusted_curvature = desired_curvature + (roll_compensation / (CS.vEgo ** 2))
       error = desired_curvature - actual_curvature
-      output_curvature = self.pid.update(error, feedforward=gravity_adjusted_curvature, speed=CS.vEgo)
+      output_curvature = self.pid.update(error, feedforward=desired_curvatur, speed=CS.vEgo)
 
       curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
       curvature_log.error = float(np.float32(error))
