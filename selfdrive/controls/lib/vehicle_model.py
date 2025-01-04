@@ -65,12 +65,11 @@ class VehicleModel:
     else:
       return kin_ss_sol(sa, u, self)
 
-  def calc_curvature_correction_3dof(self, desired_curvature, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float) -> float:
+  def calc_curvature_3dof(self, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float) -> float:
     """
-    Calculate a correction factor for the model's desired curvature based on measured inputs.
+    Calculate the current curvature based on measured inputs.
     
     Args:
-      desired_curvature: curvature from model [1/m.]
       a_y: Measured lateral acceleration [m/s^2].
       a_x: Measured longitudinal acceleration [m/s^2].
       yaw_rate: Measured yaw rate [rad/s].
@@ -78,9 +77,8 @@ class VehicleModel:
       sa: Steering angle [rad].
     
     Returns:
-      Corrected curvature factor [1/m].
+      Calculated curvature factor [1/m].
     """
-    #alpha = interp(u_measured, [18, 28, 35], [0.0, 0.25, 1])
     u = max(u_measured, 0.1)
     
     v = a_y / u if u > 0.1 else 0.0
@@ -89,9 +87,6 @@ class VehicleModel:
     input_vector = np.array([sa, a_x])
     state = -solve(A, B @ input_vector)
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
-    
-    #delta_curvature = -desired_curvature - curvature_3dof
-    #corrected_curvature = -desired_curvature + alpha * delta_curvature
     
     return curvature_3dof
 
