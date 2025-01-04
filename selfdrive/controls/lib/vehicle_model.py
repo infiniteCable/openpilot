@@ -15,14 +15,11 @@ A depends on longitudinal speed, u [m/s], and vehicle parameters CP
 
 import numpy as np
 from numpy.linalg import solve
-from openpilot.common.simple_kalman import KF1D, get_kalman_gain
 from openpilot.common.numpy_fast import interp
 
 from cereal import car, log
 
 ACCELERATION_DUE_TO_GRAVITY = 9.8
-CURVATURE_CORR_ALPHA_3DOF = 1
-CURVATURE_CORR_ALPHA_DBM = 0.05
 
 
 class VehicleModel:
@@ -83,7 +80,7 @@ class VehicleModel:
     Returns:
       Corrected curvature factor [1/m].
     """
-    alpha = interp(u_measured, [18, 28, 35], [0.0, 0.25, CURVATURE_CORR_ALPHA_3DOF])
+    #alpha = interp(u_measured, [18, 28, 35], [0.0, 0.25, 1])
     u = max(u_measured, 0.1)
     
     v = a_y / u if u > 0.1 else 0.0
@@ -93,10 +90,10 @@ class VehicleModel:
     state = -solve(A, B @ input_vector)
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
     
-    delta_curvature = -desired_curvature - curvature_3dof
-    corrected_curvature = -desired_curvature + alpha * delta_curvature
+    #delta_curvature = -desired_curvature - curvature_3dof
+    #corrected_curvature = -desired_curvature + alpha * delta_curvature
     
-    return -corrected_curvature
+    return curvature_3dof
 
   def calc_curvature(self, sa: float, u: float, roll: float) -> float:
     """Returns the curvature. Multiplied by the speed this will give the yaw rate.
@@ -110,25 +107,6 @@ class VehicleModel:
       Curvature factor [1/m]
     """
     return (self.curvature_factor(u) * sa / self.sR) + self.roll_compensation(roll, u)
-
-  def calc_curvature_correction_dbm(self, modelV2: log.ModelDataV2, sa: float, u_measured: float, roll: float) -> float:
-    """
-    Calculate curvature correction using the Dynamic Bicycle Model (DBM).
-  
-    Args:
-      sa: Steering wheel angle [rad].
-      u_measured: Measured longitudinal speed [m/s].
-      roll: Road roll [rad].
-  
-    Returns:
-      Corrected curvature factor [1/m].
-    """
-    steady_state = self.steady_state_sol(sa, u_measured, roll)
-    r = steady_state[1]
-    curvature_dbm = r / u_measured if u_measured > 0 else 0.0
-    delta_curvature = modelV2.action.desiredCurvature - curvature_dbm
-    corrected_curvature = modelV2.action.desiredCurvature + CURVATURE_CORR_ALPHA_DBM * delta_curvature
-    return corrected_curvature
 
   def curvature_factor(self, u: float) -> float:
     """Returns the curvature factor.
