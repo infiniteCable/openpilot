@@ -23,8 +23,9 @@ class LatControlCurvaturePID(LatControl):
     else:
       curvature_log.active = True
       actual_curvature_vm = -VM.calc_curvature(math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), CS.vEgo, params.roll)
-      assert calibrated_pose is not None
-      actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
+      #assert calibrated_pose is not None
+      #actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
+      curvature_desired = -VM.calc_curvature_3dof(desired_curvature, CS.latAccel, CS.longAccel, CS.yawRate, CS.vEgo, math.radians(CS.steeringAngleDeg))
       actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_pose])
 
       error = desired_curvature - actual_curvature
