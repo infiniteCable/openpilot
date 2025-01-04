@@ -44,7 +44,6 @@ class Controls:
 
     self.steer_limited = False
     self.desired_curvature = 0.0
-    self.desired_curvature_corr = 0.0
 
     self.pose_calibrator = PoseCalibrator()
     self.calibrated_pose: Pose|None = None
@@ -114,15 +113,11 @@ class Controls:
     pid_accel_limits = self.CI.get_pid_accel_limits(self.CP, CS.vEgo, CS.vCruise * CV.KPH_TO_MS)
     actuators.accel = self.LoC.update(CC.longActive, CS, long_plan.aTarget, long_plan.shouldStop, pid_accel_limits)
 
-    # Steering PID loop and lateral MPC
+    # Steering PID loop and lateral MPC    
     self.desired_curvature = clip_curvature(CS.vEgo, self.desired_curvature, model_v2.action.desiredCurvature)
-    actuators.steer, actuators.steeringAngleDeg, curvature_corr, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
-                                                                                           self.steer_limited, self.desired_curvature,
-                                                                                           self.calibrated_pose, model_v2) # TODO what if not available
-    curvature_corr_clip = clip_curvature(CS.vEgo, self.desired_curvature_corr, curvature_corr)
-    #actuators.curvature = curvature_3dof_clip if curvature_3dof != 0 else self.desired_curvature
-    actuators.curvature = curvature_corr_clip
-    self.desired_curvature_corr = actuators.curvature
+    actuators.steer, actuators.steeringAngleDeg, actuators.curvature, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
+                                                                                                self.steer_limited, self.desired_curvature,
+                                                                                                self.calibrated_pose) # TODO what if not available
 
     # Ensure no NaNs/Infs
     for p in ACTUATOR_FIELDS:
