@@ -68,64 +68,7 @@ class VehicleModel:
     else:
       return kin_ss_sol(sa, u, self)
 
-  def calc_curvature_3dof(self, modelV2: log.ModelDataV2, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float, time_horizon: float = 1.0) -> float:
-    """
-    Calculate curvature by combining the predicted path (Baseline) and 3-DoF model with measured inputs,
-    while correcting for deviations between the two curvatures.
-    
-    Args:
-      modelV2: Model data structure containing position, orientation, velocity, etc.
-      a_y: Measured lateral acceleration [m/s^2]
-      a_x: Measured longitudinal acceleration [m/s^2]
-      yaw_rate: Measured yaw rate [rad/s]
-      u_measured: Measured longitudinal speed [m/s]
-      sa: Steering angle [rad]
-      time_horizon: Time horizon [s] over which to aggregate the curvature.
-    
-    Returns:
-      Corrected curvature factor [1/m]
-    """
-    
-    positions_x = list(modelV2.position.x)
-    positions_y = list(modelV2.position.y)
-    times = list(modelV2.position.t)
-    
-    # Filter relevant indices within the time horizon
-    relevant_indices = [i for i, t in enumerate(times) if t <= time_horizon]
-    if len(relevant_indices) < 2:
-      return 0.0
-    
-    # Slice data to only include relevant time horizon
-    positions_x = positions_x[:relevant_indices[-1] + 1]
-    positions_y = positions_y[:relevant_indices[-1] + 1]
-    times = times[:relevant_indices[-1] + 1]
-    
-    # Calculate baseline curvature
-    dx = np.gradient(positions_x, times)
-    dy = np.gradient(positions_y, times)
-    ddx = np.gradient(dx, times)
-    ddy = np.gradient(dy, times)
-    curvature_baseline = (ddx * dy - ddy * dx) / (dx**2 + dy**2)**(3/2)
-    curvature_baseline = np.nanmean(curvature_baseline)
-    
-    # Calculate curvature using the 3-DoF model
-    u = u_measured if u_measured > 0.1 else dx[0]
-    v = a_y / u if u > 0.1 else 0.0
-    A, B = create_dyn_state_matrices_3dof(u, v, yaw_rate, self)
-    state = np.array([u, v, yaw_rate])
-    input_vector = np.array([sa, a_x])
-    delta_t = times[-1] - times[0]
-    x_dot = A @ state + B @ input_vector
-    state += x_dot * delta_t
-    curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
-    
-    # Combine baseline and 3-DoF curvature
-    delta_curvature = curvature_baseline - curvature_3dof
-    corrected_curvature = curvature_baseline + CURVATURE_CORR_ALPHA_3DOF * delta_curvature
-    
-    return -corrected_curvature
-
-  def calc_curvature_correction_3dof(self, modelV2: log.ModelDataV2, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float) -> float:
+  def calc_curvature_correction_3dof(self, desired_curvature, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float) -> float:
     """
     Calculate a correction factor for the model's desired curvature based on measured inputs.
     
@@ -150,8 +93,8 @@ class VehicleModel:
     state = -solve(A, B @ input_vector)
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
     
-    delta_curvature = -modelV2.action.desiredCurvature - curvature_3dof
-    corrected_curvature = -modelV2.action.desiredCurvature + alpha * delta_curvature
+    delta_curvature = -desired_curvature - curvature_3dof
+    corrected_curvature = -desired_curvature + alpha * delta_curvature
     
     return -corrected_curvature
 
