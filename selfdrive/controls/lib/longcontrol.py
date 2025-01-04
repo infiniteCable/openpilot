@@ -52,13 +52,6 @@ class LongControl:
     self.pid = PIDController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
                              (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
                              k_f=CP.longitudinalTuning.kf, rate=1 / DT_CTRL)
-    #self.pid = PIDControllerCustom(k_p=(CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
-    #                               k_i=(CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
-    #                               k_p_pos=(CP.longitudinalTuning.kpBPPos, CP.longitudinalTuning.kpVPos),
-    #                               k_i_pos=(CP.longitudinalTuning.kiBPPos, CP.longitudinalTuning.kiVPos),
-    #                               k_p_neg=(CP.longitudinalTuning.kpBPNeg, CP.longitudinalTuning.kpVNeg),
-    #                               k_i_neg=(CP.longitudinalTuning.kiBPNeg, CP.longitudinalTuning.kiVNeg),
-    #                               k_f=CP.longitudinalTuning.kf, rate=1 / DT_CTRL)
     self.last_output_accel = 0.0
 
   def reset(self):
