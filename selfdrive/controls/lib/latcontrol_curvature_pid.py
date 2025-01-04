@@ -12,9 +12,9 @@ class LatControlCurvaturePID(LatControl):
     super().__init__(CP, CI)
     self.pid = PIDController((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV),
                              (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),
-                             k_f=CP.lateralTuning.pid.kf, pos_limit=0.195, neg_limit=-0.195)
+                             k_f=CP.lateralTuning.pid.kf, pos_limit=0.2, neg_limit=-0.2)
 
-  def update(self, active, CS, VM, params, steer_limited, desired_curvature, calibrated_pose, modelV2):
+  def update(self, active, CS, VM, params, steer_limited, desired_curvature, calibrated_pose):
     curvature_log = log.ControlsState.LateralCurvatureState.new_message()
     if not active:
       output_curvature = 0.0
