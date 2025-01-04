@@ -73,7 +73,7 @@ class VehicleModel:
     Calculate a correction factor for the model's desired curvature based on measured inputs.
     
     Args:
-      modelV2: Model data structure containing action.desiredCurvature.
+      desired_curvature: curvature from model [1/m.]
       a_y: Measured lateral acceleration [m/s^2].
       a_x: Measured longitudinal acceleration [m/s^2].
       yaw_rate: Measured yaw rate [rad/s].
