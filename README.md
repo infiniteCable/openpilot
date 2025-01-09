@@ -22,7 +22,7 @@ Panda can 0 is intercepting sensors can bus directed to J533 (CANBUS Fahrwerksse
 
 Panda can 2 is intercepting sensors can bus directed to sensors. (camera + radar data filter + receiver)
 
-Panda can 1 is connected to engine can bus (CANBUS Antrieb CAN L Pin 13, CAN H Pin 14). (no function at the moment, because filtering + sending to J533 works)
+Panda can 1 is connected to engine can bus (CANBUS Antrieb CAN L Pin 13, CAN H Pin 14). (gateway or camera location detection)
 
 Panda Power with J533 power Pin 11 and ground Pin 31. No OBD needed.
 
