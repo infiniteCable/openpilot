@@ -5,7 +5,6 @@ from cereal import log
 from openpilot.common.pid import PIDController
 from openpilot.common.numpy_fast import interp
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl
-from openpilot.selfdrive.controls.lib.vehicle_model import ACCELERATION_DUE_TO_GRAVITY
 
 
 class LatControlCurvaturePID(LatControl):
@@ -28,19 +27,11 @@ class LatControlCurvaturePID(LatControl):
       #actual_curvature_pose = calibrated_pose.angular_velocity.yaw / CS.vEgo
       #curvature_desired = -VM.calc_curvature_3dof(desired_curvature, CS.latAccel, CS.longAccel, CS.yawRate, CS.vEgo, math.radians(CS.steeringAngleDeg))
       actual_curvature_3dof = -VM.calc_curvature_3dof(calibrated_pose.acceleration.y, calibrated_pose.acceleration.x, calibrated_pose.angular_velocity.yaw,
-                                                  CS.vEgo, math.radians(CS.steeringAngleDeg))
+                                                      CS.vEgo, math.radians(CS.steeringAngleDeg), params.roll)
       actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_3dof])
 
-      actual_lateral_accel = actual_curvature * CS.vEgo ** 2
-      desired_lateral_accel = desired_curvature * CS.vEgo ** 2
-
-      roll_compensation = -params.roll * ACCELERATION_DUE_TO_GRAVITY
-
-      error = (desired_lateral_accel - roll_compensation) - actual_lateral_accel
-      feedforward = desired_curvature
-      freeze_integrator = steer_limited or CS.steeringPressed or CS.vEgo < 5
-      
-      output_curvature = self.pid.update(error, feedforward=feedforward, speed=CS.vEgo, freeze_integrator=freeze_integrator)
+      error = desired_curvature - actual_curvature
+      output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
 
       curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
       curvature_log.error = float(np.float32(error))
