@@ -7,9 +7,6 @@ from openpilot.common.numpy_fast import interp
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 from openpilot.selfdrive.controls.lib.vehicle_model import ACCELERATION_DUE_TO_GRAVITY
 
-LOW_SPEED_X = [0, 10, 20, 30]
-LOW_SPEED_Y = [15, 13, 10, 5]
-
 
 class LatControlCurvaturePID(LatControl):
   def __init__(self, CP, CI):
@@ -39,13 +36,8 @@ class LatControlCurvaturePID(LatControl):
 
       roll_compensation = params.roll * ACCELERATION_DUE_TO_GRAVITY
 
-      low_speed_factor = interp(CS.vEgo, LOW_SPEED_X, LOW_SPEED_Y)**2
-      setpoint = desired_lateral_accel + low_speed_factor * desired_curvature
-      measurement = actual_lateral_accel + low_speed_factor * actual_curvature
-
-      gravity_adjusted_lateral_accel = desired_lateral_accel - roll_compensation
-      feedforward = gravity_adjusted_lateral_accel
-      error = setpoint - measurement
+      error = (desired_lateral_accel - roll_compensation) - actual_lateral_accel
+      feedforward = desired_curvature
       freeze_integrator = steer_limited or CS.steeringPressed or CS.vEgo < 5
       
       output_curvature = self.pid.update(error, feedforward=feedforward, speed=CS.vEgo, freeze_integrator=freeze_integrator)
