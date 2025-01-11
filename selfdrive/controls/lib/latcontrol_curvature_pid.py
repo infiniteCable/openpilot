@@ -34,7 +34,7 @@ class LatControlCurvaturePID(LatControl):
       actual_lateral_accel = actual_curvature * CS.vEgo ** 2
       desired_lateral_accel = desired_curvature * CS.vEgo ** 2
 
-      roll_compensation = params.roll * ACCELERATION_DUE_TO_GRAVITY
+      roll_compensation = -params.roll * ACCELERATION_DUE_TO_GRAVITY
 
       error = (desired_lateral_accel - roll_compensation) - actual_lateral_accel
       feedforward = desired_curvature
