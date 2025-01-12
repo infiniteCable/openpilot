@@ -153,7 +153,7 @@ class Controls:
     hudControl.leadVisible = self.sm['longitudinalPlan'].hasLead
     hudControl.leadDistance = self.sm['longitudinalPlan'].leadDistance
     hudControl.leadDistanceBars = self.sm['selfdriveState'].personality.raw + 1
-    hudControl.leadFollowTime = get_T_FOLLOW(hudControl.leadDistanceBars)
+    hudControl.leadFollowTime = get_T_FOLLOW(hudControl.leadDistanceBars - 1)
     
     hudControl.visualAlert = self.sm['selfdriveState'].alertHudVisual
 
