@@ -1,4 +1,6 @@
-FOR TESTING. DO NOT USE
+use at own risk
+based on cupra_born_k1 branch
+has meb dynamic jerk controlling, hud control expansion for correct gap and distance ui display, curvature controller/post-processing based on 3DOF for model curvature projecting into the real world
 
 <div align="center" style="text-align: center;">
 
