@@ -65,7 +65,7 @@ class VehicleModel:
     else:
       return kin_ss_sol(sa, u, self)
 
-  def calc_curvature_3dof(self, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float, roll: float) -> float:
+  def calc_curvature_3dof(self, a_y: float, a_x: float, yaw_rate: float, u_measured: float, sa: float) -> float:
     """
     Calculate the current curvature based on measured inputs.
     
@@ -75,7 +75,6 @@ class VehicleModel:
       yaw_rate: Measured yaw rate [rad/s].
       u_measured: Measured longitudinal speed [m/s].
       sa: Steering angle [rad].
-      roll: Road Roll [rad].
     
     Returns:
       Calculated curvature factor [1/m].
@@ -88,9 +87,6 @@ class VehicleModel:
     input_vector = np.array([sa, a_x])
     state = -solve(A, B @ input_vector)
     curvature_3dof = state[2] / state[0] if state[0] > 0.1 else 0.0
-
-    roll_compensation = self.roll_compensation(roll, u)
-    curvature_3dof += roll_compensation
     
     return curvature_3dof
 
