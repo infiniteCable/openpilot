@@ -13,6 +13,8 @@ class LatControlCurvaturePID(LatControl):
     self.pid = PIDController((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV),
                              (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),
                              k_f=CP.lateralTuning.pid.kf, pos_limit=0.2, neg_limit=-0.2)
+    self.kpBP = CP.lateralTuning.pid.kpBP
+    self.kpV = CP.lateralTuning.pid.kpV
 
   def update(self, active, CS, VM, params, steer_limited, desired_curvature, calibrated_pose):
     curvature_log = log.ControlsState.LateralCurvatureState.new_message()
@@ -22,13 +24,15 @@ class LatControlCurvaturePID(LatControl):
       self.pid.reset()
     else:
       curvature_log.active = True
-      actual_curvature_vm = -VM.calc_curvature(math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), CS.vEgo, params.roll)
+      roll_compensation = -VM.roll_compensation(params.roll, CS.vEgo)
+      actual_curvature_vm = -VM.calc_curvature(math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), CS.vEgo, 0.)
       assert calibrated_pose is not None
       actual_curvature_3dof = -VM.calc_curvature_3dof(calibrated_pose.acceleration.y, calibrated_pose.acceleration.x, calibrated_pose.angular_velocity.yaw,
-                                                      CS.vEgo, math.radians(CS.steeringAngleDeg), params.roll)
+                                                      CS.vEgo, math.radians(CS.steeringAngleDeg), 0.)
       actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_3dof])
+      roll_factor = 1 / (interp(CS.vEgo, self.kpBP, self.kpV) or 1)
 
-      error = desired_curvature - actual_curvature
+      error = desired_curvature - (actual_curvature + roll_compensation * roll_factor)
       output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
 
       curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
