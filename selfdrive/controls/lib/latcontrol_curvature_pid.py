@@ -35,9 +35,9 @@ class LatControlCurvaturePID(LatControl):
       error = desired_curvature - (actual_curvature + roll_compensation * roll_factor)
       output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
 
-      curvature_log.p = self.pid.p
-      curvature_log.i = self.pid.i
-      curvature_log.f = self.pid.f
+      curvature_log.p = float(np.float32(self.pid.p))
+      curvature_log.i = float(np.float32(self.pid.i))
+      curvature_log.f = float(np.float32(self.pid.f))
       curvature_log.saturated = self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False)
       curvature_log.error = float(np.float32(error))
       curvature_log.desiredCurvature = float(np.float32(desired_curvature))
