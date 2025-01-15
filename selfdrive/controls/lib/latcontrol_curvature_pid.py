@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from collections import deque
 
 from cereal import log
 from openpilot.common.pid import PIDController
