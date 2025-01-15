@@ -4,7 +4,7 @@ import numpy as np
 from cereal import log
 from openpilot.common.pid import PIDController
 from openpilot.common.numpy_fast import interp
-from openpilot.common.realtime import DT_MDL
+from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 
 
@@ -16,7 +16,7 @@ class LatControlCurvaturePID(LatControl):
                              k_f=CP.lateralTuning.pid.kf, pos_limit=0.2, neg_limit=-0.2)
     self.kpBP = CP.lateralTuning.pid.kpBP
     self.kpV = CP.lateralTuning.pid.kpV
-    self.curvature_hist = deque([0.0], maxlen=int(round(CP.steerActuatorDelay / DT_MDL))+1)
+    self.curvature_hist = deque([0.0], maxlen=int(round(CP.steerActuatorDelay / DT_CTRL))+1)
 
   def update(self, active, CS, VM, params, steer_limited, desired_curvature, calibrated_pose):
     curvature_log = log.ControlsState.LateralCurvatureState.new_message()
