@@ -51,14 +51,12 @@ class LatControlCurvaturePID(LatControl):
       actual_curvature = np.interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_3dof])
 
       reaction = self.lowpass_filter(actual_curvature, CS.vEgo)
-      disturbance = self.highpass_filter(actual_curvature, reaction)
-
       self.curvature_hist.append(reaction)
-      curvature_result = self.curvature_hist[0] + disturbance
+      disturbance = self.highpass_filter(actual_curvature, reaction)
       
-      roll_factor = 1 / (np.interp(CS.vEgo, self.kpBP, self.kpV) or 1)
+      correction_factor = 1 / (np.interp(CS.vEgo, self.kpBP, self.kpV) or 1)
 
-      error = desired_curvature - (curvature_result + roll_compensation * roll_factor)
+      error = desired_curvature - (self.curvature_hist[0] + (roll_compensation + disturbance) * correction_factor)
       output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
 
       curvature_log.p = float(np.float32(self.pid.p))
