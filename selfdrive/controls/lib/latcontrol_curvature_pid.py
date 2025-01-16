@@ -18,8 +18,8 @@ class LatControlCurvaturePID(LatControl):
     self.kpBP = CP.lateralTuning.pid.kpBP
     self.kpV = CP.lateralTuning.pid.kpV
     self.curvature_hist = deque([0.0], maxlen=int(round(CP.steerActuatorDelay / DT_CTRL))+1)
-    self.alpha_range = [0.15, 0.05]
-    self.v_alpha_range = [6., 28.]
+    self.alpha_range = [0.2, 0.05]
+    self.v_alpha_range = [0., 28.]
     self.lowpass_filtered = 0.0
 
   def adaptive_alpha(self, u):
