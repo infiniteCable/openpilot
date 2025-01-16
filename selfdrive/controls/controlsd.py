@@ -110,13 +110,16 @@ class Controls:
 
     # accel PID loop
     pid_accel_limits = self.CI.get_pid_accel_limits(self.CP, CS.vEgo, CS.vCruise * CV.KPH_TO_MS)
-    actuators.accel = self.LoC.update(CC.longActive, CS, long_plan.aTarget, long_plan.shouldStop, pid_accel_limits)
+    actuators.accel = float(self.LoC.update(CC.longActive, CS, long_plan.aTarget, long_plan.shouldStop, pid_accel_limits))
 
-    # Steering PID loop and lateral MPC    
+    # Steering PID loop and lateral MPC
     self.desired_curvature = clip_curvature(CS.vEgo, self.desired_curvature, model_v2.action.desiredCurvature)
-    actuators.steer, actuators.steeringAngleDeg, actuators.curvature, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
+    steer, steeringAngleDeg, curvature, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
                                                                                                 self.steer_limited, self.desired_curvature,
                                                                                                 self.calibrated_pose) # TODO what if not available
+    actuators.curvature = float(curvature)
+    actuators.steer = float(steer)
+    actuators.steeringAngleDeg = float(steeringAngleDeg)
 
     # Ensure no NaNs/Infs
     for p in ACTUATOR_FIELDS:
@@ -154,7 +157,7 @@ class Controls:
     hudControl.leadDistance = self.sm['longitudinalPlan'].leadDistance
     hudControl.leadDistanceBars = self.sm['selfdriveState'].personality.raw + 1
     hudControl.leadFollowTime = get_T_FOLLOW(hudControl.leadDistanceBars - 1)
-    
+
     hudControl.visualAlert = self.sm['selfdriveState'].alertHudVisual
 
     hudControl.rightLaneVisible = True
@@ -185,7 +188,7 @@ class Controls:
 
     cs.longitudinalPlanMonoTime = self.sm.logMonoTime['longitudinalPlan']
     cs.lateralPlanMonoTime = self.sm.logMonoTime['modelV2']
-    cs.desiredCurvature = self.desired_curvature
+    cs.desiredCurvature = float(self.desired_curvature)
     cs.longControlState = self.LoC.long_control_state
     cs.upAccelCmd = float(self.LoC.pid.p)
     cs.uiAccelCmd = float(self.LoC.pid.i)
