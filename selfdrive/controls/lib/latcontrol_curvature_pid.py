@@ -4,7 +4,6 @@ from collections import deque
 
 from cereal import log
 from openpilot.common.pid import PIDController
-from openpilot.common.numpy_fast import interp
 from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 
@@ -23,7 +22,7 @@ class LatControlCurvaturePID(LatControl):
     self.lowpass_filtered = 0.0
 
   def adaptive_alpha(self, u):
-    return interp(u, self.v_alpha_range, self.alpha_range)
+    return np.interp(u, self.v_alpha_range, self.alpha_range)
 
   def lowpass_filter(self, current_value, u):
     alpha = self.adaptive_alpha(u)
@@ -49,7 +48,7 @@ class LatControlCurvaturePID(LatControl):
       assert calibrated_pose is not None
       actual_curvature_3dof = -VM.calc_curvature_3dof(calibrated_pose.acceleration.y, calibrated_pose.acceleration.x, calibrated_pose.angular_velocity.yaw,
                                                       CS.vEgo, math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), 0.)
-      actual_curvature = interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_3dof])
+      actual_curvature = np.interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_3dof])
 
       reaction = self.lowpass_filter(actual_curvature, CS.vEgo)
       disturbance = self.highpass_filter(actual_curvature, reaction)
@@ -57,7 +56,7 @@ class LatControlCurvaturePID(LatControl):
       self.curvature_hist.append(reaction)
       curvature_result = self.curvature_hist[0] + disturbance
       
-      roll_factor = 1 / (interp(CS.vEgo, self.kpBP, self.kpV) or 1)
+      roll_factor = 1 / (np.interp(CS.vEgo, self.kpBP, self.kpV) or 1)
 
       error = desired_curvature - (curvature_result + roll_compensation * roll_factor)
       output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
