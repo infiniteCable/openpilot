@@ -60,7 +60,7 @@ class LatControlCurvaturePID(LatControl):
       self.curvature_hist.append(reaction)
       disturbance = self.highpass_filter(actual_curvature, reaction)
       
-      correction_factor = 1 / (np.interp(CS.vEgo, self.kpBP, np.abs(np.array(self.kpV))) or 1)
+      correction_factor = 1 / (np.interp(CS.vEgo, self.kpBP, self.kpV) or 1)
 
       error = desired_curvature - (self.curvature_hist[0] + (roll_compensation + disturbance) * correction_factor)
       output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
