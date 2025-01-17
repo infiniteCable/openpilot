@@ -9,6 +9,13 @@ from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 
 from opendbc.car.volkswagen.values import CarControllerParams as VWCarControllerParams
 
+# model curvature does not project correctly into the real world
+# 1) calculate the current state of curvature with 3DOF for better disturbance detection
+# 2) use a runtime dynamic scaled filter to try to divide disturbance (outer error) and car reaction from control (inner error)
+# 3) include steering actuator delay to adapt to physical car reaction time offset
+# 4) build error from model curv, delayed car reaction, disturbance and roll
+# 4.1) disturbance and roll fully apply / are corrected with PID kp to effectivly are scaled to kp = 1
+# 4.2) delayed car reaction is scaled with true PID kp to correct quasi static model error behaviour
 
 class LatControlCurvaturePID(LatControl):
   def __init__(self, CP, CI):
