@@ -9,6 +9,8 @@ from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 
 from opendbc.car.volkswagen.values import CarControllerParams as VWCarControllerParams
 
+ALPHA_MIN = 0.05
+
 # model curvature does not project correctly into the real world
 # 1) calculate the current state of curvature with 3DOF for better disturbance detection
 # 2) use a runtime dynamic scaled filter to try to divide disturbance (outer error) and car reaction from control (inner error)
@@ -28,12 +30,12 @@ class LatControlCurvaturePID(LatControl):
     self.curvature_hist = deque([0.0], maxlen=int(round(CP.steerActuatorDelay / DT_CTRL))+1)
     self.desired_curvature_prev = 0.
     self.lowpass_filtered = 0.0
+    self.alpha_prev = ALPHA_MIN
 
-  def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, dt=DT_CTRL, A=0.05, alpha_min=0.05):
+  def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, alpha_prev, dt=DT_CTRL, alpha_min=ALPHA_MIN, A=0.02, n=2.0, beta=1.0, k=2.0):
     d_desired = abs(desired_curvature - desired_curvature_prev) / dt
-    f_est = d_desired / (2 * np.pi * A) if A > 0 else 0.0
-    tau = 1 / (2 * np.pi * f_est) if f_est > 0 else float('inf')
-    alpha = min(dt / (tau + dt), alpha_min)
+    alpha_reactive = d_desired**n / (k * A) if A > 0 else 0.0
+    alpha = max(alpha_min, alpha_prev * np.exp(-beta * dt) + alpha_reactive)
     return alpha
 
   def lowpass_filter(self, current_value, alpha):
@@ -53,6 +55,7 @@ class LatControlCurvaturePID(LatControl):
       self.curvature_hist.append(0.0)
       self.lowpass_filtered = 0.0
       self.desired_curvature_prev = desired_curvature
+      self.alpha_prev = ALPHA_MIN
     else:
       curvature_log.active = True
       roll_compensation = -VM.roll_compensation(params.roll, CS.vEgo)
@@ -62,7 +65,7 @@ class LatControlCurvaturePID(LatControl):
                                                       CS.vEgo, math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), 0.)
       actual_curvature = np.interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_3dof])
 
-      alpha = self.compute_dynamic_alpha(desired_curvature, self.desired_curvature_prev)
+      alpha = self.compute_dynamic_alpha(desired_curvature, self.desired_curvature_prev, self.alpha_prev)
       reaction = self.lowpass_filter(actual_curvature, alpha)
       self.curvature_hist.append(reaction)
       disturbance = self.highpass_filter(actual_curvature, reaction)
@@ -73,6 +76,7 @@ class LatControlCurvaturePID(LatControl):
       output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
 
       self.desired_curvature_prev = desired_curvature
+      self.alpha_prev = alpha
 
       curvature_log.p = float(np.float32(self.pid.p))
       curvature_log.i = float(np.float32(self.pid.i))
