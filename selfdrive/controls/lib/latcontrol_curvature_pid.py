@@ -22,7 +22,7 @@ class LatControlCurvaturePID(LatControl):
     self.desired_curvature_prev = 0.
     self.lowpass_filtered = 0.0
 
-  def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, dt=DT_CTRL, A=0.06, alpha_min=0.05):
+  def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, dt=DT_CTRL, A=0.05, alpha_min=0.05):
     d_desired = abs(desired_curvature - desired_curvature_prev) / dt
     f_est = d_desired / (2 * np.pi * A) if A > 0 else 0.0
     tau = 1 / (2 * np.pi * f_est) if f_est > 0 else float('inf')
