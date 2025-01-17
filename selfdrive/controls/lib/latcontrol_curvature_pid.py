@@ -22,11 +22,11 @@ class LatControlCurvaturePID(LatControl):
     self.desired_curvature_prev = 0.
     self.lowpass_filtered = 0.0
 
-  def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, dt, A=0.05):
+  def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, dt=DT_CTRL, A=0.06, alpha_min=0.01):
     d_desired = abs(desired_curvature - desired_curvature_prev) / dt
     f_est = d_desired / (2 * np.pi * A) if A > 0 else 0.0
     tau = 1 / (2 * np.pi * f_est) if f_est > 0 else float('inf')
-    alpha = dt / (tau + dt)
+    alpha = min(dt / (tau + dt), 0.01)
     return alpha
 
   def lowpass_filter(self, current_value, alpha):
@@ -55,7 +55,7 @@ class LatControlCurvaturePID(LatControl):
                                                       CS.vEgo, math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), 0.)
       actual_curvature = np.interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_3dof])
 
-      alpha = self.compute_dynamic_alpha(desired_curvature, self.desired_curvature_prev, DT_CTRL, A=0.05)
+      alpha = self.compute_dynamic_alpha(desired_curvature, self.desired_curvature_prev)
       reaction = self.lowpass_filter(actual_curvature, alpha)
       self.curvature_hist.append(reaction)
       disturbance = self.highpass_filter(actual_curvature, reaction)
