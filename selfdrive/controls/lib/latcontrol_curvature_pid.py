@@ -7,8 +7,6 @@ from openpilot.common.pid import PIDController
 from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 
-from opendbc.car.volkswagen.values import CarControllerParams as VWCarControllerParams
-
 ALPHA_MIN = 0.05
 ALPHA_MAX = 0.4
 
@@ -39,8 +37,13 @@ class LatControlCurvaturePID(LatControl):
     alpha = np.clip(alpha_prev * np.exp(-beta * dt) + alpha_reactive, alpha_min, alpha_max)
     return alpha
 
-  def lowpass_filter(self, current_value, alpha):
-    self.lowpass_filtered = (1 - alpha) * self.lowpass_filtered + alpha * current_value
+  def lowpass_filter(self, current_value, alpha, alpha_min=ALPHA_MIN, alpha_max=ALPHA_MAX):
+    alpha = min(alpha, alpha_max)
+    if alpha >= alpha_max * 0.9:
+        reset_factor = (alpha - alpha_min) / (alpha_max - alpha_min)
+        self.lowpass_filtered = (1 - reset_factor) * self.lowpass_filtered + reset_factor * current_value
+    else:    
+      self.lowpass_filtered = (1 - alpha) * self.lowpass_filtered + alpha * current_value
     return self.lowpass_filtered
 
   def highpass_filter(self, current_value, lowpass_value):
