@@ -10,7 +10,7 @@ from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 from opendbc.car.volkswagen.values import CarControllerParams as VWCarControllerParams
 
 ALPHA_MIN = 0.05
-ALPHA_MAX = 0.5
+ALPHA_MAX = 0.4
 
 # model curvature does not project correctly into the real world
 # 1) calculate the current state of curvature with 3DOF for better disturbance detection
@@ -33,7 +33,7 @@ class LatControlCurvaturePID(LatControl):
     self.lowpass_filtered = 0.0
     self.alpha_prev = ALPHA_MIN
 
-  def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, alpha_prev, dt=DT_CTRL, alpha_min=ALPHA_MIN, alpha_max=ALPHA_MAX, A=0.02, n=2.0, beta=1.0, k=2.0):
+  def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, alpha_prev, dt=DT_CTRL, alpha_min=ALPHA_MIN, alpha_max=ALPHA_MAX, A=0.02, n=2.0, beta=3.0, k=2.0):
     d_desired = abs(desired_curvature - desired_curvature_prev) / dt
     alpha_reactive = d_desired**n / (k * A) if A > 0 else 0.0
     alpha = np.clip(alpha_prev * np.exp(-beta * dt) + alpha_reactive, alpha_min, alpha_max)
