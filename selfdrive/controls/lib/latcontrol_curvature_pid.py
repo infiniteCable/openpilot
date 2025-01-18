@@ -34,7 +34,7 @@ class LatControlCurvaturePID(LatControl):
 
   def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, alpha_prev, dt=DT_CTRL, alpha_min=ALPHA_MIN, A=0.02, n=2.0, beta=1.0, k=2.0):
     d_desired = abs(desired_curvature - desired_curvature_prev) / dt
-    alpha_reactive = d_desired**n / (k * A) if A > 0 else 0.0
+    alpha_reactive = min(d_desired**n / (k * A), 0.3) if A > 0 else 0.0
     alpha = max(alpha_min, alpha_prev * np.exp(-beta * dt) + alpha_reactive)
     return alpha
 
