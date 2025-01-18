@@ -10,7 +10,7 @@ from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 from opendbc.car.volkswagen.values import CarControllerParams as VWCarControllerParams
 
 ALPHA_MIN = 0.05
-ALPHA_MAX = 0.3
+ALPHA_MAX = 0.5
 
 # model curvature does not project correctly into the real world
 # 1) calculate the current state of curvature with 3DOF for better disturbance detection
