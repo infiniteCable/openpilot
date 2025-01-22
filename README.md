@@ -1,12 +1,14 @@
-based on cupra_born_k1 branch
-
-features:
-dynamic acc jerk limits
-dynamic acc control limits
-hud control expansion for correct gap and distance ui display
-curvature controller/post-processing based on 3DOF (fix model error and disturbance correction)
-steering command smoothing
-
+based on cupra_born_k1 branch<br>
+<div align="center" style="text-align: center;">
+<h3>branch features:</h3>
+dynamic acc jerk limits<br>
+dynamic acc control limits<br>
+hud control expansion for correct gap and distance ui display<br>
+curvature controller / post-processing based on 3DOF (fix model error and disturbance correction)<br>
+steering command smoothing<br>
+simple dark mode<br>
+onroad screen turn off<br>
+</div>
 
 <div align="center" style="text-align: center;">
 
