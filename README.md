@@ -1,6 +1,12 @@
-use at own risk
 based on cupra_born_k1 branch
-has meb dynamic jerk controlling, hud control expansion for correct gap and distance ui display, curvature controller/post-processing based on 3DOF for model curvature projecting into the real world
+
+features:
+dynamic acc jerk limits
+dynamic acc control limits
+hud control expansion for correct gap and distance ui display
+curvature controller/post-processing based on 3DOF (fix model error and disturbance correction)
+steering command smoothing
+
 
 <div align="center" style="text-align: center;">
 
