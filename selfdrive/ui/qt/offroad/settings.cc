@@ -149,7 +149,7 @@ void TogglesPanel::updateToggles() {
     cereal::CarParams::Reader CP = cmsg.getRoot<cereal::CarParams>();
 
     if (!CP.getExperimentalLongitudinalAvailable() || is_release) {
-      //params.remove("ExperimentalLongitudinalEnabled"); until OP is fixed, removed
+      params.remove("ExperimentalLongitudinalEnabled");
     }
     if (hasLongitudinalControl(CP)) {
       // normal description and toggle
