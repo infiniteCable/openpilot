@@ -53,6 +53,7 @@ void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
 
   drawSetSpeed(p, surface_rect);
   drawCurrentSpeed(p, surface_rect);
+  drawBatteryHeaterIcon(p, surface_rect);
 
   p.restore();
 }
