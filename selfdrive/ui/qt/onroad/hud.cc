@@ -17,11 +17,15 @@ void HudRenderer::updateState(const UIState &s) {
     is_cruise_set = false;
     set_speed = SET_SPEED_NA;
     speed = 0.0;
+    battery_heater_enabled = false;
     return;
   }
 
   const auto &controls_state = sm["controlsState"].getControlsState();
   const auto &car_state = sm["carState"].getCarState();
+  const auto &ev_data = car_state.getEVData();
+  
+  battery_heater_enabled = ev_data.getBatteryHeaterEnabled();
 
   // Handle older routes where vCruiseCluster is not set
   set_speed = car_state.getVCruiseCluster() == 0.0 ? controls_state.getVCruiseDEPRECATED() : car_state.getVCruiseCluster();
@@ -106,4 +110,30 @@ void HudRenderer::drawText(QPainter &p, int x, int y, const QString &text, int a
 
   p.setPen(QColor(0xff, 0xff, 0xff, alpha));
   p.drawText(real_rect.x(), real_rect.bottom(), text);
+}
+
+void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) {
+  const int icon_size = 100;
+  const int margin = 30;
+  float x = surface_rect.width() - icon_size - margin;
+  float y = surface_rect.height() - icon_size - margin;
+
+  float opacity = battery_heater_enabled ? 0.65f : 0.2f;
+  QColor icon_color = battery_heater_enabled ? QColor(0, 200, 0, 255) : QColor(100, 100, 100, 255);
+  icon_color.setAlphaF(opacity);
+
+  QPixmap icon_pixmap = QPixmap("../assets/img_battery_heater.png");
+
+  p.setPen(Qt::NoPen);
+  p.setBrush(QColor(0, 0, 0, 70));
+  QRectF bg_rect(x - 10, y - 10, icon_size + 20, icon_size + 20);
+  p.drawEllipse(bg_rect);
+
+  QRectF icon_rect(x, y, icon_size, icon_size);
+  p.drawPixmap(icon_rect, icon_pixmap);
+
+  if (battery_heater_enabled) {
+    p.setPen(QPen(icon_color, 3));
+    p.drawEllipse(bg_rect);
+  }
 }
