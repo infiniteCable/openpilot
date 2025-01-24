@@ -3,9 +3,6 @@
 #include <QPainter>
 #include "selfdrive/ui/ui.h"
 
-const int btn_size = 192;
-const int img_size = (btn_size / 4) * 3;
-
 class HudRenderer : public QObject {
   Q_OBJECT
 
@@ -28,5 +25,3 @@ private:
   int status = STATUS_DISENGAGED;
   bool battery_heater_enabled = false;
 };
-
-void drawIcon(QPainter &p, const QPoint &center, const QPixmap &img, const QBrush &bg, float opacity);
