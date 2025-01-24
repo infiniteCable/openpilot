@@ -24,6 +24,7 @@ private:
   bool v_ego_cluster_seen = false;
   int status = STATUS_DISENGAGED;
   bool battery_heater_enabled = false;
+  QPixmap img_battery_heater_active;
 };
 
 void drawIcon(QPainter &p, const QPoint &center, const QPixmap &img, const QBrush &bg, float opacity);
