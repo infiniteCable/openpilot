@@ -6,7 +6,10 @@
 
 constexpr int SET_SPEED_NA = 255;
 
-HudRenderer::HudRenderer() {}
+HudRenderer::HudRenderer() {
+  img_battery_heater_enabled = loadPixmap("../assets/img_battery_heater_on.png", {img_size, img_size});
+  img_battery_heater_disabled = loadPixmap("../assets/img_battery_heater_off.png", {img_size, img_size});
+}
 
 void HudRenderer::updateState(const UIState &s) {
   is_metric = s.scene.is_metric;
@@ -126,8 +129,6 @@ void HudRenderer::drawText(QPainter &p, int x, int y, const QString &text, int a
 
 void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) {
   const int margin = 30;
-  img_battery_heater_enabled = loadPixmap("../assets/img_battery_heater_on.png", {img_size, img_size});
-  img_battery_heater_disabled = loadPixmap("../assets/img_battery_heater_off.png", {img_size, img_size});
   QPoint center(surface_rect.width() - margin - btn_size / 2, surface_rect.height() - margin - btn_size / 2);
   QBrush bg = QBrush(QColor(0, 0, 0, 70));
   float opacity = battery_heater_enabled ? 0.65f : 0.2f;
