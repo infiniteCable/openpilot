@@ -152,10 +152,10 @@ void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) 
 
 void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) {
   const int margin = 30;
-  img_heater_active = loadPixmap("../assets/img_battery_heater.png", {img_size, img_size});
+  img_battery_heater_active = loadPixmap("../assets/img_battery_heater.png", {img_size, img_size});
   QPoint center(surface_rect.width() - margin - btn_size / 2, surface_rect.height() - margin - btn_size / 2);
   QBrush bg = QBrush(QColor(0, 0, 0, 70));
   float opacity = battery_heater_enabled ? 0.65f : 0.2f;
-  QPixmap img = battery_heater_enabled ? img_heater_active : img_heater_active;
+  QPixmap img = battery_heater_enabled ? img_battery_heater_active : img_battery_heater_active;
   drawIcon(p, center, img, bg, opacity);
 }
