@@ -26,6 +26,7 @@ private:
   int status = STATUS_DISENGAGED;
   bool battery_heater_enabled = false;
   QPixmap img_battery_heater_enabled;
+  QPixmap img_battery_heater_disabled;
   const int btn_size = 192;
   const int img_size = (btn_size / 4) * 3;
 };
