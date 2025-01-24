@@ -41,7 +41,7 @@ void HudRenderer::updateState(const UIState &s) {
   speed = std::max<float>(0.0f, v_ego * (is_metric ? MS_TO_KPH : MS_TO_MPH));
 }
 
-void drawIcon(QPainter &p, const QPoint &center, const QPixmap &img, const QBrush &bg, float opacity) {
+void HudRenderer::drawIcon(QPainter &p, const QPoint &center, const QPixmap &img, const QBrush &bg, float opacity) {
   p.setRenderHint(QPainter::Antialiasing);
   p.setOpacity(1.0);  // bg dictates opacity of ellipse
   p.setPen(Qt::NoPen);
@@ -125,37 +125,11 @@ void HudRenderer::drawText(QPainter &p, int x, int y, const QString &text, int a
 }
 
 void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) {
-  const int icon_size = 100;
   const int margin = 30;
-  float x = surface_rect.width() - icon_size - margin;
-  float y = surface_rect.height() - icon_size - margin;
-
-  float opacity = battery_heater_enabled ? 0.65f : 0.2f;
-  QColor icon_color = battery_heater_enabled ? QColor(0, 200, 0, 255) : QColor(100, 100, 100, 255);
-  icon_color.setAlphaF(opacity);
-
-  icon_pixmap = loadPixmap("../assets/img_battery_heater.png", {icon_size, icon_size});
-
-  p.setPen(Qt::NoPen);
-  p.setBrush(QColor(0, 0, 0, 70));
-  QRectF bg_rect(x - 10, y - 10, icon_size + 20, icon_size + 20);
-  p.drawEllipse(bg_rect);
-
-  QRectF icon_rect(x, y, icon_size, icon_size);
-  p.drawPixmap(icon_rect, icon_pixmap);
-
-  if (battery_heater_enabled) {
-    p.setPen(QPen(icon_color, 3));
-    p.drawEllipse(bg_rect);
-  }
-}
-
-void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) {
-  const int margin = 30;
-  img_battery_heater_active = loadPixmap("../assets/img_battery_heater.png", {img_size, img_size});
+  img_battery_heater_enabled = loadPixmap("../assets/img_battery_heater.png", {img_size, img_size});
   QPoint center(surface_rect.width() - margin - btn_size / 2, surface_rect.height() - margin - btn_size / 2);
   QBrush bg = QBrush(QColor(0, 0, 0, 70));
   float opacity = battery_heater_enabled ? 0.65f : 0.2f;
-  QPixmap img = battery_heater_enabled ? img_battery_heater_active : img_battery_heater_active;
+  QPixmap img = battery_heater_enabled ? img_battery_heater_enabled : img_battery_heater_enabled;
   drawIcon(p, center, img, bg, opacity);
 }
