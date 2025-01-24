@@ -41,6 +41,17 @@ void HudRenderer::updateState(const UIState &s) {
   speed = std::max<float>(0.0f, v_ego * (is_metric ? MS_TO_KPH : MS_TO_MPH));
 }
 
+void drawIcon(QPainter &p, const QPoint &center, const QPixmap &img, const QBrush &bg, float opacity) {
+  p.setRenderHint(QPainter::Antialiasing);
+  p.setOpacity(1.0);  // bg dictates opacity of ellipse
+  p.setPen(Qt::NoPen);
+  p.setBrush(bg);
+  p.drawEllipse(center, btn_size / 2, btn_size / 2);
+  p.setOpacity(opacity);
+  p.drawPixmap(center - QPoint(img.width() / 2, img.height() / 2), img);
+  p.setOpacity(1.0);
+}
+
 void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
   p.save();
 
@@ -123,7 +134,7 @@ void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) 
   QColor icon_color = battery_heater_enabled ? QColor(0, 200, 0, 255) : QColor(100, 100, 100, 255);
   icon_color.setAlphaF(opacity);
 
-  QPixmap icon_pixmap = QPixmap("../assets/img_battery_heater.png");
+  icon_pixmap = loadPixmap("../assets/img_battery_heater.png", {icon_size, icon_size});
 
   p.setPen(Qt::NoPen);
   p.setBrush(QColor(0, 0, 0, 70));
@@ -137,4 +148,14 @@ void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) 
     p.setPen(QPen(icon_color, 3));
     p.drawEllipse(bg_rect);
   }
+}
+
+void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) {
+  const int margin = 30;
+  img_heater_active = loadPixmap("../assets/img_battery_heater.png", {img_size, img_size});
+  QPoint center(surface_rect.width() - margin - btn_size / 2, surface_rect.height() - margin - btn_size / 2);
+  QBrush bg = QBrush(QColor(0, 0, 0, 70));
+  float opacity = battery_heater_enabled ? 0.65f : 0.2f;
+  QPixmap img = battery_heater_enabled ? img_heater_active : img_heater_active;
+  drawIcon(p, center, img, bg, opacity);
 }
