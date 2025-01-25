@@ -27,8 +27,13 @@ void HudRenderer::updateState(const UIState &s) {
   const auto &controls_state = sm["controlsState"].getControlsState();
   const auto &car_state = sm["carState"].getCarState();
   const auto &battery_data = car_state.getBatteryDetails();
-  
-  battery_heater_enabled = battery_data.getHeaterActive();
+
+  bool battery_heater_state = battery_data.getHeaterActive();
+
+  if (battery_heater_state != battery_heater_enabled) {
+    battery_heater_enabled = battery_heater_state;
+    update();
+  }
 
   // Handle older routes where vCruiseCluster is not set
   set_speed = car_state.getVCruiseCluster() == 0.0 ? controls_state.getVCruiseDEPRECATED() : car_state.getVCruiseCluster();
