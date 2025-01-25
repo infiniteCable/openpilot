@@ -32,7 +32,7 @@ void HudRenderer::updateState(const UIState &s) {
 
   if (battery_heater_state != battery_heater_enabled) {
     battery_heater_enabled = battery_heater_state;
-    update();
+    triggerParentUpdate();
   }
 
   // Handle older routes where vCruiseCluster is not set
@@ -139,4 +139,18 @@ void HudRenderer::drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect) 
   float opacity = battery_heater_enabled ? 0.65f : 0.2f;
   QPixmap img = battery_heater_enabled ? img_battery_heater_enabled : img_battery_heater_disabled;
   drawIcon(p, center, img, bg, opacity);
+}
+
+void HudRenderer::triggerParentUpdate() {
+  QWidget *widget = nullptr;
+  QObject *current = parent();
+
+  while (current) {
+    widget = qobject_cast<QWidget *>(current);
+    if (widget) {
+      widget->update();
+      break;
+    }
+    current = current->parent();
+  }
 }
