@@ -7,7 +7,7 @@ from openpilot.common.pid import PIDController
 from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 
-ALPHA_MIN = 0.05
+ALPHA_MIN = 0.01
 ALPHA_MAX = 0.4
 
 # model curvature does not project correctly into the real world
