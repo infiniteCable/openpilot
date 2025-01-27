@@ -18,6 +18,7 @@ private:
   void drawText(QPainter &p, int x, int y, const QString &text, int alpha = 255);
   void drawIcon(QPainter &p, const QPoint &center, const QPixmap &img, const QBrush &bg, float opacity);
   void drawBatteryHeaterIcon(QPainter &p, const QRect &surface_rect);
+  void drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect);
 
   float speed = 0;
   float set_speed = 0;
@@ -30,4 +31,5 @@ private:
   QPixmap img_battery_heater_disabled;
   const int btn_size = 192;
   const int img_size = (btn_size / 4) * 3;
+  cereal::CarState::BatteryDetails battery_details;
 };
