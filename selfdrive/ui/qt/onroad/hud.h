@@ -31,5 +31,16 @@ private:
   QPixmap img_battery_heater_disabled;
   const int btn_size = 192;
   const int img_size = (btn_size / 4) * 3;
-  cereal::CarState::BatteryDetails battery_details;
+
+  bool heater_active = false;
+  float capacity = 0.0f;
+  float charge = 0.0f;
+  float soc = 0.0f;
+  float temperature = 0.0f;
+  float cell_voltage = 0.0f;
+  float voltage = 0.0f;
+  float current = 0.0f;
+  float current_max = 0.0f;
+  float power = 0.0f;
+  float power_max = 0.0f;
 };
