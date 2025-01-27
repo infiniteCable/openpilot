@@ -26,19 +26,19 @@ void HudRenderer::updateState(const UIState &s) {
 
   const auto &controls_state = sm["controlsState"].getControlsState();
   const auto &car_state = sm["carState"].getCarState();
-  const auto &battery_data = car_state.getBatteryDetails();
+  const auto battery_data = car_state.getBatteryDetails();
 
-  heater_active = battery_data.getHeaterActive();
-  capacity = battery_data.getCapacity();
-  charge = battery_data.getCharge();
-  soc = battery_data.getSoc();
-  temperature = battery_data.getTemperature();
-  cell_voltage = battery_data.getCellVoltage();
-  voltage = battery_data.getVoltage();
-  current = battery_data.getCurrent();
-  current_max = battery_data.getCurrentMax();
-  power = battery_data.getPower();
-  power_max = battery_data.getPowerMax();
+  battery_details.heater_active = battery_data.getHeaterActive();
+  battery_details.capacity = battery_data.getCapacity();
+  battery_details.charge = battery_data.getCharge();
+  battery_details.soc = battery_data.getSoc();
+  battery_details.temperature = battery_data.getTemperature();
+  battery_details.cell_voltage = battery_data.getCellVoltage();
+  battery_details.voltage = battery_data.getVoltage();
+  battery_details.current = battery_data.getCurrent();
+  battery_details.current_max = battery_data.getCurrentMax();
+  battery_details.power = battery_data.getPower();
+  battery_details.power_max = battery_data.getPowerMax();
 
   //bool battery_heater_state = battery_details.getHeaterActive();
 
@@ -180,17 +180,20 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   const int line_height = 40;
   const int text_margin = 10;
 
+  // Panel position
   int x = surface_rect.width() - panel_width - panel_margin;
-  int y = surface_rect.height() - panel_margin - (line_height * 12);
+  int y = surface_rect.height() - panel_margin - (line_height * 12);  // 12 Werte in der Struktur
 
   QRect panel_rect(x, y, panel_width, line_height * 12 + text_margin);
   p.setBrush(QColor(0, 0, 0, 150));
   p.setPen(Qt::NoPen);
   p.drawRoundedRect(panel_rect, 10, 10);
 
+  // Text styling
   p.setPen(Qt::white);
   p.setFont(InterFont(20, QFont::Bold));
 
+  // Werte untereinander zeichnen
   QStringList labels = {
     "Heater Active:",
     "Capacity:",
@@ -206,17 +209,17 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   };
 
   QStringList values = {
-    heater_active ? "True" : "False",
-    QString::number(capacity, 'f', 2) + " Wh",
-    QString::number(charge, 'f', 2) + " Wh",
-    QString::number(soc, 'f', 2) + " %",
-    QString::number(temperature, 'f', 2) + " °C",
-    QString::number(cell_voltage, 'f', 2) + " V",
-    QString::number(voltage, 'f', 2) + " V",
-    QString::number(current, 'f', 2) + " A",
-    QString::number(current_max, 'f', 2) + " A",
-    QString::number(power, 'f', 2) + " W",
-    QString::number(power_max, 'f', 2) + " W"
+    battery_details.getHeaterActive() ? "True" : "False",
+    QString::number(battery_details.getCapacity(), 'f', 2) + " Wh",
+    QString::number(battery_details.getCharge(), 'f', 2) + " Wh",
+    QString::number(battery_details.getSoc(), 'f', 2) + " %",
+    QString::number(battery_details.getTemperature(), 'f', 2) + " °C",
+    QString::number(battery_details.getCellVoltage(), 'f', 2) + " V",
+    QString::number(battery_details.getVoltage(), 'f', 2) + " V",
+    QString::number(battery_details.getCurrent(), 'f', 2) + " A",
+    QString::number(battery_details.getCurrentMax(), 'f', 2) + " A",
+    QString::number(battery_details.getPower(), 'f', 2) + " W",
+    QString::number(battery_details.getPowerMax(), 'f', 2) + " W"
   };
 
   for (int i = 0; i < labels.size(); ++i) {
