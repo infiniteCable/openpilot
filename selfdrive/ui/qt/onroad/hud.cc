@@ -84,6 +84,13 @@ void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
 
   drawSetSpeed(p, surface_rect);
   drawCurrentSpeed(p, surface_rect);
+
+  auto params = Params();
+  bool display_battery_details = params.getBool("BatteryDetails");
+  if (display_battery_details) {
+    drawBatteryDetailsPanel(p, surface_rect);
+  }
+  
   //drawBatteryHeaterIcon(p, surface_rect);
 
   p.restore();
