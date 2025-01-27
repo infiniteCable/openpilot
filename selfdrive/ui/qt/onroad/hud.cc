@@ -175,43 +175,35 @@ void HudRenderer::triggerParentUpdate() {
 }
 
 void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect) {
-  const int panel_width = 300;
+  const int panel_width = 500;
   const int panel_margin = 20;
-  const int line_height = 40;
-  const int text_margin = 10;
+  const int line_height = 60;
+  const int text_margin = 20;
+  const int label_width = 250;
+  const int value_width = 200;
 
-  // Panel position
   int x = surface_rect.width() - panel_width - panel_margin;
-  int y = surface_rect.height() - panel_margin - (line_height * 12);  // 12 Werte in der Struktur
+  int y = surface_rect.height() - panel_margin - (line_height * 11);
 
-  QRect panel_rect(x, y, panel_width, line_height * 12 + text_margin);
+  QRect panel_rect(x, y, panel_width, line_height * 11 + text_margin);
   p.setBrush(QColor(0, 0, 0, 150));
   p.setPen(Qt::NoPen);
   p.drawRoundedRect(panel_rect, 10, 10);
 
-  // Text styling
   p.setPen(Qt::white);
-  p.setFont(InterFont(20, QFont::Bold));
+  p.setFont(InterFont(40, QFont::Bold));
 
-  // Werte untereinander zeichnen
   QStringList labels = {
-    "Heater Active:",
-    "Capacity:",
-    "Charge:",
-    "SoC:",
-    "Temperature:",
-    "Cell Voltage:",
-    "Voltage:",
-    "Current:",
-    "Max Current:",
-    "Power:",
-    "Max Power:"
+    "Heater Active:", "Capacity:", "Charge:",
+    "SoC:", "Temperature:", "Cell Voltage:",
+    "Voltage:", "Current:", "Max Current:",
+    "Power:", "Max Power:"
   };
 
   QStringList values = {
     battery_details.heaterActive ? "True" : "False",
-    QString::number(battery_details.capacity, 'f', 2) + " Wh",
-    QString::number(battery_details.charge, 'f', 2) + " Wh",
+    QString::number(battery_details.capacity, 'f', 2) + " Ah",
+    QString::number(battery_details.charge, 'f', 2) + " Ah",
     QString::number(battery_details.soc, 'f', 2) + " %",
     QString::number(battery_details.temperature, 'f', 2) + " °C",
     QString::number(battery_details.cellVoltage, 'f', 2) + " V",
@@ -224,6 +216,11 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
 
   for (int i = 0; i < labels.size(); ++i) {
     int text_y = y + text_margin + (i * line_height);
-    p.drawText(x + text_margin, text_y, labels[i] + " " + values[i]);
+
+    QRect label_rect(x + text_margin, text_y, label_width, line_height);
+    p.drawText(label_rect, Qt::AlignLeft | Qt::AlignVCenter, labels[i]);
+
+    QRect value_rect(x + label_width, text_y, value_width, line_height);
+    p.drawText(value_rect, Qt::AlignRight | Qt::AlignVCenter, values[i]);
   }
 }
