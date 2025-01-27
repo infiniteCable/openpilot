@@ -26,7 +26,19 @@ void HudRenderer::updateState(const UIState &s) {
 
   const auto &controls_state = sm["controlsState"].getControlsState();
   const auto &car_state = sm["carState"].getCarState();
-  battery_details = car_state.getBatteryDetails();
+  const auto &battery_data = car_state.getBatteryDetails();
+
+  heater_active = battery_data.getHeaterActive();
+  capacity = battery_data.getCapacity();
+  charge = battery_data.getCharge();
+  soc = battery_data.getSoc();
+  temperature = battery_data.getTemperature();
+  cell_voltage = battery_data.getCellVoltage();
+  voltage = battery_data.getVoltage();
+  current = battery_data.getCurrent();
+  current_max = battery_data.getCurrentMax();
+  power = battery_data.getPower();
+  power_max = battery_data.getPowerMax();
 
   //bool battery_heater_state = battery_details.getHeaterActive();
 
@@ -187,17 +199,17 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   };
 
   QStringList values = {
-    battery_details.getHeaterActive() ? "True" : "False",
-    QString::number(battery_details.getCapacity(), 'f', 2) + " Wh",
-    QString::number(battery_details.getCharge(), 'f', 2) + " Wh",
-    QString::number(battery_details.getSoc(), 'f', 2) + " %",
-    QString::number(battery_details.getTemperature(), 'f', 2) + " °C",
-    QString::number(battery_details.getCellVoltage(), 'f', 2) + " V",
-    QString::number(battery_details.getVoltage(), 'f', 2) + " V",
-    QString::number(battery_details.getCurrent(), 'f', 2) + " A",
-    QString::number(battery_details.getCurrentMax(), 'f', 2) + " A",
-    QString::number(battery_details.getPower(), 'f', 2) + " W",
-    QString::number(battery_details.getPowerMax(), 'f', 2) + " W"
+    heater_active ? "True" : "False",
+    QString::number(capacity, 'f', 2) + " Wh",
+    QString::number(charge, 'f', 2) + " Wh",
+    QString::number(soc, 'f', 2) + " %",
+    QString::number(temperature, 'f', 2) + " °C",
+    QString::number(cell_voltage, 'f', 2) + " V",
+    QString::number(voltage, 'f', 2) + " V",
+    QString::number(current, 'f', 2) + " A",
+    QString::number(current_max, 'f', 2) + " A",
+    QString::number(power, 'f', 2) + " W",
+    QString::number(power_max, 'f', 2) + " W"
   };
 
   for (int i = 0; i < labels.size(); ++i) {
