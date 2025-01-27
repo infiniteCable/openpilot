@@ -49,6 +49,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
+      "BatteryDetails",
+      tr("Display Battery Details"),
+      tr("Enable battery details panel."),
+      "../assets/offroad/icon_monitoring.png",
+    },
+    {
       "IsLdwEnabled",
       tr("Enable Lane Departure Warnings"),
       tr("Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31 mph (50 km/h)."),
