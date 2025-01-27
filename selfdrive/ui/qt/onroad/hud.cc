@@ -175,23 +175,24 @@ void HudRenderer::triggerParentUpdate() {
 }
 
 void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect) {
-  const int panel_width = 500;
+  const float scale_factor = 0.75;
+  const int panel_width = 600;
   const int panel_margin = 20;
-  const int line_height = 60;
+  const int line_height = 45;
   const int text_margin = 20;
-  const int label_width = 250;
-  const int value_width = 200;
+  const int label_width = 300;
+  const int value_width = 250;
 
   int x = surface_rect.width() - panel_width - panel_margin;
-  int y = surface_rect.height() - panel_margin - (line_height * 11);
+  int y = surface_rect.height() - panel_margin - static_cast<int>((line_height * 11 + text_margin) * scale_factor);
 
-  QRect panel_rect(x, y, panel_width, line_height * 11 + text_margin);
+  QRect panel_rect(x, y, panel_width, static_cast<int>((line_height * 11 + text_margin) * scale_factor));
   p.setBrush(QColor(0, 0, 0, 150));
   p.setPen(Qt::NoPen);
   p.drawRoundedRect(panel_rect, 10, 10);
 
   p.setPen(Qt::white);
-  p.setFont(InterFont(40, QFont::Bold));
+  p.setFont(InterFont(30, QFont::Bold));
 
   QStringList labels = {
     "Heater Active:", "Capacity:", "Charge:",
@@ -202,8 +203,8 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
 
   QStringList values = {
     battery_details.heaterActive ? "True" : "False",
-    QString::number(battery_details.capacity, 'f', 2) + " Ah",
-    QString::number(battery_details.charge, 'f', 2) + " Ah",
+    QString::number(battery_details.capacity, 'f', 2) + " Wh",
+    QString::number(battery_details.charge, 'f', 2) + " Wh",
     QString::number(battery_details.soc, 'f', 2) + " %",
     QString::number(battery_details.temperature, 'f', 2) + " °C",
     QString::number(battery_details.cellVoltage, 'f', 2) + " V",
@@ -215,12 +216,12 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   };
 
   for (int i = 0; i < labels.size(); ++i) {
-    int text_y = y + text_margin + (i * line_height);
+    int text_y = y + text_margin + static_cast<int>(i * line_height * scale_factor);
 
-    QRect label_rect(x + text_margin, text_y, label_width, line_height);
+    QRect label_rect(x + text_margin, text_y, label_width, static_cast<int>(line_height * scale_factor));
     p.drawText(label_rect, Qt::AlignLeft | Qt::AlignVCenter, labels[i]);
-
-    QRect value_rect(x + label_width, text_y, value_width, line_height);
+    
+    QRect value_rect(x + label_width, text_y, value_width, static_cast<int>(line_height * scale_factor));
     p.drawText(value_rect, Qt::AlignRight | Qt::AlignVCenter, values[i]);
   }
 }
