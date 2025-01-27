@@ -26,14 +26,14 @@ void HudRenderer::updateState(const UIState &s) {
 
   const auto &controls_state = sm["controlsState"].getControlsState();
   const auto &car_state = sm["carState"].getCarState();
-  const auto &battery_data = car_state.getBatteryDetails();
+  battery_details = car_state.getBatteryDetails();
 
-  bool battery_heater_state = battery_data.getHeaterActive();
+  //bool battery_heater_state = battery_details.getHeaterActive();
 
-  if (battery_heater_state != battery_heater_enabled) {
-    battery_heater_enabled = battery_heater_state;
-    triggerParentUpdate();
-  }
+  //if (battery_heater_state != battery_heater_enabled) {
+  //  battery_heater_enabled = battery_heater_state;
+  //  triggerParentUpdate();
+  //}
 
   // Handle older routes where vCruiseCluster is not set
   set_speed = car_state.getVCruiseCluster() == 0.0 ? controls_state.getVCruiseDEPRECATED() : car_state.getVCruiseCluster();
@@ -72,7 +72,7 @@ void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
 
   drawSetSpeed(p, surface_rect);
   drawCurrentSpeed(p, surface_rect);
-  drawBatteryHeaterIcon(p, surface_rect);
+  //drawBatteryHeaterIcon(p, surface_rect);
 
   p.restore();
 }
@@ -152,5 +152,56 @@ void HudRenderer::triggerParentUpdate() {
       break;
     }
     current = current->parent();
+  }
+}
+
+void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect) {
+  const int panel_width = 300;
+  const int panel_margin = 20;
+  const int line_height = 40;
+  const int text_margin = 10;
+
+  int x = surface_rect.width() - panel_width - panel_margin;
+  int y = surface_rect.height() - panel_margin - (line_height * 12);
+
+  QRect panel_rect(x, y, panel_width, line_height * 12 + text_margin);
+  p.setBrush(QColor(0, 0, 0, 150));
+  p.setPen(Qt::NoPen);
+  p.drawRoundedRect(panel_rect, 10, 10);
+
+  p.setPen(Qt::white);
+  p.setFont(InterFont(20, QFont::Bold));
+
+  QStringList labels = {
+    "Heater Active:",
+    "Capacity:",
+    "Charge:",
+    "SoC:",
+    "Temperature:",
+    "Cell Voltage:",
+    "Voltage:",
+    "Current:",
+    "Max Current:",
+    "Power:",
+    "Max Power:"
+  };
+
+  QStringList values = {
+    battery_details.getHeaterActive() ? "True" : "False",
+    QString::number(battery_details.getCapacity(), 'f', 2) + " Wh",
+    QString::number(battery_details.getCharge(), 'f', 2) + " Wh",
+    QString::number(battery_details.getSoc(), 'f', 2) + " %",
+    QString::number(battery_details.getTemperature(), 'f', 2) + " °C",
+    QString::number(battery_details.getCellVoltage(), 'f', 2) + " V",
+    QString::number(battery_details.getVoltage(), 'f', 2) + " V",
+    QString::number(battery_details.getCurrent(), 'f', 2) + " A",
+    QString::number(battery_details.getCurrentMax(), 'f', 2) + " A",
+    QString::number(battery_details.getPower(), 'f', 2) + " W",
+    QString::number(battery_details.getPowerMax(), 'f', 2) + " W"
+  };
+
+  for (int i = 0; i < labels.size(); ++i) {
+    int text_y = y + text_margin + (i * line_height);
+    p.drawText(x + text_margin, text_y, labels[i] + " " + values[i]);
   }
 }
