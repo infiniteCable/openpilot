@@ -209,7 +209,7 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   };
 
   QStringList values = {
-    battery_details.heaterActive() ? "True" : "False",
+    battery_details.heaterActive ? "True" : "False",
     QString::number(battery_details.capacity, 'f', 2) + " Wh",
     QString::number(battery_details.charge, 'f', 2) + " Wh",
     QString::number(battery_details.soc, 'f', 2) + " %",
