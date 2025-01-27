@@ -2,6 +2,7 @@
 
 #include <QPainter>
 #include "selfdrive/ui/ui.h"
+#include "common/params.h"
 
 class HudRenderer : public QObject {
   Q_OBJECT
