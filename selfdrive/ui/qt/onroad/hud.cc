@@ -211,8 +211,8 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
     QString::number(battery_details.voltage, 'f', 2) + " V",
     QString::number(battery_details.current, 'f', 2) + " A",
     QString::number(battery_details.currentMax, 'f', 2) + " A",
-    QString::number(battery_details.power, 'f', 2) + " W",
-    QString::number(battery_details.powerMax, 'f', 2) + " W"
+    QString::number(battery_details.power, 'f', 2) + " kW",
+    QString::number(battery_details.powerMax, 'f', 2) + " kW"
   };
 
   for (int i = 0; i < labels.size(); ++i) {
