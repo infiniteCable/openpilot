@@ -128,14 +128,14 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   const float scale_factor = 1.3;       // Erhöhe die Größe um 30 %
   const int panel_width = surface_rect.width() * 0.7;  // 70 % der Breite von rechts aus
   const int panel_margin = 20;          // Abstand vom unteren Rand
-  const int line_height = 60;           // Größere Zeilenhöhe
+  const int line_height = 60;           // Zeilenhöhe
   const int text_margin = 20;           // Abstand innerhalb der Spalten
   const int column_spacing = panel_width / 2 + 20;  // Abstand zwischen den beiden Spalten (+20 px zusätzliche Lücke)
   const int label_width = 200;          // Breite für Labels
 
-  // Text styling für Labels und Werte
-  QFont bold_font = InterFont(40, QFont::Bold);  // Fett für Labels
-  QFont normal_font = InterFont(40, QFont::Normal);  // Normal für Werte
+  // Text styling
+  p.setPen(Qt::white);
+  p.setFont(InterFont(40, QFont::Bold));  // Schriftgröße entsprechend skaliert
 
   QStringList labels = {
     "Capacity:", "Charge:", "SoC:", "Temperature:",
@@ -163,12 +163,9 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
     int text_y = surface_rect.height() - panel_margin - static_cast<int>((line_height * (4 - row) * scale_factor));
 
     QRect label_rect(text_x, text_y, label_width, static_cast<int>(line_height * scale_factor));
-    p.setFont(bold_font);
-    p.setPen(Qt::white);
     p.drawText(label_rect, Qt::AlignLeft | Qt::AlignVCenter, labels[i]);
 
     QRect value_rect(text_x + label_width + text_margin, text_y, column_spacing - label_width - text_margin, static_cast<int>(line_height * scale_factor));
-    p.setFont(normal_font);
     p.drawText(value_rect, Qt::AlignLeft | Qt::AlignVCenter, values[i]);
   }
 }
