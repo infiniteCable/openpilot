@@ -125,22 +125,30 @@ void HudRenderer::drawText(QPainter &p, int x, int y, const QString &text, int a
 }
 
 void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect) {
-  const float scale_factor = 1.3;       // Erhöhe die Größe um 30 %
+  const float scale_factor = 1.1;       // Skalierung um 20 % kleiner gemacht
   const int panel_width = surface_rect.width() * 0.7;  // 70 % der Breite von rechts aus
   const int panel_margin = 20;          // Abstand vom unteren Rand
-  const int line_height = 54;           // Zeilenhöhe (10% kleiner)
-  const int text_margin = 20;           // Abstand innerhalb der Spalten
-  const int column_spacing = panel_width / 2 + 10;  // Abstand zwischen den beiden Spalten (+10 px zusätzliche Lücke)
-  const int label_width = 200;          // Breite für Labels
+  const int line_height = 48;           // Zeilenhöhe leicht reduziert
+  const int text_margin = 15;           // Abstand innerhalb der Spalten
+  const int column_spacing = panel_width / 2 - 10;  // Kleinere Lücke zwischen den Spalten (-10 px)
+  const int label_width = 250;          // Breite für Labels erweitert
   const int value_width = column_spacing - label_width - text_margin; // Breite für Werte
 
   // Panel position (unterer Rand)
   int x_start = surface_rect.width() - panel_width;
   int y_start = surface_rect.height() - panel_margin - static_cast<int>(line_height * 4 * scale_factor); // 4 Zeilen hoch
 
+  // Hintergrund zeichnen (für das gesamte Panel)
+  QRect panel_rect(x_start, y_start, panel_width, static_cast<int>(line_height * 4 * scale_factor));
+  p.save();
+  p.setBrush(QColor(0, 0, 0, 128)); // Schwarzer Hintergrund mit 50% Transparenz
+  p.setPen(Qt::NoPen);
+  p.drawRoundedRect(panel_rect, 10, 10);
+  p.restore();
+
   // Text styling
   p.setPen(Qt::white);
-  p.setFont(InterFont(36, QFont::Normal));  // Schriftgröße 36 (ca. 10% kleiner)
+  p.setFont(InterFont(40, QFont::Normal));  // Schriftgröße 40
 
   // Labels und Werte
   QStringList labels = {
