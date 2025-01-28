@@ -128,9 +128,9 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   const float scale_factor = 1.3;       // Erhöhe die Größe um 30 %
   const int panel_width = surface_rect.width() * 0.7;  // 70 % der Breite von rechts aus
   const int panel_margin = 20;          // Abstand vom unteren Rand
-  const int line_height = 60;           // Größere Zeilenhöhe
+  const int line_height = 54;           // Zeilenhöhe (10% kleiner)
   const int text_margin = 20;           // Abstand innerhalb der Spalten
-  const int column_spacing = panel_width / 2;  // Abstand zwischen den beiden Spalten
+  const int column_spacing = panel_width / 2 + 10;  // Abstand zwischen den beiden Spalten (+10 px zusätzliche Lücke)
   const int label_width = 200;          // Breite für Labels
   const int value_width = column_spacing - label_width - text_margin; // Breite für Werte
 
@@ -138,6 +138,11 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   int x_start = surface_rect.width() - panel_width;
   int y_start = surface_rect.height() - panel_margin - static_cast<int>(line_height * 4 * scale_factor); // 4 Zeilen hoch
 
+  // Text styling
+  p.setPen(Qt::white);
+  p.setFont(InterFont(36, QFont::Normal));  // Schriftgröße 36 (ca. 10% kleiner)
+
+  // Labels und Werte
   QStringList labels = {
     "Capacity:", "Charge:", "SoC:", "Temperature:",
     "Heater Active:", "Voltage:", "Current:", "Power:"
@@ -167,8 +172,8 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
     QRect label_rect(text_x, text_y, label_width, static_cast<int>(line_height * scale_factor));
     p.drawText(label_rect, Qt::AlignLeft | Qt::AlignVCenter, labels[i]);
 
-    // Wert zeichnen (rechts, in der gleichen Spalte)
+    // Wert zeichnen (links neben dem Label)
     QRect value_rect(text_x + label_width + text_margin, text_y, value_width, static_cast<int>(line_height * scale_factor));
-    p.drawText(value_rect, Qt::AlignRight | Qt::AlignVCenter, values[i]);
+    p.drawText(value_rect, Qt::AlignLeft | Qt::AlignVCenter, values[i]);
   }
 }
