@@ -131,7 +131,7 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   const int line_height = 48;           // Zeilenhöhe
   const int text_margin = 25;           // Abstand zwischen Bezeichner und Wert
   const int column_spacing = panel_width / 2 - 20;  // Abstand zwischen den Spalten
-  const int label_width = 260;          // Breite für Labels
+  const int label_width = 265;          // Breite für Labels
   const int value_width = column_spacing - label_width - text_margin; // Breite für Werte
 
   // Panel position (unterer Rand)
