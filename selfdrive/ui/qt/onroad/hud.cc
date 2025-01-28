@@ -130,13 +130,22 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   const int panel_margin = 20;          // Abstand vom unteren Rand
   const int line_height = 60;           // Größere Zeilenhöhe
   const int text_margin = 20;           // Abstand innerhalb der Spalten
-  const int column_spacing = panel_width / 2;  // Abstand zwischen den beiden Spalten
+  const int column_spacing = panel_width / 2 + 20;  // Abstand zwischen den beiden Spalten (+20 px zusätzliche Lücke)
   const int label_width = 200;          // Breite für Labels
-  const int value_width = column_spacing - label_width - text_margin; // Breite für Werte
 
   // Panel position (unterer Rand)
   int x_start = surface_rect.width() - panel_width;
-  int y_start = surface_rect.height() - panel_margin - static_cast<int>(line_height * 4 * scale_factor); // 4 Zeilen hoch
+  int y_start = surface_rect.height() - panel_margin - static_cast<int>((line_height * 4 * scale_factor)); // 4 Zeilen hoch
+
+  // Hintergrund (Panel) zeichnen
+  QRect panel_rect(x_start, y_start, panel_width, static_cast<int>((line_height * 4 * scale_factor)));
+  p.setBrush(QColor(0, 0, 0, 128)); // Hintergrundfarbe: Schwarz, 50% transparent
+  p.setPen(Qt::NoPen);              // Kein Rand um das Panel
+  p.drawRoundedRect(panel_rect, 10, 10);
+
+  // Text styling für Labels und Werte
+  QFont bold_font = InterFont(40, QFont::Bold);  // Fett für Labels
+  QFont normal_font = InterFont(40, QFont::Normal);  // Normal für Werte
 
   QStringList labels = {
     "Capacity:", "Charge:", "SoC:", "Temperature:",
@@ -163,12 +172,14 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
     int text_x = x_start + column * column_spacing;
     int text_y = y_start + static_cast<int>(row * line_height * scale_factor);
 
-    // Label zeichnen (links)
+    // Label zeichnen (fett)
     QRect label_rect(text_x, text_y, label_width, static_cast<int>(line_height * scale_factor));
+    p.setFont(bold_font);
     p.drawText(label_rect, Qt::AlignLeft | Qt::AlignVCenter, labels[i]);
 
-    // Wert zeichnen (rechts, in der gleichen Spalte)
-    QRect value_rect(text_x + label_width + text_margin, text_y, value_width, static_cast<int>(line_height * scale_factor));
-    p.drawText(value_rect, Qt::AlignRight | Qt::AlignVCenter, values[i]);
+    // Wert zeichnen (normal)
+    QRect value_rect(text_x + label_width + text_margin, text_y, column_spacing - label_width - text_margin, static_cast<int>(line_height * scale_factor));
+    p.setFont(normal_font);
+    p.drawText(value_rect, Qt::AlignLeft | Qt::AlignVCenter, values[i]);
   }
 }
