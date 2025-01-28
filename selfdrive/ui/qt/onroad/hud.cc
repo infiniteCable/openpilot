@@ -138,8 +138,8 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   int y_start = surface_rect.height() - panel_margin - static_cast<int>((line_height * 4 * scale_factor)); // 4 Zeilen hoch
 
   QRect panel_rect(x_start, y_start, panel_width, static_cast<int>((line_height * 4 * scale_factor)));
-  p.setBrush(QColor(0, 0, 0, 128)); // Hintergrundfarbe: Schwarz, 50% transparent
-  p.setPen(Qt::NoPen);              // Kein Rand um das Panel
+  p.setBrush(QColor(0, 0, 0, 128)); // Halbtransparenter Hintergrund (50 % transparent)
+  p.setPen(Qt::NoPen);
   p.drawRoundedRect(panel_rect, 10, 10);
 
   // Text styling für Labels und Werte
@@ -174,6 +174,7 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
     // Label zeichnen (fett)
     QRect label_rect(text_x, text_y, label_width, static_cast<int>(line_height * scale_factor));
     p.setFont(bold_font);
+    p.setPen(Qt::white);
     p.drawText(label_rect, Qt::AlignLeft | Qt::AlignVCenter, labels[i]);
 
     // Wert zeichnen (normal)
