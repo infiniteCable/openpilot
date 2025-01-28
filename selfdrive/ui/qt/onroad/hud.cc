@@ -133,22 +133,6 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   const int column_spacing = panel_width / 2 + 20;  // Abstand zwischen den beiden Spalten (+20 px zusätzliche Lücke)
   const int label_width = 200;          // Breite für Labels
 
-  // Panel position (unterer Rand)
-  int x_start = surface_rect.width() - panel_width;
-  int y_start = surface_rect.height() - panel_margin - static_cast<int>((line_height * 4 * scale_factor)); // 4 Zeilen hoch
-  QRect panel_rect(x_start, y_start, panel_width, static_cast<int>((line_height * 4 * scale_factor)));
-
-  // **HINTERGRUND ZUERST ZEICHNEN**
-  p.save();
-  p.setOpacity(0.5);  // 50% Transparenz für das Panel
-  p.setBrush(Qt::black);
-  p.setPen(Qt::NoPen);
-  p.drawRoundedRect(panel_rect, 10, 10);
-  p.restore();  // Wiederherstellen, damit nachfolgende Elemente volle Deckkraft haben
-
-  // **TEXT MIT VOLLER SICHTBARKEIT**
-  p.setOpacity(1.0);  // Stelle sicher, dass der Text nicht transparent ist
-
   // Text styling für Labels und Werte
   QFont bold_font = InterFont(40, QFont::Bold);  // Fett für Labels
   QFont normal_font = InterFont(40, QFont::Normal);  // Normal für Werte
@@ -175,11 +159,22 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
     int row = i % 4;    // Zeile innerhalb der Spalte
 
     // Position für die aktuelle Spalte und Zeile berechnen
-    int text_x = x_start + column * column_spacing;
-    int text_y = y_start + static_cast<int>(row * line_height * scale_factor);
+    int text_x = surface_rect.width() - panel_width + column * column_spacing;
+    int text_y = surface_rect.height() - panel_margin - static_cast<int>((line_height * (4 - row) * scale_factor));
+
+    QRect cell_rect(text_x, text_y, column_spacing - text_margin, static_cast<int>(line_height * scale_factor));
+
+    // Halbtransparenten Hintergrund für jede Zelle zeichnen
+    p.save();
+    p.setOpacity(0.5);
+    p.setBrush(QColor(0, 0, 0));  // Schwarzer Hintergrund
+    p.setPen(Qt::NoPen);
+    p.drawRoundedRect(cell_rect, 5, 5);
+    p.restore(); // Hintergrund ist jetzt gesetzt, stellen wir Opazität für Text wieder auf 1.0
 
     // Label zeichnen (fett)
     QRect label_rect(text_x, text_y, label_width, static_cast<int>(line_height * scale_factor));
+    p.setOpacity(1.0);  // Text immer voll sichtbar
     p.setFont(bold_font);
     p.setPen(Qt::white);
     p.drawText(label_rect, Qt::AlignLeft | Qt::AlignVCenter, labels[i]);
