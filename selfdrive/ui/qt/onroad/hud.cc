@@ -162,32 +162,12 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
     int text_x = surface_rect.width() - panel_width + column * column_spacing;
     int text_y = surface_rect.height() - panel_margin - static_cast<int>((line_height * (4 - row) * scale_factor));
 
-    // **Label: Hintergrund und Text**
     QRect label_rect(text_x, text_y, label_width, static_cast<int>(line_height * scale_factor));
-
-    // Hintergrund für das Label zeichnen
-    p.save();
-    p.setBrush(QColor(0, 0, 0, 128));  // Halbtransparenter schwarzer Hintergrund
-    p.setPen(Qt::NoPen);
-    p.fillRect(label_rect, p.brush());
-    p.restore();  // Stellt sicher, dass der Text voll sichtbar bleibt
-
-    // Text des Labels
     p.setFont(bold_font);
     p.setPen(Qt::white);
     p.drawText(label_rect, Qt::AlignLeft | Qt::AlignVCenter, labels[i]);
 
-    // **Wert: Hintergrund und Text**
     QRect value_rect(text_x + label_width + text_margin, text_y, column_spacing - label_width - text_margin, static_cast<int>(line_height * scale_factor));
-
-    // Hintergrund für den Wert zeichnen
-    p.save();
-    p.setBrush(QColor(0, 0, 0, 128));  // Halbtransparenter schwarzer Hintergrund
-    p.setPen(Qt::NoPen);
-    p.fillRect(value_rect, p.brush());
-    p.restore();
-
-    // Text des Werts
     p.setFont(normal_font);
     p.drawText(value_rect, Qt::AlignLeft | Qt::AlignVCenter, values[i]);
   }
