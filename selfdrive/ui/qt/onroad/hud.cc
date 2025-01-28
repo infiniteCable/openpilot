@@ -138,13 +138,17 @@ void HudRenderer::drawBatteryDetailsPanel(QPainter &p, const QRect &surface_rect
   int y_start = surface_rect.height() - panel_margin - static_cast<int>((line_height * 4 * scale_factor)); // 4 Zeilen hoch
 
   QRect panel_rect(x_start, y_start, panel_width, static_cast<int>((line_height * 4 * scale_factor)));
-  p.setBrush(QColor(0, 0, 0, 128)); // Halbtransparenter Hintergrund (50 % transparent)
+  p.save();                      // Speichere ursprüngliche Painter-Einstellungen
+  p.setOpacity(0.5);             // Setze Transparenz auf 50 %
+  p.setBrush(Qt::black);         // Schwarzer Hintergrund
   p.setPen(Qt::NoPen);
   p.drawRoundedRect(panel_rect, 10, 10);
+  p.restore();                   // Setze den Painter zurück auf ursprüngliche Werte
 
   // Text styling für Labels und Werte
   QFont bold_font = InterFont(40, QFont::Bold);  // Fett für Labels
   QFont normal_font = InterFont(40, QFont::Normal);  // Normal für Werte
+  p.setOpacity(1.0);             // Setze Text wieder auf volle Sichtbarkeit
 
   QStringList labels = {
     "Capacity:", "Charge:", "SoC:", "Temperature:",
