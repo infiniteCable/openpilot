@@ -37,6 +37,18 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
+      "EnableCurvatureCorrection",
+      tr("Enable Curvature Correction"),
+      tr("Correct the curvature based on the actual vehicle movement, assuming that the model path is correct but the model curvature does not correctly represent reality."),
+      "../assets/img_chffr_wheel.png",
+    },
+    {
+      "EnableDisturbanceCorrection",
+      tr("Enable Disturbance Correction"),
+      tr("Correct external disturbances such as gusts of wind"),
+      "../assets/img_chffr_wheel.png",
+    },
+    {
       "DarkMode",
       tr("Dark Mode"),
       tr("Force brightness to a minimal value."),
