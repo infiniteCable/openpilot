@@ -19,7 +19,7 @@ ALPHA_MAX = 0.4
 # 4.2) delayed car reaction is scaled with true PID kp to correct quasi static model error behaviour
 
 class LatControlCurvaturePID(LatControl):
-  def __init__(self, CP, CI):
+  def __init__(self, CP, CI, curv_model_correction, curv_disturbance_correction):
     super().__init__(CP, CI)
     self.pid = PIDController((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV),
                              (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),
@@ -30,6 +30,8 @@ class LatControlCurvaturePID(LatControl):
     self.desired_curvature_prev = 0.
     self.lowpass_filtered = 0.0
     self.alpha_prev = ALPHA_MIN
+    self.curv_model_correction = curv_model_correction
+    self.curv_disturbance_correction = curv_disturbance_correction
 
   def compute_dynamic_alpha(self, desired_curvature, desired_curvature_prev, alpha_prev, dt=DT_CTRL, alpha_min=ALPHA_MIN, alpha_max=ALPHA_MAX, A=0.02, n=2.0, beta=3.0, k=2.0):
     d_desired = abs(desired_curvature - desired_curvature_prev) / dt
@@ -69,26 +71,41 @@ class LatControlCurvaturePID(LatControl):
                                                       CS.vEgo, math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), 0.)
       actual_curvature = np.interp(CS.vEgo, [2.0, 5.0], [actual_curvature_vm, actual_curvature_3dof])
 
-      alpha = self.compute_dynamic_alpha(desired_curvature, self.desired_curvature_prev, self.alpha_prev)
-      reaction = self.lowpass_filter(actual_curvature, alpha)
-      self.curvature_hist.append(reaction)
-      disturbance = self.highpass_filter(actual_curvature, reaction)
+      if self.curv_model_correction or self.curv_disturbance_correction:
+        alpha = self.compute_dynamic_alpha(desired_curvature, self.desired_curvature_prev, self.alpha_prev)
+        reaction = self.lowpass_filter(actual_curvature, alpha)
+        self.curvature_hist.append(reaction)
+        disturbance = self.highpass_filter(actual_curvature, reaction)
       
-      correction_factor = 1 / (np.interp(CS.vEgo, self.kpBP, self.kpV) or 1)
+        correction_factor = 1 / (np.interp(CS.vEgo, self.kpBP, self.kpV) or 1)
+        corr_factor_roll = correction_factor if self.curv_model_correction else 0
+        corr_factor_disturbance = correction_factor if self.curv_disturbance_correction else 0
 
-      error = desired_curvature - (self.curvature_hist[0] + (roll_compensation + disturbance) * correction_factor)
-      output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
+        curvature_reference = self.curvature_hist[0] if self.curv_model_correction else desired_curvature
+      
+        error = desired_curvature - (curvature_reference + roll_compensation * corr_factor_roll + disturbance * corr_factor_disturbance)
+        output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
 
-      self.desired_curvature_prev = desired_curvature
-      self.alpha_prev = alpha
+        self.desired_curvature_prev = desired_curvature
+        self.alpha_prev = alpha
 
-      curvature_log.p = float(np.float32(self.pid.p))
-      curvature_log.i = float(np.float32(self.pid.i))
-      curvature_log.f = float(np.float32(self.pid.f))
-      curvature_log.saturated = bool(self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False))
-      curvature_log.error = float(np.float32(error))
-      curvature_log.desiredCurvature = float(np.float32(desired_curvature))
-      curvature_log.actualCurvature = float(np.float32(actual_curvature))
-      curvature_log.output = float(np.float32(output_curvature))
+        curvature_log.p = float(np.float32(self.pid.p))
+        curvature_log.i = float(np.float32(self.pid.i))
+        curvature_log.f = float(np.float32(self.pid.f))
+        curvature_log.saturated = bool(self._check_saturation(abs(desired_curvature - output_curvature) < 1e-5, CS, False))
+        curvature_log.error = float(np.float32(error))
+        curvature_log.desiredCurvature = float(np.float32(desired_curvature))
+        curvature_log.actualCurvature = float(np.float32(actual_curvature))
+        curvature_log.output = float(np.float32(output_curvature))
+
+      else:
+        output_curvature = desired_curvature
+        error = abs(actual_curvature - output_curvature)
+        
+        curvature_log.saturated = bool(self._check_saturation(error < 1e-5, CS, False))
+        curvature_log.error = float(np.float32(error))
+        curvature_log.desiredCurvature = float(np.float32(desired_curvature))
+        curvature_log.actualCurvature = float(np.float32(actual_curvature))
+        curvature_log.output = float(np.float32(output_curvature))
 
     return 0, 0.0, float(output_curvature), curvature_log
