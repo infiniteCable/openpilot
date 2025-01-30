@@ -42,6 +42,9 @@ class Controls:
                                    'driverMonitoringState', 'onroadEvents', 'driverAssistance'], poll='selfdriveState')
     self.pm = messaging.PubMaster(['carControl', 'controlsState'])
 
+    self.curv_model_correction = self.params.get("EnableCurvatureCorrection")
+    self.curv_disturbance_correction = self.params.get("EnableDisturbanceCorrection")
+
     self.steer_limited = False
     self.desired_curvature = 0.0
 
@@ -54,7 +57,7 @@ class Controls:
     if self.CP.steerControlType == car.CarParams.SteerControlType.angle:
       self.LaC = LatControlAngle(self.CP, self.CI)
     elif self.CP.steerControlType == car.CarParams.SteerControlType.curvatureDEPRECATED:
-      self.LaC = LatControlCurvaturePID(self.CP, self.CI)
+      self.LaC = LatControlCurvaturePID(self.CP, self.CI, self.curv_model_correction, self.curv_disturbance_correction)
     elif self.CP.lateralTuning.which() == 'pid':
       self.LaC = LatControlPID(self.CP, self.CI)
     elif self.CP.lateralTuning.which() == 'torque':
@@ -115,8 +118,8 @@ class Controls:
     # Steering PID loop and lateral MPC
     self.desired_curvature = clip_curvature(CS.vEgo, self.desired_curvature, model_v2.action.desiredCurvature)
     steer, steeringAngleDeg, curvature, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
-                                                                                                self.steer_limited, self.desired_curvature,
-                                                                                                self.calibrated_pose) # TODO what if not available
+                                                                  self.steer_limited, self.desired_curvature,
+                                                                  self.calibrated_pose) # TODO what if not available
     actuators.curvature = float(curvature)
     actuators.steer = float(steer)
     actuators.steeringAngleDeg = float(steeringAngleDeg)
