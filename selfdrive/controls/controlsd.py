@@ -42,8 +42,8 @@ class Controls:
                                    'driverMonitoringState', 'onroadEvents', 'driverAssistance'], poll='selfdriveState')
     self.pm = messaging.PubMaster(['carControl', 'controlsState'])
 
-    self.curv_model_correction = self.params.get("EnableCurvatureCorrection")
-    self.curv_disturbance_correction = self.params.get("EnableDisturbanceCorrection")
+    self.curv_model_correction = self.params.get_bool("EnableCurvatureCorrection")
+    self.curv_disturbance_correction = self.params.get_bool("EnableDisturbanceCorrection")
 
     self.steer_limited = False
     self.desired_curvature = 0.0
