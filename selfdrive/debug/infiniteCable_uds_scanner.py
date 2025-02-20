@@ -3,6 +3,7 @@
 import struct
 import time
 from opendbc.car.uds import UdsClient, MessageTimeoutError, NegativeResponseError
+from opendbc.safety import Safety
 from panda import Panda
 
 # Radar ECU-Adresse
@@ -26,8 +27,8 @@ if __name__ == "__main__":
   print("[INFO] Starting UDS Scan on Continental Radar...")
 
   panda = Panda()
-  panda.set_safety_mode(Panda.SAFETY_ELM327)  # Freier Zugriff auf UDS
-  bus = 1 if panda.has_obd() else 0  # Wähle den richtigen CAN-Bus
+  panda.set_safety_mode(Safety.SAFETY_ELM327)
+  bus = 0 #1 if panda.has_obd() else 0  # Wähle den richtigen CAN-Bus
 
   uds_client = UdsClient(panda, RADAR_CAN_ADDR, RADAR_CAN_ADDR + RX_OFFSET, bus, timeout=0.2)
 
