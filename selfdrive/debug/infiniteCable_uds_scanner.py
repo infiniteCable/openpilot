@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
   panda = Panda()
   panda.set_safety_mode(Safety.SAFETY_ELM327)
-  bus = 0 #1 if panda.has_obd() else 0  # Wähle den richtigen CAN-Bus
+  bus = 1 if panda.has_obd() else 0  # Wähle den richtigen CAN-Bus
 
   uds_client = UdsClient(panda, RADAR_CAN_ADDR, RADAR_CAN_ADDR + RX_OFFSET, bus, timeout=0.2)
 
