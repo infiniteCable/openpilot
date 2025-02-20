@@ -48,8 +48,8 @@ CameraBuf::~CameraBuf() {
   }
 }
 
-bool CameraBuf::acquire(int expo_time) {
-  if (!safe_queue.try_pop(cur_buf_idx, 50)) return false;
+bool CameraBuf::acquire() {
+  if (!safe_queue.try_pop(cur_buf_idx, 0)) return false;
 
   if (frame_metadata[cur_buf_idx].frame_id == -1) {
     LOGE("no frame data? wtf");
@@ -90,7 +90,7 @@ kj::Array<uint8_t> get_raw_frame_image(const CameraBuf *b) {
   return kj::mv(frame_image);
 }
 
-float set_exposure_target(const CameraBuf *b, Rect ae_xywh, int x_skip, int y_skip) {
+float calculate_exposure_value(const CameraBuf *b, Rect ae_xywh, int x_skip, int y_skip) {
   int lum_med;
   uint32_t lum_binning[256] = {0};
   const uint8_t *pix_ptr = b->cur_yuv_buf->y;
