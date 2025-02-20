@@ -10,7 +10,7 @@ from panda import Panda
 
 # Radar ECU-Adresse
 RADAR_CAN_ADDR = 0x757  # Dein Radar
-RX_OFFSET = 0x8A  # Antwort-Offset kann variieren
+RX_OFFSET = 0x6A  # Antwort-Offset kann variieren
 
 # Bekannte Security Access Passphrase
 SECURITY_ACCESS_KEY = 0x4E37  # Hex für 20103 (sofern statisch)
