@@ -12,6 +12,7 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"AthenadPid", PERSISTENT},
     {"AthenadUploadQueue", PERSISTENT},
     {"AthenadRecentlyViewedRoutes", PERSISTENT},
+	{"BatteryDetails", PERSISTENT},
     {"BootCount", PERSISTENT},
     {"CalibrationParams", PERSISTENT},
     {"CameraDebugExpGain", CLEAR_ON_MANAGER_START},
