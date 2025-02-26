@@ -39,10 +39,17 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
     {
       "EnableCurvatureCorrection",
       tr("Enable Curvature Correction"),
-      tr("Correct the curvature based on the actual vehicle movement, assuming that the model path is correct but the model curvature does not correctly represent reality.<br>"
-         "Also enables roll compensation.<br><br>"
+      tr("Correct the curvature based on the actual vehicle movement, assuming that the model path is correct but the model curvature does not correctly represent reality.<br><br>"
          "Switching has no effect while onroad.<br>"
-         "Disabling this and the switch for Disturbance Correction enables steering through raw curvature."),
+         "Disabling this, Roll Compensation and Disturbance Correction enables steering through raw curvature."),
+      "../assets/img_chffr_wheel.png",
+    },
+    {
+      "EnableRollCorrection",
+      tr("Enable Roll Compensation"),
+      tr("Enables roll compensation.<br><br>"
+         "Switching has no effect while onroad.<br>"
+         "Disabling this, Curvature Correction and Disturbance Correction enables steering through raw curvature."),
       "../assets/img_chffr_wheel.png",
     },
     {
@@ -50,7 +57,7 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       tr("Enable Disturbance Correction"),
       tr("Correct external disturbances such as gusts of wind. (distinguishable short term events)<br><br>"
          "Switching has no effect while onroad.<br>"
-         "Disabling this and the switch for Curvature Correction enables steering through raw curvature."),
+         "Disabling this, Roll Compensation and Curvature Correction enables steering through raw curvature."),
       "../assets/img_chffr_wheel.png",
     },
     {
