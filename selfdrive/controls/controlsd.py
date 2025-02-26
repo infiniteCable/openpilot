@@ -44,6 +44,7 @@ class Controls:
 
     self.curv_model_correction = self.params.get_bool("EnableCurvatureCorrection")
     self.curv_disturbance_correction = self.params.get_bool("EnableDisturbanceCorrection")
+    self.curv_roll_correction = self.params.get_bool("EnableRollCorrection")
 
     self.steer_limited = False
     self.desired_curvature = 0.0
@@ -57,7 +58,7 @@ class Controls:
     if self.CP.steerControlType == car.CarParams.SteerControlType.angle:
       self.LaC = LatControlAngle(self.CP, self.CI)
     elif self.CP.steerControlType == car.CarParams.SteerControlType.curvatureDEPRECATED:
-      self.LaC = LatControlCurvaturePID(self.CP, self.CI, self.curv_model_correction, self.curv_disturbance_correction)
+      self.LaC = LatControlCurvaturePID(self.CP, self.CI, self.curv_model_correction, self.curv_disturbance_correction, self.curv_roll_correction)
     elif self.CP.lateralTuning.which() == 'pid':
       self.LaC = LatControlPID(self.CP, self.CI)
     elif self.CP.lateralTuning.which() == 'torque':
