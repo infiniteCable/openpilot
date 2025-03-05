@@ -52,7 +52,7 @@ class LatControlCurvaturePID(LatControl):
   def highpass_filter(self, current_value, lowpass_value):
     return current_value - lowpass_value
 
-  def update(self, active, CS, VM, params, steer_limited, desired_curvature, calibrated_pose):
+  def update(self, active, CS, VM, params, steer_limited_by_controls, desired_curvature, calibrated_pose, curvature_limited):
     curvature_log = log.ControlsState.LateralCurvatureState.new_message()
     if not active:
       output_curvature = 0.0
@@ -94,7 +94,7 @@ class LatControlCurvaturePID(LatControl):
         curvature_log.p = float(np.float32(self.pid.p))
         curvature_log.i = float(np.float32(self.pid.i))
         curvature_log.f = float(np.float32(self.pid.f))
-        curvature_log.saturated = bool(self._check_saturation(abs(actual_curvature - output_curvature) < 1e-5, CS, False))
+        curvature_log.saturated = bool(self._check_saturation(abs(actual_curvature - output_curvature) < 1e-5, CS, False, curvature_limited))
         curvature_log.error = float(np.float32(error))
         curvature_log.desiredCurvature = float(np.float32(desired_curvature))
         curvature_log.actualCurvature = float(np.float32(actual_curvature))
@@ -104,7 +104,7 @@ class LatControlCurvaturePID(LatControl):
         output_curvature = desired_curvature
         error = abs(actual_curvature - output_curvature)
         
-        curvature_log.saturated = bool(self._check_saturation(error < 1e-5, CS, False))
+        curvature_log.saturated = bool(self._check_saturation(error < 1e-5, CS, False, curvature_limited))
         curvature_log.error = float(np.float32(error))
         curvature_log.desiredCurvature = float(np.float32(desired_curvature))
         curvature_log.actualCurvature = float(np.float32(actual_curvature))
