@@ -98,6 +98,8 @@ class Controls:
 
     if self.sm['onroadEvents'].contains(EventName.lateralOnly) and self.lateral_only_allowed:
       self.lateral_only_mode = True
+    if not CC.enabled:
+      self.lateral_only_mode = False
 
     # Check which actuators can be enabled
     standstill = abs(CS.vEgo) <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
