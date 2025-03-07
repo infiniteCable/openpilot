@@ -35,10 +35,6 @@ class StateMachine:
       else:
         # ENABLED
         if self.state == State.enabled:
-
-          if events.contains(EventName.lateralOnly):
-            self.state = State.enabled
-            self.current_alert_types.append(ET.WARNING) 
           
           if events.contains(ET.SOFT_DISABLE):
             self.state = State.softDisabling
