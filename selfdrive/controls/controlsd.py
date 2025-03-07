@@ -24,6 +24,7 @@ from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import get_T
 State = log.SelfdriveState.OpenpilotState
 LaneChangeState = log.LaneChangeState
 LaneChangeDirection = log.LaneChangeDirection
+EventName = log.OnroadEvent.EventName
 
 ACTUATOR_FIELDS = tuple(car.CarControl.Actuators.schema.fields.keys())
 
@@ -96,7 +97,7 @@ class Controls:
     CC = car.CarControl.new_message()
     CC.enabled = self.sm['selfdriveState'].enabled
 
-    if any(e.name == log.OnroadEvent.EventName.lateralOnly for e in self.sm['onroadEvents']) and self.lateral_only_allowed:
+    if any(e.name == EventName.lateralOnly for e in self.sm['onroadEvents']) and self.lateral_only_allowed:
       self.lateral_only_mode = True
     if not CC.enabled:
       self.lateral_only_mode = False
