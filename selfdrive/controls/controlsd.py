@@ -45,6 +45,8 @@ class Controls:
     self.curv_model_correction = self.params.get_bool("EnableCurvatureCorrection")
     self.curv_disturbance_correction = self.params.get_bool("EnableDisturbanceCorrection")
     self.curv_roll_correction = self.params.get_bool("EnableRollCorrection")
+    self.lateral_only_allowed = self.params.get_bool("DontDisengageLatOnBrake")
+    self.lateral_only_mode = False
 
     self.steer_limited_by_controls = False
     self.desired_curvature = 0.0
@@ -94,10 +96,13 @@ class Controls:
     CC = car.CarControl.new_message()
     CC.enabled = self.sm['selfdriveState'].enabled
 
+    if self.sm['onroadEvents'].contains(EventName.lateralOnly):
+      self.lateral_only_mode = True
+
     # Check which actuators can be enabled
     standstill = abs(CS.vEgo) <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
     CC.latActive = self.sm['selfdriveState'].active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and not standstill
-    CC.longActive = CC.enabled and not any(e.overrideLongitudinal for e in self.sm['onroadEvents']) and self.CP.openpilotLongitudinalControl
+    CC.longActive = CC.enabled and not self.lateral_only_mode and not any(e.overrideLongitudinal for e in self.sm['onroadEvents']) and self.CP.openpilotLongitudinalControl
 
     actuators = CC.actuators
     actuators.longControlState = self.LoC.long_control_state
