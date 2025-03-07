@@ -38,6 +38,13 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
+      "DontDisengageLatOnBrake",
+      tr("Do not disengage Lateral on Brake"),
+      tr("When enabled, any braking will not disengage lateral control of openpilot.<br>"
+         "Openpilot must be reengaged to reenable longitudinal control."),
+      "../assets/offroad/icon_disengage_on_accelerator.svg",
+    },
+    {
       "EnableCurvatureCorrection",
       tr("Enable Curvature Correction"),
       tr("Correct the curvature based on the actual vehicle movement, assuming that the model path is correct but the model curvature does not correctly represent reality.<br><br>"
