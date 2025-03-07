@@ -96,7 +96,7 @@ class Controls:
     CC = car.CarControl.new_message()
     CC.enabled = self.sm['selfdriveState'].enabled
 
-    if self.sm['onroadEvents'].contains(EventName.lateralOnly) and self.lateral_only_allowed:
+    if any(e.name == EventName.lateralOnly for e in self.sm['onroadEvents']) and self.lateral_only_allowed:
       self.lateral_only_mode = True
     if not CC.enabled:
       self.lateral_only_mode = False
