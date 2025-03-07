@@ -35,7 +35,6 @@ class StateMachine:
       else:
         # ENABLED
         if self.state == State.enabled:
-          
           if events.contains(ET.SOFT_DISABLE):
             self.state = State.softDisabling
             self.soft_disable_timer = int(SOFT_DISABLE_TIME / DT_CTRL)
