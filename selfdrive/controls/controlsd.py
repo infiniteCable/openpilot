@@ -102,6 +102,8 @@ class Controls:
     if not CC.enabled:
       self.lateral_only_mode = False
 
+    CC.lateralOnly = self.lateral_only_mode
+
     # Check which actuators can be enabled
     standstill = abs(CS.vEgo) <= max(self.CP.minSteerSpeed, MIN_LATERAL_CONTROL_SPEED) or CS.standstill
     CC.latActive = self.sm['selfdriveState'].active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and not standstill
