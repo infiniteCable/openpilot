@@ -377,7 +377,7 @@ EVENTS: dict[int, dict[str, Alert | AlertCallbackType]] = {
     ET.WARNING: Alert(
         "Lateral Control Only",
         "Longitudinal Control Disabled Until reengagement",
-        AlertStatus.userPrompt, AlertSize.mid,
+        AlertStatus.userPrompt, AlertSize.small,
         Priority.MID, VisualAlert.none, AudibleAlert.none, 2.),
   },
 
