@@ -98,9 +98,9 @@ class Controls:
     CC.enabled = self.sm['selfdriveState'].enabled
 
     if any(e.name == EventName.lateralOnly for e in self.sm['onroadEvents']) and self.lateral_only_allowed:
-      self.lateral_only_mode = True
-    if not CC.enabled:
-      self.lateral_only_mode = False
+      self.lateral_only_mode = True # e.g. enabled on brake
+    if not CC.enabled or any(e.name == EventName.buttonEnable for e in self.sm['onroadEvents']):
+      self.lateral_only_mode = False # lateral only disabled on disabling OP or user reengagement
 
     CC.lateralOnly = self.lateral_only_mode
 
