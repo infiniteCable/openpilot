@@ -191,6 +191,8 @@ class Controls:
       if self.CP.steerControlType == car.CarParams.SteerControlType.angle:
         self.steer_limited_by_controls = abs(CC.actuators.steeringAngleDeg - CO.actuatorsOutput.steeringAngleDeg) > \
                                               STEER_ANGLE_SATURATION_THRESHOLD
+      elif self.CP.steerControlType == car.CarParams.SteerControlType.curvatureDEPRECATED:
+        self.steer_limited_by_controls = abs(CC.actuators.curvature - CC.currentCurvature) > 1e-5
       else:
         self.steer_limited_by_controls = abs(CC.actuators.torque - CO.actuatorsOutput.torque) > 1e-2
 
