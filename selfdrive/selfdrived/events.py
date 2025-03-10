@@ -374,11 +374,11 @@ EVENTS: dict[int, dict[str, Alert | AlertCallbackType]] = {
   },
 
   EventName.lateralOnly: {
-    ET.ENABLE: Alert(
+    ET.WARNING: Alert(
         "Lateral Control Only",
         "Longitudinal Control Disabled Until reengagement",
         AlertStatus.userPrompt, AlertSize.small,
-        Priority.MID, VisualAlert.none, AudibleAlert.none, 2.),
+        Priority.LOW, VisualAlert.none, AudibleAlert.prompt, 2.),
   },
 
   EventName.longitudinalManeuver: {
