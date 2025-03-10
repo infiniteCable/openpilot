@@ -184,7 +184,7 @@ class SelfdriveD:
         
       if (CS.brakePressed and (not self.CS_prev.brakePressed or not CS.standstill)) or \
         (CS.regenBraking and (not self.CS_prev.regenBraking or not CS.standstill)):
-        if self.lateral_only_allowed and self.enabled:
+        if self.lateral_only_allowed and self.enabled and not self.events.contains(EventName.preEnableStandstill):
           self.events.add(EventName.lateralOnly)
         else:
           self.events.add(EventName.pedalPressed)
