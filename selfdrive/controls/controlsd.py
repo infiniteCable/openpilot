@@ -131,7 +131,7 @@ class Controls:
 
     # Steering PID loop and lateral MPC
     #self.desired_curvature, curvature_limited  = clip_curvature(CS.vEgo, self.desired_curvature, model_v2.action.desiredCurvature, lp.roll)
-    self.desired_curvature, curvature_limited = self.lateral_iso_controller.update(CS.vEgo, model_v2.action.desiredCurvature, lp.roll, CS.steeringPressed)
+    self.desired_curvature, curvature_limited = self.lateral_iso_controller.update(CS.vEgo, model_v2.action.desiredCurvature, CC.currentCurvature, lp.roll, CS.steeringPressed)
     steer, steeringAngleDeg, curvature, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
                                                                   self.steer_limited_by_controls, self.desired_curvature,
                                                                   self.calibrated_pose, curvature_limited) # TODO what if not available
