@@ -51,7 +51,7 @@ class LateralISOController:
     if iso_limit_exceeded:
       if lateral_user_override:
         # Während Override: Nutze die tatsächliche Krümmung, aber begrenze sie maximal auf `new_curvature`
-        new_curvature = min(abs(current_curvature), abs(new_curvature)) * np.sign(new_curvature)
+        new_curvature = np.clip(current_curvature, -abs(new_curvature), abs(new_curvature))
         self.soft_limit_active = False  # Soft Limit deaktivieren
         self.override_last = True # Override hat stattgefunden
       else:
