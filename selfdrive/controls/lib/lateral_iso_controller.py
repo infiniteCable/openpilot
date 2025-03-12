@@ -24,14 +24,16 @@ class LateralISOController:
     self.soft_limit_active = False
     self.soft_limit_counter = 0
     self.soft_limit_start_curvature = 0.0
+    self.override_last = False
 
   def reset(self):
     self.prev_curvature = 0.0
     self.soft_limit_active = False
     self.soft_limit_counter = 0
     self.soft_limit_start_curvature = 0.0
+    self.override_last = False
   
-  def update(self, v_ego, new_curvature, roll, lateral_user_override):
+  def update(self, v_ego, new_curvature, current_curvature, roll, lateral_user_override):
     v_ego = max(v_ego, MIN_SPEED)
     max_curvature_rate = MAX_LATERAL_JERK / (v_ego ** 2)
     
@@ -42,39 +44,37 @@ class LateralISOController:
     roll_compensation = roll * ACCELERATION_DUE_TO_GRAVITY
     max_lat_accel = MAX_LATERAL_ACCEL_NO_ROLL + roll_compensation
     min_lat_accel = -MAX_LATERAL_ACCEL_NO_ROLL + roll_compensation
-    
-    iso_limit_exceeded = abs(new_curvature * v_ego ** 2) > max_lat_accel
 
-    # Falls das ISO-Limit nicht mehr überschritten wird -> Soft Limit deaktivieren
-    if not iso_limit_exceeded:
-      self.soft_limit_active = False
-      self.soft_limit_counter = 0  # Counter zurücksetzen
+    iso_limit = max_lat_accel / (v_ego ** 2)  # Berechnung des ISO-Limits
+    iso_limit_exceeded = abs(new_curvature) > iso_limit
 
-    # Falls der Fahrer eingreift und das Limit überschritten ist
-    if lateral_user_override and iso_limit_exceeded and not self.soft_limit_active:
-      self.soft_limit_active = True
-      self.soft_limit_counter = 0
-      self.soft_limit_start_curvature = self.prev_curvature
-    
-    # Falls Soft Limit aktiv ist, weiche Interpolation
-    if self.soft_limit_active:
-      self.soft_limit_counter += 1
-      alpha = min(1.0, self.soft_limit_counter / SOFT_LIMIT_STEPS)
-
-      # Die Krümmung sanft in Richtung `new_curvature` bringen
-      target_curvature = (1 - alpha) * self.soft_limit_start_curvature + alpha * new_curvature
-      new_curvature = target_curvature
-
-      # Nach Ablauf des Timers wird das Soft Limit deaktiviert
-      if self.soft_limit_counter >= SOFT_LIMIT_STEPS:
-        self.soft_limit_active = False
-        self.soft_limit_counter = 0  # Rücksetzen
-    
-    # Falls kein Soft Limit aktiv ist, Clipping nach ISO 11270
+    if lateral_user_override:
+      # Während Override: Nutze die tatsächliche Krümmung, aber begrenze sie maximal auf `new_curvature`
+      adjusted_curvature = min(abs(current_curvature), abs(new_curvature)) * np.sign(new_curvature)
+      new_curvature = np.clip(adjusted_curvature, -iso_limit, iso_limit)
+      self.soft_limit_active = False  # Soft Limit deaktivieren
+      self.override_last = True # Override hat stattgefunden
     else:
-      new_curvature = np.clip(new_curvature, min_lat_accel / v_ego ** 2, max_lat_accel / v_ego ** 2)
-    
+      # Falls kein Override mehr -> sanft auf ISO-Limit zurückfahren
+      if self.override_last and iso_limit_exceeded:
+        if not self.soft_limit_active:
+          self.soft_limit_active = True
+          self.soft_limit_counter = 0
+          self.soft_limit_start_curvature = self.prev_curvature
+
+        self.soft_limit_counter += 1
+        alpha = min(1.0, self.soft_limit_counter / SOFT_LIMIT_STEPS)
+        target_curvature = (1 - alpha) * self.soft_limit_start_curvature + alpha * np.clip(new_curvature, -iso_limit, iso_limit)
+        new_curvature = target_curvature
+
+        if self.soft_limit_counter >= SOFT_LIMIT_STEPS:
+          self.soft_limit_active = False
+          self.override_last = False
+      else:
+        # Falls keine Limitüberschreitung mehr -> Soft Limit deaktivieren
+        self.soft_limit_active = False
+
     new_curvature, limited_max_curv = np.clip(new_curvature, -MAX_CURVATURE, MAX_CURVATURE), abs(new_curvature) > MAX_CURVATURE
-    
+
     self.prev_curvature = new_curvature
     return float(new_curvature), limited_max_curv or iso_limit_exceeded
