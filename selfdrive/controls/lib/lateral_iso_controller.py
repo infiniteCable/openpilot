@@ -48,16 +48,15 @@ class LateralISOController:
     iso_limit = max_lat_accel / (v_ego ** 2)  # Berechnung des ISO-Limits
     iso_limit_exceeded = abs(new_curvature) > iso_limit
 
-    if lateral_user_override:
-      # Während Override: Nutze die tatsächliche Krümmung, aber begrenze sie maximal auf `new_curvature`
-      adjusted_curvature = min(abs(current_curvature), abs(new_curvature)) * np.sign(new_curvature)
-      new_curvature = np.clip(adjusted_curvature, -iso_limit, iso_limit)
-      self.soft_limit_active = False  # Soft Limit deaktivieren
-      self.override_last = True # Override hat stattgefunden
-    else:
-      # Falls kein Override mehr -> sanft auf ISO-Limit zurückfahren, aber nur wenn das Limit überschritten wurde
-      if self.override_last:
-        if iso_limit_exceeded:
+    if iso_limit_exceeded:
+      if lateral_user_override:
+        # Während Override: Nutze die tatsächliche Krümmung, aber begrenze sie maximal auf `new_curvature`
+        new_curvature = min(abs(current_curvature), abs(new_curvature)) * np.sign(new_curvature)
+        self.soft_limit_active = False  # Soft Limit deaktivieren
+        self.override_last = True # Override hat stattgefunden
+      else:
+        # Falls kein Override mehr -> sanft auf ISO-Limit zurückfahren, aber nur wenn das Limit überschritten wurde
+        if self.override_last:
           if not self.soft_limit_active:
             self.soft_limit_active = True
             self.soft_limit_counter = 0
@@ -72,9 +71,12 @@ class LateralISOController:
             self.soft_limit_active = False
             self.override_last = False
         else:
-          # Falls keine Limitüberschreitung mehr -> Soft Limit deaktivieren
-          self.soft_limit_active = False
-          self.override_last = False
+          new_curvature = np.clip(new_curvature, -iso_limit, iso_limit)
+          
+    else:
+      # Falls keine Limitüberschreitung mehr -> Soft Limit deaktivieren
+      self.soft_limit_active = False
+      self.override_last = False
 
     new_curvature, limited_max_curv = np.clip(new_curvature, -MAX_CURVATURE, MAX_CURVATURE), abs(new_curvature) > MAX_CURVATURE
 
