@@ -55,24 +55,26 @@ class LateralISOController:
       self.soft_limit_active = False  # Soft Limit deaktivieren
       self.override_last = True # Override hat stattgefunden
     else:
-      # Falls kein Override mehr -> sanft auf ISO-Limit zurückfahren
-      if self.override_last and iso_limit_exceeded:
-        if not self.soft_limit_active:
-          self.soft_limit_active = True
-          self.soft_limit_counter = 0
-          self.soft_limit_start_curvature = self.prev_curvature
+      # Falls kein Override mehr -> sanft auf ISO-Limit zurückfahren, aber nur wenn das Limit überschritten wurde
+      if self.override_last:
+        if iso_limit_exceeded:
+          if not self.soft_limit_active:
+            self.soft_limit_active = True
+            self.soft_limit_counter = 0
+            self.soft_limit_start_curvature = self.prev_curvature
 
-        self.soft_limit_counter += 1
-        alpha = min(1.0, self.soft_limit_counter / SOFT_LIMIT_STEPS)
-        target_curvature = (1 - alpha) * self.soft_limit_start_curvature + alpha * np.clip(new_curvature, -iso_limit, iso_limit)
-        new_curvature = target_curvature
+          self.soft_limit_counter += 1
+          alpha = min(1.0, self.soft_limit_counter / SOFT_LIMIT_STEPS)
+          target_curvature = (1 - alpha) * self.soft_limit_start_curvature + alpha * np.clip(new_curvature, -iso_limit, iso_limit)
+          new_curvature = target_curvature
 
-        if self.soft_limit_counter >= SOFT_LIMIT_STEPS:
+          if self.soft_limit_counter >= SOFT_LIMIT_STEPS:
+            self.soft_limit_active = False
+            self.override_last = False
+        else:
+          # Falls keine Limitüberschreitung mehr -> Soft Limit deaktivieren
           self.soft_limit_active = False
           self.override_last = False
-      else:
-        # Falls keine Limitüberschreitung mehr -> Soft Limit deaktivieren
-        self.soft_limit_active = False
 
     new_curvature, limited_max_curv = np.clip(new_curvature, -MAX_CURVATURE, MAX_CURVATURE), abs(new_curvature) > MAX_CURVATURE
 
