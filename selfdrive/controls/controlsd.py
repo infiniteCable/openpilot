@@ -20,6 +20,7 @@ from openpilot.selfdrive.controls.lib.latcontrol_torque import LatControlTorque
 from openpilot.selfdrive.controls.lib.longcontrol import LongControl
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import get_T_FOLLOW
+from openpilot.selfdrive.controls.lib.lateral_iso_controller import LateralISOController
 
 State = log.SelfdriveState.OpenpilotState
 LaneChangeState = log.LaneChangeState
@@ -55,6 +56,7 @@ class Controls:
     self.pose_calibrator = PoseCalibrator()
     self.calibrated_pose: Pose | None = None
 
+    self.lateral_iso_controller = LateralISOController()
     self.LoC = LongControl(self.CP)
     self.VM = VehicleModel(self.CP)
     self.LaC: LatControl
@@ -127,7 +129,8 @@ class Controls:
     actuators.accel = float(self.LoC.update(CC.longActive, CS, long_plan.aTarget, long_plan.shouldStop, pid_accel_limits))
 
     # Steering PID loop and lateral MPC
-    self.desired_curvature, curvature_limited  = clip_curvature(CS.vEgo, self.desired_curvature, model_v2.action.desiredCurvature, lp.roll)
+    #self.desired_curvature, curvature_limited  = clip_curvature(CS.vEgo, self.desired_curvature, model_v2.action.desiredCurvature, lp.roll)
+    self.desired_curvature, curvature_limited = self.lateral_iso_controller.update(CS.vEgo, model_v2.action.desiredCurvature, lp.roll, CS.steeringPressed)
     steer, steeringAngleDeg, curvature, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
                                                                   self.steer_limited_by_controls, self.desired_curvature,
                                                                   self.calibrated_pose, curvature_limited) # TODO what if not available
