@@ -152,8 +152,7 @@ class Controls:
 
     lp = self.sm['liveParameters']
     steer_angle_without_offset = math.radians(CS.steeringAngleDeg - lp.angleOffsetDeg)
-    curvature_roll = lp.roll if self.curv_roll_correction else 0.
-    current_curvature = -self.VM.calc_curvature(steer_angle_without_offset, CS.vEgo, curvature_roll)
+    current_curvature = -self.VM.calc_curvature(steer_angle_without_offset, CS.vEgo, 0.)
 
     # Orientation and angle rates can be useful for carcontroller
     # Only calibrated (car) frame is relevant for the carcontroller
