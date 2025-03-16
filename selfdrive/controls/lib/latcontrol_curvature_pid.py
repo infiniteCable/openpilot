@@ -26,7 +26,7 @@ class LatControlCurvaturePID(LatControl):
                              k_f=CP.lateralTuning.pid.kf, pos_limit=0.2, neg_limit=-0.2)
     self.kpBP = CP.lateralTuning.pid.kpBP
     self.kpV = CP.lateralTuning.pid.kpV
-    self.curvature_hist = deque([0.0], maxlen=int(round(CP.steerActuatorDelay / DT_CTRL))+1)
+    #self.curvature_hist = deque([0.0], maxlen=int(round(CP.steerActuatorDelay / DT_CTRL))+1)
     self.desired_curvature_prev = 0.
     self.lowpass_filtered = 0.0
     self.alpha_prev = ALPHA_MIN
@@ -58,8 +58,8 @@ class LatControlCurvaturePID(LatControl):
       output_curvature = 0.0
       curvature_log.active = False
       self.pid.reset()
-      self.curvature_hist.clear()
-      self.curvature_hist.append(0.0)
+      #self.curvature_hist.clear()
+      #self.curvature_hist.append(0.0)
       self.lowpass_filtered = 0.0
       self.desired_curvature_prev = desired_curvature
       self.alpha_prev = ALPHA_MIN
@@ -74,7 +74,7 @@ class LatControlCurvaturePID(LatControl):
       if self.curv_model_correction or self.curv_disturbance_correction or self.curv_roll_correction:
         alpha = self.compute_dynamic_alpha(desired_curvature, self.desired_curvature_prev, self.alpha_prev)
         reaction = self.lowpass_filter(actual_curvature, alpha)
-        self.curvature_hist.append(reaction)
+        #self.curvature_hist.append(reaction)
         disturbance = self.highpass_filter(actual_curvature, reaction)
 
         roll_compensation = -VM.roll_compensation(params.roll, CS.vEgo)
@@ -83,7 +83,8 @@ class LatControlCurvaturePID(LatControl):
         corr_factor_roll = correction_factor if self.curv_roll_correction else 0
         corr_factor_disturbance = correction_factor if self.curv_disturbance_correction else 0
 
-        curvature_reference = self.curvature_hist[0] if self.curv_model_correction else desired_curvature
+        #curvature_reference = self.curvature_hist[0] if self.curv_model_correction else desired_curvature
+        curvature_reference = reaction if self.curv_model_correction else desired_curvature
       
         error = desired_curvature - (curvature_reference + roll_compensation * corr_factor_roll + disturbance * corr_factor_disturbance)
         output_curvature = self.pid.update(error, feedforward=desired_curvature, speed=CS.vEgo)
