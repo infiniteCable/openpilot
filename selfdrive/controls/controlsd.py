@@ -132,6 +132,9 @@ class Controls:
   def publish(self, CC, lac_log):
     CS = self.sm['carState']
 
+    lp = self.sm['liveParameters']
+    CC.rollDEPRECATED = lp.roll
+
     # Orientation and angle rates can be useful for carcontroller
     # Only calibrated (car) frame is relevant for the carcontroller
     if self.calibrated_pose is not None:
