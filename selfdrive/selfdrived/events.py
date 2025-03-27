@@ -373,6 +373,14 @@ EVENTS: dict[int, dict[str, Alert | AlertCallbackType]] = {
     ET.PERMANENT: NormalPermanentAlert("Joystick Mode"),
   },
 
+  EventName.lateralOnly: {
+    ET.WARNING: Alert(
+        "Lateral Control Only",
+        "Longitudinal Control Disabled Until reengagement",
+        AlertStatus.userPrompt, AlertSize.small,
+        Priority.LOW, VisualAlert.none, AudibleAlert.none, 2.),
+  },
+
   EventName.longitudinalManeuver: {
     ET.WARNING: longitudinal_maneuver_alert,
     ET.PERMANENT: NormalPermanentAlert("Longitudinal Maneuver Mode",
