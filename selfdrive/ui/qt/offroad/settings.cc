@@ -38,6 +38,13 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
+      "DontDisengageLatOnBrake",
+      tr("Do not disengage Lateral on Brake"),
+      tr("When enabled, any braking will not disengage lateral control of openpilot.<br>"
+         "Openpilot must be reengaged to reenable longitudinal control."),
+      "../assets/offroad/icon_disengage_on_accelerator.svg",
+    },
+    {
       "IsLdwEnabled",
       tr("Enable Lane Departure Warnings"),
       tr("Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31 mph (50 km/h)."),
