@@ -40,6 +40,9 @@ class Controls:
                                    'driverMonitoringState', 'onroadEvents', 'driverAssistance'], poll='selfdriveState')
     self.pm = messaging.PubMaster(['carControl', 'controlsState'])
 
+    self.lateral_only_allowed = self.params.get_bool("DontDisengageLatOnBrake")
+    self.lateral_only_mode = False
+
     self.steer_limited_by_controls = False
     self.desired_curvature = 0.0
 
@@ -86,12 +89,19 @@ class Controls:
     CC = car.CarControl.new_message()
     CC.enabled = self.sm['selfdriveState'].enabled
 
+    if any(e.name == EventName.lateralOnly for e in self.sm['onroadEvents']) and self.lateral_only_allowed:
+      self.lateral_only_mode = True # e.g. enabled on brake
+    if not CC.enabled or any(e.name == EventName.buttonEnable for e in self.sm['onroadEvents']):
+      self.lateral_only_mode = False # lateral only disabled on disabling OP or user reengagement
+
+    CC.lateralOnly = self.lateral_only_mode
+
     # Check which actuators can be enabled
     standstill = abs(CS.vEgo) <= max(self.CP.minSteerSpeed, 0.3) or CS.standstill
     CC.latActive = self.sm['selfdriveState'].active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                    (not standstill or self.CP.steerAtStandstill)
-    CC.longActive = CC.enabled and not any(e.overrideLongitudinal for e in self.sm['onroadEvents']) and self.CP.openpilotLongitudinalControl
-
+    CC.longActive = CC.enabled and not self.lateral_only_mode and not any(e.overrideLongitudinal for e in self.sm['onroadEvents']) and self.CP.openpilotLongitudinalControl
+    
     actuators = CC.actuators
     actuators.longControlState = self.LoC.long_control_state
 
@@ -146,7 +156,7 @@ class Controls:
 
     speeds = self.sm['longitudinalPlan'].speeds
     if len(speeds):
-      CC.cruiseControl.resume = CC.enabled and CS.cruiseState.standstill and speeds[-1] > 0.1
+      CC.cruiseControl.resume = CC.enabled and CS.cruiseState.standstill and speeds[-1] > 0.1 and not self.lateral_only_mode
 
     hudControl = CC.hudControl
     hudControl.setSpeed = float(CS.vCruiseCluster * CV.KPH_TO_MS)
