@@ -38,10 +38,12 @@ class CarSpecificEvents:
     self.low_speed_alert = False
     self.no_steer_warning = False
     self.silent_steer_warning = True
+    self.lateral_only_mode = False
 
     self.cruise_buttons: deque = deque([], maxlen=HYUNDAI_PREV_BUTTON_SAMPLES)
 
   def update(self, CS: car.CarState, CS_prev: car.CarState, CC: car.CarControl):
+    self.lateral_only_mode = CC.lateralOnly
     if self.CP.brand in ('body', 'mock'):
       events = Events()
 
@@ -236,7 +238,7 @@ class CarSpecificEvents:
     if pcm_enable:
       if CS.cruiseState.enabled and not CS_prev.cruiseState.enabled and allow_enable:
         events.add(EventName.pcmEnable)
-      elif not CS.cruiseState.enabled:
+      elif not CS.cruiseState.enabled and (not self.lateral_only_mode or not CS.cruiseState.available):
         events.add(EventName.pcmDisable)
 
     return events
