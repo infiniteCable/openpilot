@@ -45,6 +45,18 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
+      "DarkMode",
+      tr("Dark Mode"),
+      tr("Force brightness to a minimal value."),
+      "../assets/offroad/icon_disengage_on_accelerator.svg",
+    },
+    {
+      "DisableScreenTimer",
+      tr("Turn onroad screen off after 10 seconds"),
+      tr("the onroad screen is turned of after 10 seconds. It will be temporarily enabled on alerts."),
+      "../assets/offroad/icon_disengage_on_accelerator.svg",
+    },
+    {
       "IsLdwEnabled",
       tr("Enable Lane Departure Warnings"),
       tr("Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31 mph (50 km/h)."),
