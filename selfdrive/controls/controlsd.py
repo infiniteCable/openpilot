@@ -46,6 +46,7 @@ class Controls:
     self.steer_limited_by_controls = False
     self.curvature = 0.0
     self.desired_curvature = 0.0
+    self.roll = 0.0
 
     self.pose_calibrator = PoseCalibrator()
     self.calibrated_pose: Pose | None = None
@@ -80,6 +81,8 @@ class Controls:
     steer_angle_without_offset = math.radians(CS.steeringAngleDeg - lp.angleOffsetDeg)
     self.curvature = -self.VM.calc_curvature(steer_angle_without_offset, CS.vEgo, lp.roll)
 
+    self.roll = lp.roll
+
     # Update Torque Params
     if self.CP.lateralTuning.which() == 'torque':
       torque_params = self.sm['liveTorqueParameters']
@@ -105,7 +108,7 @@ class Controls:
     CC.latActive = self.sm['selfdriveState'].active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                    (not standstill or self.CP.steerAtStandstill)
     CC.longActive = CC.enabled and not self.lateral_only_mode and not any(e.overrideLongitudinal for e in self.sm['onroadEvents']) and self.CP.openpilotLongitudinalControl
-    
+
     actuators = CC.actuators
     actuators.longControlState = self.LoC.long_control_state
 
@@ -149,8 +152,7 @@ class Controls:
   def publish(self, CC, lac_log):
     CS = self.sm['carState']
 
-    lp = self.sm['liveParameters']
-    CC.rollDEPRECATED = lp.roll
+    CC.rollDEPRECATED = self.roll
 
     # Orientation and angle rates can be useful for carcontroller
     # Only calibrated (car) frame is relevant for the carcontroller
