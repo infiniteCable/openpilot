@@ -22,6 +22,7 @@ from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 State = log.SelfdriveState.OpenpilotState
 LaneChangeState = log.LaneChangeState
 LaneChangeDirection = log.LaneChangeDirection
+EventName = log.OnroadEvent.EventName
 
 ACTUATOR_FIELDS = tuple(car.CarControl.Actuators.schema.fields.keys())
 
