@@ -1,3 +1,7 @@
+<b>PLEASE USE: installer.comma.ai/jyoung8607/vw-meb<br>
+https://github.com/jyoung8607/opendbc/tree/vw-meb<br>
+This branch is not being updated and serves as reference</b><br>
+
 THIS PROJECT IS STILL IN PROGRESS
 
 Part 1: Harness build (done at Gateway/J533/ICAS1 which is acc controlling capable) (camera harness also possible for steering only)
