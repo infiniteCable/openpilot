@@ -38,37 +38,6 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
-      "DontDisengageLatOnBrake",
-      tr("Do not disengage Lateral on Brake"),
-      tr("When enabled, any braking will not disengage lateral control of openpilot.<br>"
-         "Openpilot must be reengaged to reenable longitudinal control."),
-      "../assets/offroad/icon_disengage_on_accelerator.svg",
-    },
-    {
-      "EnableCurvatureCorrection",
-      tr("Enable Curvature Correction"),
-      tr("Correct the curvature based on the actual vehicle movement, assuming that the model path is correct but the model curvature does not correctly represent reality.<br><br>"
-         "Switching has no effect while onroad.<br>"
-         "Disabling this, Roll Compensation and Disturbance Correction enables steering through raw curvature."),
-      "../assets/img_chffr_wheel.png",
-    },
-    {
-      "EnableRollCorrection",
-      tr("Enable Roll Compensation"),
-      tr("Enables roll compensation.<br><br>"
-         "Switching has no effect while onroad.<br>"
-         "Disabling this, Curvature Correction and Disturbance Correction enables steering through raw curvature."),
-      "../assets/img_chffr_wheel.png",
-    },
-    {
-      "EnableDisturbanceCorrection",
-      tr("Enable Disturbance Correction"),
-      tr("Correct external disturbances such as gusts of wind. (distinguishable short term events)<br><br>"
-         "Switching has no effect while onroad.<br>"
-         "Disabling this, Roll Compensation and Curvature Correction enables steering through raw curvature."),
-      "../assets/img_chffr_wheel.png",
-    },
-    {
       "DarkMode",
       tr("Dark Mode"),
       tr("Force brightness to a minimal value."),
