@@ -90,4 +90,4 @@ class LatControlTorque(LatControl):
       pid_log.saturated = bool(self._check_saturation(self.steer_max - abs(output_torque) < 1e-3, CS, steer_limited_by_controls, curvature_limited))
 
     # TODO left is positive in this convention
-    return -output_torque, 0.0, 0.0, pid_log
+    return -output_torque, 0.0, pid_log
