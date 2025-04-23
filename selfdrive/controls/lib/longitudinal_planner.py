@@ -69,6 +69,7 @@ class LongitudinalPlanner:
     self.prev_accel_clip = [ACCEL_MIN, ACCEL_MAX]
     self.v_model_error = 0.0
     self.output_a_target = 0.0
+    self.output_v_target = 0.0
     self.output_should_stop = False
 
     self.v_desired_trajectory = np.zeros(CONTROL_N)
@@ -167,8 +168,8 @@ class LongitudinalPlanner:
     self.v_desired_filter.x = self.v_desired_filter.x + self.dt * (self.a_desired + a_prev) / 2.0
 
     action_t =  self.CP.longitudinalActuatorDelay + DT_MDL
-    output_a_target_mpc, output_should_stop_mpc = get_accel_from_plan(self.v_desired_trajectory, self.a_desired_trajectory, CONTROL_N_T_IDX,
-                                                                        action_t=action_t, vEgoStopping=self.CP.vEgoStopping)
+    output_a_target_mpc, output_should_stop_mpc, output_v_target = get_accel_from_plan(self.v_desired_trajectory, self.a_desired_trajectory, CONTROL_N_T_IDX,
+                                                                                       action_t=action_t, vEgoStopping=self.CP.vEgoStopping)
     output_a_target_e2e = sm['modelV2'].action.desiredAcceleration
     output_should_stop_e2e = sm['modelV2'].action.shouldStop
 
@@ -182,6 +183,7 @@ class LongitudinalPlanner:
     for idx in range(2):
       accel_clip[idx] = np.clip(accel_clip[idx], self.prev_accel_clip[idx] - 0.05, self.prev_accel_clip[idx] + 0.05)
     self.output_a_target = np.clip(output_a_target, accel_clip[0], accel_clip[1])
+    self.output_v_target = output_v_target
     self.prev_accel_clip = accel_clip
 
   def publish(self, sm, pm):
@@ -205,6 +207,7 @@ class LongitudinalPlanner:
 
     longitudinalPlan.aTarget = float(self.output_a_target)
     longitudinalPlan.shouldStop = bool(self.output_should_stop)
+    longitudinalPlan.vTarget = float(self.output_v_target)
     longitudinalPlan.allowBrake = True
     longitudinalPlan.allowThrottle = bool(self.allow_throttle)
 
