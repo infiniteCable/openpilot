@@ -1244,6 +1244,7 @@ struct LongitudinalPlan @0xe00b5b3eba12876c {
   speeds @33 :List(Float32);
   jerks @34 :List(Float32);
   aTarget @18 :Float32;
+  vTarget @41 :Float32;
   shouldStop @37: Bool;
   allowThrottle @38: Bool;
   allowBrake @39: Bool;
