@@ -38,6 +38,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
+      "EnableSmoothSteer",
+      tr("Enable Steer Smoothing"),
+      tr("Enables S-curving on lateral control for smoother steering<br>"),
+      "../assets/img_chffr_wheel.png",
+    },
+    {
       "DarkMode",
       tr("Dark Mode"),
       tr("Force brightness to a minimal value."),
