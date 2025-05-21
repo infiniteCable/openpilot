@@ -36,17 +36,19 @@ class VCruiseHelper:
     self.v_cruise_kph_last = 0
     self.button_timers = {ButtonType.decelCruise: 0, ButtonType.accelCruise: 0}
     self.button_change_states = {btn: {"standstill": False, "enabled": False} for btn in self.button_timers}
-
+    self.v_speed_limit_kph = 0
+  
   @property
   def v_cruise_initialized(self):
     return self.v_cruise_kph != V_CRUISE_UNSET
 
-  def update_v_cruise(self, CS, enabled, is_metric):
+  def update_v_cruise(self, CS, enabled, is_metric, speed_limit_control=False):
     self.v_cruise_kph_last = self.v_cruise_kph
 
     if CS.cruiseState.available:
       if not self.CP.pcmCruise:
         # if stock cruise is completely disabled, then we can use our own set speed logic
+        self._update_v_speed_limit(CS, enabled, speed_limit_control)
         self._update_v_cruise_non_pcm(CS, enabled, is_metric)
         self.v_cruise_cluster_kph = self.v_cruise_kph
         self.update_button_timers(CS, enabled)
@@ -62,6 +64,17 @@ class VCruiseHelper:
     else:
       self.v_cruise_kph = V_CRUISE_UNSET
       self.v_cruise_cluster_kph = V_CRUISE_UNSET
+
+  def _update_v_speed_limit(self, CS, enabled, speed_limit_control):
+    if not speed_limit_control: # or not enabled # always set speed limit
+      return
+
+    speed_limit = CS.cruiseState.speedLimit * CV.MS_TO_KPH
+    if speed_limit != self.v_speed_limit_kph:
+      if speed_limit != 0:
+        self.v_cruise_kph = speed_limit
+        self.v_cruise_kph = np.clip(round(self.v_cruise_kph, 1), V_CRUISE_MIN, V_CRUISE_MAX)
+      self.v_speed_limit_kph = speed_limit 
 
   def _update_v_cruise_non_pcm(self, CS, enabled, is_metric):
     # handle button presses. TODO: this should be in state_control, but a decelCruise press
