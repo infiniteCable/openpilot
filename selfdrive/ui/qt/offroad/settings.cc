@@ -38,6 +38,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_disengage_on_accelerator.svg",
     },
     {
+      "EnableSpeedLimitControl",
+      tr("Enable Speed Limit Control"),
+      tr("Enables setting maximum speed by speed limit detection<br>"),
+      "../assets/img_chffr_wheel.png",
+    },
+    {
       "EnableSmoothSteer",
       tr("Enable Steer Smoothing"),
       tr("Enables S-curving on lateral control for smoother steering<br>"),
