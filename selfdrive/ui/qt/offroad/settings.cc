@@ -41,7 +41,13 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "EnableSpeedLimitControl",
       tr("Enable Speed Limit Control"),
       tr("Enables setting maximum speed by speed limit detection<br>"),
-      "../assets/img_chffr_wheel.png",
+      "../assets/speed_limit.png",
+    },
+    {
+      "EnableSpeedLimitPredicative",
+      tr("Enable Predicative Speed Limit"),
+      tr("Enables setting predicative speed limit<br>"),
+      "../assets/speed_limit.png",
     },
     {
       "EnableSmoothSteer",
