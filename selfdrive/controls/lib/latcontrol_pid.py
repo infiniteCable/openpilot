@@ -45,4 +45,4 @@ class LatControlPID(LatControl):
       pid_log.output = float(output_steer)
       pid_log.saturated = bool(self._check_saturation(self.steer_max - abs(output_steer) < 1e-3, CS, steer_limited_by_controls, curvature_limited))
 
-    return output_steer, angle_steers_des, pid_log
+    return output_steer, angle_steers_des, desired_curvature, pid_log
