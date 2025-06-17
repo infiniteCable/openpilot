@@ -9,8 +9,8 @@ CURVATURE_SATURATION_THRESHOLD = 1e-3 # rad/m
 
 
 class LatControlCurvature(LatControl):
-  def __init__(self, CP, CP_SP, CI):
-    super().__init__(CP, CP_SP, CI)
+  def __init__(self, CP, CI):
+    super().__init__(CP, CI)
     self.pid = PIDController((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV),
                              (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),
                              k_f=CP.lateralTuning.pid.kf, pos_limit=self.curvature_max, neg_limit=-self.curvature_max)
