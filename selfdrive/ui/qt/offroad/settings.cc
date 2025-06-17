@@ -41,6 +41,13 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       false,
     },
     {
+      "EnableCurvatureController",
+      tr("Enable Curvature Controller"),
+      tr("Enables curvature post-processing<br>"),
+      "../assets/icons/chffr_wheel.png",
+      false,
+    },
+    {
       "EnableSpeedLimitControl",
       tr("Enable Speed Limit Control"),
       tr("Enables setting maximum speed by speed limit detection<br>"),
