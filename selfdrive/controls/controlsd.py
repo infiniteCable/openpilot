@@ -172,7 +172,7 @@ class Controls:
     # Orientation and angle rates can be useful for carcontroller
     # Only calibrated (car) frame is relevant for the carcontroller
     CC.currentCurvature = self.curvature
-    CC.currentCurvatureNoRoll = self.curvaturenoroll
+    #CC.currentCurvatureNoRoll = self.curvaturenoroll
     CC.rollDEPRECATED = self.roll # for lateral iso limit calculation
 
     if self.calibrated_pose is not None:
