@@ -146,10 +146,10 @@ class Controls:
     if self.enable_smooth_steer:
       new_desired_curvature = self.smooth_steer.update(new_desired_curvature)
     self.desired_curvature, curvature_limited = clip_curvature(CS.vEgo, self.desired_curvature, new_desired_curvature, lp.roll)
-    
+
     steer, steeringAngleDeg, curvature, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
                                                                   self.steer_limited_by_controls, self.desired_curvature,
-                                                                  self.calibrated_pose, curvature_limited)  # TODO what if not available
+                                                                  curvature_limited)  # TODO what if not available
     actuators.curvature = float(curvature) if self.enable_curvature_controller else self.desired_curvature
     actuators.torque = float(steer)
     actuators.steeringAngleDeg = float(steeringAngleDeg)
@@ -185,8 +185,7 @@ class Controls:
     CC.cruiseControl.speedLimitPredicative = self.enable_speed_limit_predicative
     
     speeds = self.sm['longitudinalPlan'].speeds
-    if len(speeds):
-      CC.cruiseControl.resume = CC.enabled and CS.cruiseState.standstill and speeds[-1] > 0.1
+    CC.cruiseControl.resume = CC.enabled and CS.cruiseState.standstill and not self.sm['longitudinalPlan'].shouldStop
 
     hudControl = CC.hudControl
     hudControl.setSpeed = float(CS.vCruiseCluster * CV.KPH_TO_MS)
