@@ -19,6 +19,7 @@ from openpilot.selfdrive.controls.lib.latcontrol_torque import LatControlTorque
 from openpilot.selfdrive.controls.lib.longcontrol import LongControl
 from openpilot.selfdrive.modeld.modeld import LAT_SMOOTH_SECONDS
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
+from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import get_T_FOLLOW
 
 State = log.SelfdriveState.OpenpilotState
 LaneChangeState = log.LaneChangeState
@@ -77,6 +78,7 @@ class Controls:
 
     steer_angle_without_offset = math.radians(CS.steeringAngleDeg - lp.angleOffsetDeg)
     self.curvature = -self.VM.calc_curvature(steer_angle_without_offset, CS.vEgo, lp.roll)
+    self.roll_compensation = -self.VM.roll_compensation(lp.roll, CS.vEgo)
 
     # Update Torque Params
     if self.CP.lateralTuning.which() == 'torque':
@@ -144,6 +146,7 @@ class Controls:
     # Orientation and angle rates can be useful for carcontroller
     # Only calibrated (car) frame is relevant for the carcontroller
     CC.currentCurvature = self.curvature
+    CC.rollCompensation = self.roll_compensation
     if self.calibrated_pose is not None:
       CC.orientationNED = self.calibrated_pose.orientation.xyz.tolist()
       CC.angularVelocity = self.calibrated_pose.angular_velocity.xyz.tolist()
@@ -157,7 +160,9 @@ class Controls:
     hudControl.speedVisible = CC.enabled
     hudControl.lanesVisible = CC.enabled
     hudControl.leadVisible = self.sm['longitudinalPlan'].hasLead
+    hudControl.leadDistance = self.sm['longitudinalPlan'].leadDistance
     hudControl.leadDistanceBars = self.sm['selfdriveState'].personality.raw + 1
+    hudControl.leadFollowTime = get_T_FOLLOW(hudControl.leadDistanceBars - 1)
     hudControl.visualAlert = self.sm['selfdriveState'].alertHudVisual
 
     hudControl.rightLaneVisible = True
