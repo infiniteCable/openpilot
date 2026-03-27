@@ -147,6 +147,8 @@ class Controls:
     # Only calibrated (car) frame is relevant for the carcontroller
     CC.currentCurvature = self.curvature
     CC.rollCompensation = self.roll_compensation
+    CC.steerLimited     = self.steer_limited_by_safety
+    
     if self.calibrated_pose is not None:
       CC.orientationNED = self.calibrated_pose.orientation.xyz.tolist()
       CC.angularVelocity = self.calibrated_pose.angular_velocity.xyz.tolist()
